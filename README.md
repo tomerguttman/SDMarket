@@ -1,2 +1,2 @@
-# SDMarket
+# SDMarket 🏪🛒
 Java based super market system
