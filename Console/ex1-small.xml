@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<super-duper-market-descriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="E:\aviad\courses\JAVAAN~1\exercises\2020-C~1\SAMPLE~1\ex1\SDM-V1.xsd">
+	<SDM-items>
+		<SDM-item id="1">
+			<name>Ketshop</name>
+			<purchase-category>Quantity</purchase-category>
+		</SDM-item>
+		<SDM-item id="2">
+			<name>Banana</name>
+			<purchase-category>Weight</purchase-category>
+		</SDM-item>
+		<SDM-item id="3">
+			<name>Water</name>
+			<purchase-category>Quantity</purchase-category>
+		</SDM-item>
+		<SDM-item id="4">
+			<name>Pasta</name>
+			<purchase-category>Quantity</purchase-category>
+		</SDM-item>
+		<SDM-item id="5">
+			<name>Tomato</name>
+			<purchase-category>Weight</purchase-category>
+		</SDM-item>
+	</SDM-items>
+	<SDM-stores>
+		<SDM-store id="1">
+			<name>super baba</name>
+			<delivery-ppk>30</delivery-ppk>
+			<location x="3" y="4"/>
+			<SDM-prices>
+				<SDM-sell item-id="1" price="20"/>
+				<SDM-sell item-id="2" price="10"/>
+				<SDM-sell item-id="5" price="50"/>
+			</SDM-prices>
+		</SDM-store>
+		<SDM-store id="2">
+			<name>Givataim Shivataim</name>
+			<delivery-ppk>20</delivery-ppk>
+			<location x="1" y="5"/>
+			<SDM-prices>
+				<SDM-sell item-id="2" price="20"/>
+				<SDM-sell item-id="3" price="10"/>
+				<SDM-sell item-id="4" price="50"/>
+			</SDM-prices>
+		</SDM-store>
+	</SDM-stores>
+</super-duper-market-descriptor>
