@@ -223,4 +223,17 @@ public class SuperMarketLogic {
 
         return locationIsValidFlag;
     }
+
+    public void updateStoreAndSystemItemAmountInformationAccordingToNewOrder(List<StoreItem> orderItems, Store storeToOrderFrom) {
+        orderItems.forEach(itemInOrder -> {
+            int currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
+            storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
+            currentItemAmount = this.SDMImproved.getSystemItems().get(itemInOrder.getId()).getTotalItemsSold();
+            this.SDMImproved.getSystemItems().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
+        });
+    }
+
+    public int getLastOrderID(){
+        return this.SDMImproved.getOrderID();
+    }
 }

@@ -4,6 +4,8 @@ import jaxb.generatedClasses.SDMItem;
 import jaxb.generatedClasses.SDMSell;
 import jaxb.generatedClasses.SDMStore;
 import jaxb.generatedClasses.SuperDuperMarketDescriptor;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,27 +13,51 @@ import java.util.stream.Collectors;
 public class SuperDuperMarket {
     private final Map<Integer, Store> systemStores;
     private final Map<Integer, StoreItem> systemItems;
-    private int orderID = 0;
+    private int orderID = 1;
 
     public SuperDuperMarket(SuperDuperMarketDescriptor inputSDM){
         systemStores = inputSDM.getSDMStores().getSDMStore().stream().collect(Collectors.toMap(SDMStore::getId, Store::new));
         systemItems = inputSDM.getSDMItems().getSDMItem().stream().collect(Collectors.toMap(SDMItem::getId, StoreItem::new));
         initializeStoresItems(inputSDM);
+        initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+
+    }
+
+    private void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
+        Collection<Store> storesInSystem = systemStores.values();
+        double sum;
+        int amountOfStoresSellingAnItem;
+
+        for (StoreItem systemItem : systemItems.values() ) {
+            amountOfStoresSellingAnItem = 0;
+            sum = 0;
+
+            for (Store store: systemStores.values()) {
+                if(store.getItemsBeingSold().containsKey(systemItem.getId())) {
+                    amountOfStoresSellingAnItem += 1;
+                    sum += store.getItemsBeingSold().get(systemItem.getId()).getPricePerUnit();
+                }
+
+            }
+
+            systemItem.setAveragePriceOfTheItem(sum / (double)amountOfStoresSellingAnItem);
+            systemItem.setAmountOfStoresSellingThisItem(amountOfStoresSellingAnItem);
+        }
     }
 
     private void initializeStoresItems(SuperDuperMarketDescriptor inputSDM) {
         Map<Integer, SDMItem> SDMItemsMap = inputSDM.getSDMItems().getSDMItem().stream().collect(Collectors.toMap(SDMItem::getId, item -> item));
-        Map<Integer, StoreItem> betterStoreItemsForSale;
+        Map<Integer, StoreItem> storeItemsForSaleImproved;
 
         for (SDMStore currentStore : inputSDM.getSDMStores().getSDMStore()) {
-            betterStoreItemsForSale = new HashMap<>();
-            Store betterStore = systemStores.get(currentStore.getId());
+            storeItemsForSaleImproved = new HashMap<>();
+            Store improvedStore = systemStores.get(currentStore.getId());
 
             for (SDMSell currentItem : currentStore.getSDMPrices().getSDMSell()) {
-                betterStoreItemsForSale.put(currentItem.getItemId(),new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem));
+                storeItemsForSaleImproved.put(currentItem.getItemId(),new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem));
             }
 
-            betterStore.setItemBeingSold(betterStoreItemsForSale);
+            improvedStore.setItemBeingSold(storeItemsForSaleImproved);
         }
     }
 
@@ -46,8 +72,10 @@ public class SuperDuperMarket {
     public void setOrderID(int orderID) {
         this.orderID = orderID;
     }
-
+    /*
+        NEED TO BE CHECKED ! ! ! !
+     */
     public int getOrderID() {
-        return orderID;
+        return orderID++;
     }
 }

@@ -1,5 +1,8 @@
 package SDMImprovedFacade;
 
+import jaxb.generatedClasses.Location;
+
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,9 +16,11 @@ public class Order {
     final double totalOrderCost;
     final String dateOrderWasMade;
     final String storeName;
+    final Location orderDestination;
+
     final List<StoreItem> itemsInOrder;
 
-    public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost, String storeName, List<StoreItem> itemsInOrder) {
+    public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost, String storeName, List<StoreItem> itemsInOrder, Location userLocation) {
         this.dateOrderWasMade = dateOrderWasMade;
         this.orderId = orderId;
         this.storeId = storeId;
@@ -24,6 +29,7 @@ public class Order {
         this.itemsInOrder = itemsInOrder;
         costOfItemsInOrder = calculateTotalCostOfItemsInOrder();
         totalOrderCost = deliveryCost + costOfItemsInOrder;
+        this.orderDestination = userLocation;
     }
 
     public int getNumberOfItemsInOrder(){
@@ -34,9 +40,7 @@ public class Order {
     }
 
     private double calculateTotalCostOfItemsInOrder(){
-        return itemsInOrder.stream().
-                mapToDouble(StoreItem::getPricePerUnit).
-                sum();
+        return itemsInOrder.stream().mapToDouble(itemInOrder -> itemInOrder.getTotalItemsSold() * itemInOrder.getPricePerUnit()).sum();
     }
 
     public int getOrderId() {
@@ -47,8 +51,18 @@ public class Order {
         return storeId;
     }
 
+    public double getCostOfItemsInOrder() {
+        return costOfItemsInOrder;
+    }
+
+    public double getTotalOrderCost() { return totalOrderCost; }
+    
     public double getDeliveryCost() {
         return deliveryCost;
+    }
+
+    public Location getOrderDestination() {
+        return orderDestination;
     }
 
     public String getDateOrderWasMade() {
@@ -74,6 +88,17 @@ public class Order {
                     }
                 }).
                 sum();
+    }
+
+    public String getStringWholeOrder(){
+        StringBuilder stbOrder = new StringBuilder();
+        this.itemsInOrder.forEach(item -> {
+            stbOrder.append(item.getStringItemForPurchase());
+            stbOrder.append("\t\tAmount Bought: ").append(item.getTotalItemsSold()).append("\n");
+            stbOrder.append("\t\tTotal Price: ").append(item.getTotalItemsSold() * item.getPricePerUnit()).append("\n");
+        });
+
+        return stbOrder.toString();
     }
 
     @Override

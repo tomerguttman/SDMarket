@@ -3,6 +3,7 @@ package SDMImprovedFacade;
 import jaxb.generatedClasses.Location;
 import jaxb.generatedClasses.SDMStore;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,10 @@ public class Store {
 
     public List<Order> getStoreOrdersHistory() {
         return storeOrdersHistory;
+    }
+
+    public Order getLastOrder(){
+        return this.storeOrdersHistory.get(this.storeOrdersHistory.size() - 1);
     }
 
     public void setItemBeingSold(Map<Integer, StoreItem> itemBeingSold) {
@@ -67,11 +72,13 @@ public class Store {
         this.storeLocation = storeLocation;
     }
 
-    public void generateOrder(String orderDate, int orderId, List<StoreItem> itemsInOrder, Location userCoordinates){
-        storeOrdersHistory.add(new Order(orderDate, orderId, this.Id, calculateDistance(userCoordinates) * deliveryPpk, this.name, itemsInOrder));
+    public void generateOrder(String orderDate, int orderId, List<StoreItem> itemsInOrder, Location userCoordinates, Location userLocation){
+        Order order = new Order(orderDate, orderId, this.Id, calculateDistance(userCoordinates) * deliveryPpk, this.name, itemsInOrder, userLocation);
+        storeOrdersHistory.add(order);
+        this.totalOrdersRevenue += order.getTotalOrderCost();
     }
 
-    private double calculateDistance(Location userCoordinates) {
+    public double calculateDistance(Location userCoordinates) {
         int x1 = userCoordinates.getX(), x2 = storeLocation.getX(), y1 = userCoordinates.getY(), y2 = storeLocation.getY();
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
