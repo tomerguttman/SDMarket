@@ -1,14 +1,9 @@
 package UI;
 
 import Engine.SuperMarketLogic;
-import SDMImprovedFacade.Order;
 import SDMImprovedFacade.Store;
 import SDMImprovedFacade.StoreItem;
-import com.sun.deploy.util.StringUtils;
-import com.sun.xml.internal.ws.util.StreamUtils;
 import jaxb.generatedClasses.Location;
-import org.omg.PortableInterceptor.USER_EXCEPTION;
-
 import javax.xml.bind.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,7 +43,15 @@ public class ConsoleUI {
     }
 
     private void run() {
-        //D:\Java - SDM\SDM_ConsoleApp\src\ex1-small.xml
+        //IN THE README MENTION THAT 2 STORES ON THE SAME LOCATION IS NOT VALID! ! ! ! ! !
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-small.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.7.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.6.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.5.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.4.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.3.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.2.xml [V]
+        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-big.xml [V]
         SDMLogic = new SuperMarketLogic();
         Scanner scn = new Scanner(System.in);
         String userMenuChoice;
@@ -129,13 +132,35 @@ public class ConsoleUI {
         userLocationInput = getLocationFromUserAndValidate(sc);
         displayAllSystemItemsForPurchaseByStore(storeToOrderFrom);
         orderItems = getAllItemsOfOrder(sc, storeToOrderFrom);
-        displayLastOrder(storeToOrderFrom);
 
-        if(isOrderApproved(sc)){
-            this.SDMLogic.updateStoreAndSystemItemAmountInformationAccordingToNewOrder(orderItems, storeToOrderFrom);
-            storeToOrderFrom.generateOrder(userDateInput, SDMLogic.getLastOrderID(), orderItems, userLocationInput, userLocationInput);
+        if(orderItems.size() > 0){
+            displayLastOrder(orderItems, storeToOrderFrom, userLocationInput);
+
+            if(isOrderApproved(sc)){
+                this.SDMLogic.updateStoreAndSystemItemAmountInformationAccordingToNewOrder(orderItems, storeToOrderFrom);
+                storeToOrderFrom.generateOrder(userDateInput, SDMLogic.getLastOrderID(), orderItems, userLocationInput, userLocationInput);
+            }
+            else { System.out.println("\nThe order was cancelled!\n"); }
         }
-        else { System.out.println("\nThe order was cancelled\n"); }
+        else { System.out.println("\nThe order was cancelled!\n"); }
+    }
+
+    private void displayLastOrder(List<StoreItem> orderItems, Store storeToOrderFrom, Location userLocationInput) {
+        StringBuilder orderStringBuilder = new StringBuilder();
+        double distanceFromUser = storeToOrderFrom.calculateDistance(userLocationInput);
+        int ppk = storeToOrderFrom.getDeliveryPpk();
+
+        orderItems.forEach(itemOrdered -> {
+            orderStringBuilder.append(itemOrdered.getStringItemForPurchase());
+            orderStringBuilder.append("\t\tAmount Bought: ").append(itemOrdered.getTotalItemsSold()).append("\n");
+            orderStringBuilder.append("\t\tTotal Price: ").append(itemOrdered.getTotalItemsSold() * itemOrdered.getPricePerUnit()).append("\n");
+        });
+
+        orderStringBuilder.append("Distance From Destination: ").append(String.format("%.2f", distanceFromUser)).append("\n");
+        orderStringBuilder.append("PPK: ").append(ppk).append("\n");
+        orderStringBuilder.append("Total Cost Of Delivery: ").append(String.format("%.2f", distanceFromUser * ppk)).append("\n");
+
+        System.out.println(orderStringBuilder.toString());
     }
 
     private boolean isOrderApproved(Scanner sc) {
@@ -151,20 +176,6 @@ public class ConsoleUI {
         }
 
         return acceptOrder;
-    }
-
-    private void displayLastOrder(Store storeToOrderFrom) {
-        StringBuilder orderStringBuilder = new StringBuilder();
-        Order lastOrder = storeToOrderFrom.getLastOrder();
-        double distanceFromUser = storeToOrderFrom.calculateDistance(lastOrder.getOrderDestination());
-        int ppk = storeToOrderFrom.getDeliveryPpk();
-
-        orderStringBuilder.append(lastOrder.getStringWholeOrder());
-        orderStringBuilder.append("Distance From Destination: ").append(String.format("%.2f", distanceFromUser)).append("\n");
-        orderStringBuilder.append("PPK: ").append(ppk).append("\n");
-        orderStringBuilder.append("Total Cost Of Delivery: ").append(lastOrder.getDeliveryCost()).append("\n");
-
-        System.out.println(orderStringBuilder.toString());
     }
 
     private List<StoreItem> getAllItemsOfOrder(Scanner sc, Store storeToOrderFrom) {
@@ -189,28 +200,44 @@ public class ConsoleUI {
     private StoreItem handleAmountForOneItem(Scanner sc, int userInput, Store storeToOrderFrom) {
         StoreItem sItem = storeToOrderFrom.getItemsBeingSold().get(userInput);
         StoreItem item = new StoreItem(sItem);
-        item.setTotalItemsSold(getAmountOfItems(sc, item.getName()));
+        item.setTotalItemsSold(getAmountOfItems(sc, item));
         return item;
     }
 
-    //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    // NEED TO CHANGE STRING TO ITEM AND THE CHECK WHICH PURCHASE CATEGORY IS IT AND HANDLE IT ....
-
-    private int getAmountOfItems(Scanner sc, String name) {
-        int intUserInput = 0;
+    private double getAmountOfItems(Scanner sc, StoreItem itemToBuy) {
+        double doubleUserInput = 0;
         boolean isInputValid = false;
         String userInput;
 
         while(!isInputValid){
-            System.out.format("How many %s would you like to order?\n", name);
+            System.out.format("How many %s would you like to order?\n", itemToBuy.getName());
             userInput = sc.nextLine();
-            if (isNumber(userInput)){
-                intUserInput = Integer.parseInt(userInput);
-                if ( intUserInput >= 1) { isInputValid = true; }
+
+            if(itemToBuy.getPurchaseCategory().equals("Quantity")) {
+                if (isNumber(userInput)){
+                    doubleUserInput = Integer.parseInt(userInput);
+                    if ( doubleUserInput >= 1) { isInputValid = true; }
+                }
+                else { System.out.println("<The input you entered is not an integer>"); }
+            }
+            else {
+                if (isDouble(userInput)){
+                    doubleUserInput = Double.parseDouble(userInput);
+                    if ( doubleUserInput > 0) { isInputValid = true; }
+                }
+                else { System.out.println("<The input you entered is not a number>"); }
             }
         }
 
-        return intUserInput;
+        return doubleUserInput;
+    }
+
+    private boolean isDouble(String userInput) {
+        try {
+            Double.parseDouble(userInput);
+            return true;
+        }
+        catch(NumberFormatException e) { return false;}
     }
 
     private boolean validateOrderInput(Map<Integer, StoreItem> itemsBeingSold, String userInput) throws Exception {
@@ -239,6 +266,7 @@ public class ConsoleUI {
     }
 
     private void displayAllSystemItemsForPurchaseByStore(Store storeToOrderFrom) {
+        System.out.println("-----\tItems Available\t-----\n");
         this.SDMLogic.getItems().values().forEach(itemInSystem -> {
             if (storeToOrderFrom.getItemsBeingSold().containsKey(itemInSystem.getId())) {
                 System.out.println(storeToOrderFrom.getItemsBeingSold().get(itemInSystem.getId()).getStringItemForPurchase());
@@ -254,11 +282,23 @@ public class ConsoleUI {
                 String userStoreIDInput;
                 System.out.println("Please enter the ID of the store you want to order from");
                 userStoreIDInput = sc.nextLine();
-                return this.SDMLogic.getStores().getOrDefault(Integer.parseInt(userStoreIDInput), null);
+                if(isValidStoreChoice(userStoreIDInput))
+                {
+                    return this.SDMLogic.getStores().get(Integer.parseInt(userStoreIDInput));
+                }
+                else {
+                    System.out.println("<The input you entered wasn't an existing store's ID>");
+                }
             } catch (NumberFormatException e) {
-                System.out.println("<The input you entered wasn't a number representing a store ID>");
+                System.out.println("<The input you entered wasn't a number>");
             }
         }
+    }
+
+    private boolean isValidStoreChoice(String userStoreIDInput) {
+        int storeID;
+        storeID = Integer.parseInt(userStoreIDInput);
+        return this.SDMLogic.getStores().containsKey(storeID);
     }
 
     private Location getLocationFromUserAndValidate(Scanner sc) {
@@ -354,11 +394,7 @@ public class ConsoleUI {
     private void displaySystemItemsInformation(){
         System.out.println("-----   System Items    -----\n");
         Map<Integer, StoreItem> systemStores = SDMLogic.getItems();
-        systemStores.forEach((id, item) -> System.out.println(item.toString()));
-    }
-
-    private void allowXMLReloadAtAllTime(Scanner scn, StringBuilder stb) throws JAXBException {
-        handleLoadDataFromXMLAction(scn, stb);
+        systemStores.forEach((id, item) -> System.out.println(item.getStringItemForAllSystemItemsDisplay()));
     }
 
     private class IllegalInputException extends Exception{

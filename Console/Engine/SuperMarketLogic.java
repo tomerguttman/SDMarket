@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SuperMarketLogic {
     private SuperDuperMarket SDMImproved;
@@ -25,6 +26,7 @@ public class SuperMarketLogic {
                 File file = new File(filePath);
                 if (file.exists()) {
                     SDMImproved = loadXML(file, outputMessage);
+                    if(SDMImproved == null) { successFlag = false; }
                 } else {
                     updateOutputMessage(outputMessage,"<The file does not exist in the path that was given>");
                     successFlag = false;
@@ -99,7 +101,7 @@ public class SuperMarketLogic {
     }
 
     private boolean isItemsIdUnique(SDMItems itemsToValidate) {
-        HashSet<Integer> hashSet = new HashSet<Integer>();
+        HashSet<Integer> hashSet = new HashSet<>();
 
         for ( SDMItem item:  itemsToValidate.getSDMItem()) {
             if(!hashSet.contains(item.getId()))
@@ -155,7 +157,7 @@ public class SuperMarketLogic {
 
     private boolean isStoreItemsExistInSystem(SDMStores storesToValidate , SDMItems systemItemsAvailable) {
 
-        Set<Integer> setOfItemsInSystem = new HashSet<>();
+        Set<Integer> setOfItemsInSystem;
         setOfItemsInSystem = listToSet(systemItemsAvailable.getSDMItem());
 
         for (SDMStore store : storesToValidate.getSDMStore()) {
@@ -191,7 +193,7 @@ public class SuperMarketLogic {
     }
 
     private boolean isStoreIdUnique(SDMStores storesToValidate) {
-        HashSet<Integer> hashSet = new HashSet<Integer>();
+        HashSet<Integer> hashSet = new HashSet<>();
 
         for ( SDMStore store: storesToValidate.getSDMStore() ) {
             if(!hashSet.contains(store.getId()))
@@ -213,20 +215,25 @@ public class SuperMarketLogic {
     }
 
     public boolean checkUserLocationAgainstAllStoresLocations(int x, int y) {
-        boolean locationIsValidFlag;
-        Map<Integer, Store> systemStores;
+        AtomicBoolean locationIsValidFlag = new AtomicBoolean(true);
         Location userLocation = new Location();
         userLocation.setX(x);
         userLocation.setY(y);
         //iterate over the values and stop when one of the stores location equals to the user order location - return false because one of them matches.
-        locationIsValidFlag = this.SDMImproved.getSystemStores().values().stream().noneMatch(store -> store.getStoreLocation().equals(userLocation));
+        for (Store store : this.SDMImproved.getSystemStores().values()){
+            if(store.getStoreLocation().getY() == y && store.getStoreLocation().getX() == x)
+            {
+                locationIsValidFlag.set(false);
+                break;
+            }
+        }
 
-        return locationIsValidFlag;
+        return locationIsValidFlag.get();
     }
 
     public void updateStoreAndSystemItemAmountInformationAccordingToNewOrder(List<StoreItem> orderItems, Store storeToOrderFrom) {
         orderItems.forEach(itemInOrder -> {
-            int currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
+            double currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
             storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
             currentItemAmount = this.SDMImproved.getSystemItems().get(itemInOrder.getId()).getTotalItemsSold();
             this.SDMImproved.getSystemItems().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());

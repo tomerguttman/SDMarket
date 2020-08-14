@@ -3,7 +3,6 @@ package SDMImprovedFacade;
 import jaxb.generatedClasses.Location;
 import jaxb.generatedClasses.SDMStore;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,10 +83,8 @@ public class Store {
     }
 
     public String displayStoreForPurchase() {
-        StringBuilder storeInformation = new StringBuilder();
-        storeInformation.append("- ID: ").append(this.Id).append(", Name: ").
-                append(this.name).append(", PPK: ").append(this.deliveryPpk).append("\n");
-        return storeInformation.toString();
+        return "- ID: " + this.Id + ", Name: " +
+                this.name + ", PPK: " + this.deliveryPpk + "\n";
     }
 
     @Override
@@ -96,7 +93,7 @@ public class Store {
         storeInformation.append("\n<><><><><>   Store - ").append(Id).append("  <><><><><>\n");
         storeInformation.append("Store ID: ").append(Id).append("\n").append("Store Name: ").append(name).append("\n");
         storeInformation.append("Store PPK: ").append(deliveryPpk).append("\n");
-        storeInformation.append("Total Orders Revenue: ").append(totalOrdersRevenue).append("\n\n");
+        storeInformation.append("Total Orders Revenue: ").append(String.format("%.2f", totalOrdersRevenue)).append("\n\n");
         storeInformation.append("Store Item List: ").append(itemsBeingSold.size()).append(" items\n");
         storeInformation.append("\n-----  Store Items  -----\n\n");
         itemsBeingSold.values().forEach(item -> storeInformation.append(item.toString()));

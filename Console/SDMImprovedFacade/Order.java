@@ -1,12 +1,9 @@
 package SDMImprovedFacade;
 
 import jaxb.generatedClasses.Location;
-
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Order {
     final int orderId;
@@ -84,7 +81,7 @@ public class Order {
                         return 1;
                     }
                     else {
-                        return item.getTotalItemsSold();
+                        return (int)item.getTotalItemsSold();//What returns here is a Quantity item.
                     }
                 }).
                 sum();
@@ -108,8 +105,8 @@ public class Order {
                 "\t\tStore ID: " + storeId + "(" + storeName + ")\n" +
                 "\t\tAmount Of Item Types: " + getNumberOfItemsInOrder() + "\n" +
                 "\t\tTotal Number Of Items In Order: " + getTotalNumberOfItemsInOrder() + "\n" +
-                "\t\tTotal Cost Of Items In Order: " + totalOrderCost + "\n" +
-                "\t\tDelivery Cost: " + deliveryCost + "\n" +
-                "\t\tTotal Cost Of Order: " + totalOrderCost + "\n";
+                "\t\tTotal Cost Of Items In Order: " + String.format("%.2f", costOfItemsInOrder) + "\n" +
+                "\t\tDelivery Cost: " + String.format("%.2f", deliveryCost) + "\n" +
+                "\t\tTotal Cost Of Order: " + String.format("%.2f",totalOrderCost) + "\n";
     }
 }

@@ -5,12 +5,9 @@ import jaxb.generatedClasses.SDMSell;
 
 public class StoreItem {
     private final int Id;
-    private int totalItemsSold = 0;
-
-
+    private double totalItemsSold = 0;
     private int amountOfStoresSellingThisItem = 0;
     private double averagePriceOfTheItem;
-
     private double pricePerUnit = 0;
     private final String name;
     private final String purchaseCategory;
@@ -35,7 +32,7 @@ public class StoreItem {
         this.purchaseCategory = sItem.purchaseCategory;
     }
 
-    public void setTotalItemsSold(int totalItemsSold) {
+    public void setTotalItemsSold(double totalItemsSold) {
         this.totalItemsSold = totalItemsSold;
     }
 
@@ -47,7 +44,7 @@ public class StoreItem {
         return Id;
     }
 
-    public int getTotalItemsSold() {
+    public double getTotalItemsSold() {
         return totalItemsSold;
     }
 
@@ -91,6 +88,15 @@ public class StoreItem {
                 "\t\tItem Name: " + name + "\n" +
                 "\t\tPurchase Category: " + purchaseCategory +"\n" +
                 "\t\t-THIS ITEM IS NOT BEING SOLD BY THE STORE YOU CHOSE-\n";
+    }
+
+    public String getStringItemForAllSystemItemsDisplay(){
+        return  "\tItem ID: " + Id + "\n" +
+                "\t\tItem Name: " + name + "\n" +
+                "\t\tPurchase Category: " + purchaseCategory +"\n" +
+                "\t\tAmount Of Stores Selling The Item: " + amountOfStoresSellingThisItem + "\n" +
+                "\t\tAverage Price In System: " + averagePriceOfTheItem + "\n" +
+                "\t\tAmount Of Units Sold: " + totalItemsSold + "\n";
     }
     @Override
     public String toString() {
