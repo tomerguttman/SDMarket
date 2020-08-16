@@ -23,7 +23,7 @@ public class SuperDuperMarket {
 
     }
 
-    private void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
+    public void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
         Collection<Store> storesInSystem = systemStores.values();
         double sum;
         int amountOfStoresSellingAnItem;

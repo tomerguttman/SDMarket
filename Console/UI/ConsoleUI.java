@@ -26,13 +26,14 @@ public class ConsoleUI {
         System.out.println("3.Print the details of all the items that are currently in the system.");
         System.out.println("4.Perform a purchase.");
         System.out.println("5.Print orders history of the entire system.");
+        System.out.println("6.Update store products.");
         System.out.println("\nPress 'q' at any time to exit the system");
     }
 
     private boolean validateMenuUserInputChoice(String userInput) throws IllegalInputException {
         try {
             int userInputParsed = Integer.parseInt(userInput);
-            return 1 <= userInputParsed && userInputParsed <= 5;
+            return 1 <= userInputParsed && userInputParsed <= 6;
         }
         catch (NumberFormatException e) {
             if(userInput.toLowerCase().equals("q")){
@@ -79,7 +80,7 @@ public class ConsoleUI {
                         else { System.out.println("\n<You can't perform this action without loading a system data file first>\n"); }
                     }
                 }
-                else { System.out.println("\n<Please choose one of the options available between [1 - 5] or 'q' to exit the system>\n"); }
+                else { System.out.println("\n<Please choose one of the options available between [1 - 6] or 'q' to exit the system>\n"); }
             }
             catch (Exception e) { System.out.println(e.getMessage()); }
         }
@@ -109,10 +110,253 @@ public class ConsoleUI {
             case "5":
                 displayAllStoresOrderHistory();
                 break;
+            case "6":
+                updateStoreProducts();
+                break;
             default:
                 printUserMenuChoiceError();
                 break;
         }
+    }
+
+    private void updateStoreProducts() {
+        Scanner scn = new Scanner(System.in);
+        String userInput;
+        userInput = getAndValidateUpdateStoreProductInput(scn);
+        performUpdateStoreProductsOfChoice(userInput, scn);
+    }
+
+    private void performUpdateStoreProductsOfChoice(String userInput, Scanner scn) {
+        switch(userInput){
+            case "1":
+                updateStoreItemPrice(scn);
+                break;
+            case "2":
+                addItemToStore(scn);
+                break;
+            case "3":
+                removeItemFromStore(scn);
+                break;
+            default:
+                printUserMenuChoiceError();
+                break;
+        }
+    }
+
+    private void removeItemFromStore(Scanner scn) {
+        Store storeOfChoice = printAndGetStoreOfChoice(scn);
+        StoreItem itemToRemove = getStoreItemToRemove(scn, storeOfChoice);
+
+        if(itemToRemove != null) {
+            this.SDMLogic.removeItemFromStore(itemToRemove, storeOfChoice);
+            System.out.println("The item was removed successfully!\n");
+        }
+    }
+
+    private StoreItem getStoreItemToRemove(Scanner scn, Store storeOfChoice) {
+        System.out.println(storeOfChoice.getStringStoreItemsShort());
+        String userInput;
+        StoreItem itemToRemove = null;
+        boolean isValidItemToRemove = false;
+
+        while(!isValidItemToRemove) {
+            System.out.println("Please select an item to remove");
+            userInput = scn.nextLine();
+
+            if(isNumber(userInput)) {
+                int userInputInteger = Integer.parseInt(userInput);
+
+                if(storeOfChoice.getItemsBeingSold().containsKey(userInputInteger)) {
+                    itemToRemove = this.SDMLogic.getItems().get(userInputInteger);
+                    isValidItemToRemove = true;
+                }
+                else {
+                    System.out.println("<The item you chose is not sold by the store>\n");
+                }
+            }
+            else {
+                System.out.println("<The input is not an integer>\n");
+            }
+        }
+
+
+        /*
+            NEED TO SEE WHAT'S AVIAD'S APPROACH ABOUT THIS ! ! ! ! ! !
+         */
+        if(!(storeOfChoice.getItemsBeingSold().size() > 1)) {
+            System.out.println("<This is the only item this store is selling, therefore it cannot be removed>\n");
+
+        }
+        else {
+            if (this.SDMLogic.getItems().get(itemToRemove.getId()).getAmountOfStoresSellingThisItem() > 1) {
+                return itemToRemove;
+            }
+            else {
+                System.out.println("<This store is the only one selling this item, therefore it cannot be removed>\n");
+            }
+        }
+
+        return null;
+    }
+
+    private void addItemToStore(Scanner scn) {
+        Store storeOfChoice = printAndGetStoreOfChoice(scn);
+        StoreItem itemToAdd = getSystemItemToAdd(scn, storeOfChoice);
+        this.SDMLogic.addItemToStore(itemToAdd, storeOfChoice);
+        /*
+            this.SDMLogic.addItemToStore(itemToAdd, storeOfChoice);
+            updates inside the - amount of stores selling the item
+                               - average price of item in the system
+         */
+        System.out.println("The item was added successfully!\n");
+    }
+
+    private StoreItem getSystemItemToAdd(Scanner scn, Store storeOfChoice) {
+        return getAndValidateSystemItemToAdd(scn, storeOfChoice);
+    }
+
+    private StoreItem getAndValidateSystemItemToAdd(Scanner scn, Store storeOfChoice) {
+        displaySystemItemsInformation();
+        String userInput;
+        StoreItem itemToAdd = null;
+        boolean isValidItemToAdd = false;
+
+        while(!isValidItemToAdd) {
+            System.out.println("Please select an item to add");
+            userInput = scn.nextLine();
+
+            if(isNumber(userInput)) {
+                int userInputInteger = Integer.parseInt(userInput);
+
+                if(this.SDMLogic.getItems().containsKey(userInputInteger)){
+                    if(!storeOfChoice.getItemsBeingSold().containsKey(userInputInteger)) {
+                        isValidItemToAdd = true;
+                        itemToAdd = this.SDMLogic.getItems().get(userInputInteger);
+                    }
+                    else {
+                        System.out.println("<The item you chose already exists in this store>\n");
+                    }
+                }
+                else {
+                    System.out.println("<The ID you chose does not belong to an existing item>\n");
+                }
+            }
+            else {
+                System.out.println("<The input is not an integer>\n");
+            }
+        }
+
+        return itemToAdd;
+    }
+
+    private void updateStoreItemPrice(Scanner scn) {
+        Store storeOfChoice = printAndGetStoreOfChoice(scn);
+        StoreItem itemToUpdate = getItemToUpdate(scn, storeOfChoice);
+        updateItemPrice(scn, itemToUpdate, storeOfChoice.getId());
+        this.SDMLogic.updateAllStoresItemsAveragePricesAndAmountOfStoresSellingAnItem();
+        System.out.println("The price was updated successfully!\n");
+    }
+
+    private void updateItemPrice(Scanner scn, StoreItem itemToUpdate, int storeOfChoiceId) {
+        double newPrice = getAndValidatePrice(scn);
+        this.SDMLogic.updatePriceOfAnItem(storeOfChoiceId, itemToUpdate.getId(), newPrice);
+    }
+
+    private double getAndValidatePrice(Scanner scn) {
+        boolean isValidPrice = false;
+        double priceOfChoice = 0;
+        String userInput;
+
+        while(!isValidPrice)
+        {
+            System.out.println("Please enter the new price of the item");
+            userInput = scn.nextLine();
+
+            if(isDouble(userInput)) {
+                isValidPrice = true;
+                priceOfChoice = Double.parseDouble(userInput);
+            }
+            else {
+                System.out.println("<The input you entered is not a number>");
+            }
+        }
+
+        return priceOfChoice;
+    }
+
+    private StoreItem getItemToUpdate(Scanner scn, Store storeOfChoice) {
+        return getAndValidateItemById(scn, storeOfChoice);
+
+    }
+
+    private StoreItem getAndValidateItemById(Scanner scn, Store storeOfChoice) {
+        boolean isValidItemId = false;
+        StoreItem chosenItem = null;
+        String userInput;
+        printStoreItemsForUpdate(storeOfChoice);
+
+        while(!isValidItemId) {
+            System.out.println("Please choose an item by it's id");
+            userInput = scn.nextLine().trim();
+
+            if(isNumber(userInput)) {
+                if(storeOfChoice.getItemsBeingSold().containsKey(Integer.parseInt(userInput))) {
+                    chosenItem = storeOfChoice.getItemsBeingSold().get(Integer.parseInt(userInput));
+                    isValidItemId = true;
+                }
+                else {
+                    System.out.println("<The ID you entered does not exist in the current store>\n");
+                }
+            }
+            else {
+                System.out.println("<The input you entered is not an integer>\n");
+            }
+        }
+        
+        return chosenItem;
+    }
+
+    private void printStoreItemsForUpdate(Store storeOfChoice) {
+        StringBuilder allStoreItems = new StringBuilder();
+        storeOfChoice.getItemsBeingSold().values().forEach( item ->  allStoreItems.append(item.getStringItemForPurchase()));
+        System.out.println(allStoreItems.toString());
+    }
+
+    private Store printAndGetStoreOfChoice(Scanner scn) {
+        StringBuilder allStoresToChooseFrom = new StringBuilder();
+        allStoresToChooseFrom.append("\n-----\tStores to choose from\t-----\n");
+        this.SDMLogic.getStores().values().forEach(store ->  allStoresToChooseFrom.append(store.displayStoreForPurchase()));
+        System.out.println(allStoresToChooseFrom.toString());
+        return getStoreOfChoiceByID(scn);
+    }
+
+    private String getAndValidateUpdateStoreProductInput(Scanner scn) {
+        String userInput = null;
+        int integerUserInput;
+        boolean isValidInput = false;
+        while(!isValidInput) {
+
+            printStoreUpdateMenu();
+            userInput = scn.nextLine().trim();
+            if(isNumber(userInput))
+            {
+                integerUserInput = Integer.parseInt(userInput);
+                if(1 <= integerUserInput && integerUserInput <= 3) { isValidInput = true;}
+                else { System.out.println("<Please enter a number between [1-3]>\n"); }
+            }
+            else {
+                System.out.println("<The input is not a number>\n");
+            }
+        }
+        
+        return userInput;
+    }
+
+    private void printStoreUpdateMenu() {
+        System.out.println("\tPlease choose one of the following options:");
+        System.out.println("\t\t1.Update item price.");
+        System.out.println("\t\t2.Add item to store.");
+        System.out.println("\t\t3.Remove item from store.\n");
     }
 
     private void printUserMenuChoiceError() {
@@ -280,17 +524,17 @@ public class ConsoleUI {
         {
             try {
                 String userStoreIDInput;
-                System.out.println("Please enter the ID of the store you want to order from");
+                System.out.println("Please choose a store using it's ID");
                 userStoreIDInput = sc.nextLine();
                 if(isValidStoreChoice(userStoreIDInput))
                 {
                     return this.SDMLogic.getStores().get(Integer.parseInt(userStoreIDInput));
                 }
                 else {
-                    System.out.println("<The input you entered wasn't an existing store's ID>");
+                    System.out.println("<The input you entered wasn't an existing store's ID>\n");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("<The input you entered wasn't a number>");
+                System.out.println("<The input you entered wasn't a number>\n");
             }
         }
     }

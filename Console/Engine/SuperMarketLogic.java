@@ -243,4 +243,24 @@ public class SuperMarketLogic {
     public int getLastOrderID(){
         return this.SDMImproved.getOrderID();
     }
+
+    public void updatePriceOfAnItem(int storeOfChoiceId, int itemId, double newPrice) {
+        this.getStores().get(storeOfChoiceId).getItemsBeingSold().get(itemId).setPricePerUnit(newPrice);
+    }
+
+    public void updateAllStoresItemsAveragePricesAndAmountOfStoresSellingAnItem() {
+        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+    }
+
+    public void addItemToStore(StoreItem itemToAdd, Store storeOfChoice) {
+        this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().put(itemToAdd.getId(),itemToAdd);
+        this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).
+                getItemsBeingSold().get(itemToAdd.getId()).setPricePerUnit(itemToAdd.getAveragePriceOfTheItem());
+        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+    }
+
+    public void removeItemFromStore(StoreItem itemToRemove, Store storeOfChoice) {
+        this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().remove(itemToRemove.getId());
+        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+    }
 }

@@ -87,6 +87,14 @@ public class Store {
                 this.name + ", PPK: " + this.deliveryPpk + "\n";
     }
 
+    public String getStringStoreItemsShort(){
+        StringBuilder storeItemsStringBuilder = new StringBuilder();
+        storeItemsStringBuilder.append("-----\tStore items available\t-----\n");
+        itemsBeingSold.values().forEach(item -> storeItemsStringBuilder.append(item.getStringItemForPurchase()));
+        return storeItemsStringBuilder.toString();
+
+    }
+
     @Override
     public String toString() {
         StringBuilder storeInformation = new StringBuilder();

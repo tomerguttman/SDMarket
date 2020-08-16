@@ -98,6 +98,7 @@ public class StoreItem {
                 "\t\tAverage Price In System: " + averagePriceOfTheItem + "\n" +
                 "\t\tAmount Of Units Sold: " + totalItemsSold + "\n";
     }
+
     @Override
     public String toString() {
         return  "\tItem ID: " + Id + "\n" +
