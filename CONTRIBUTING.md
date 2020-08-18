@@ -12,7 +12,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 3. Update the README.md with details of changes to the interface, this includes new environment 
    variables, exposed ports, useful file locations and container parameters.
 4. Issue a pull request and ask us to review it. Don't forget to link the PR to a relevant issue if it exists.
-5. Make sure the pull request passes CI checks (Lint,tests, etc...)
+5. If theres a CI check, make sure the pull request passes CI checks (Lint,tests, etc...) - iff theres
 6. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
