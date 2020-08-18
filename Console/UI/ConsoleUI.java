@@ -3,8 +3,11 @@ package UI;
 import Engine.SuperMarketLogic;
 import SDMImprovedFacade.Store;
 import SDMImprovedFacade.StoreItem;
+import com.google.gson.Gson;
 import jaxb.generatedClasses.Location;
 import javax.xml.bind.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.*;
@@ -27,13 +30,15 @@ public class ConsoleUI {
         System.out.println("4.Perform a purchase.");
         System.out.println("5.Print orders history of the entire system.");
         System.out.println("6.Update store products.");
+        System.out.println("7.Save system orders to file.");
+        System.out.println("8.Load orders history");
         System.out.println("\nPress 'q' at any time to exit the system");
     }
 
     private boolean validateMenuUserInputChoice(String userInput) throws IllegalInputException {
         try {
             int userInputParsed = Integer.parseInt(userInput);
-            return 1 <= userInputParsed && userInputParsed <= 6;
+            return 1 <= userInputParsed && userInputParsed <= 8;
         }
         catch (NumberFormatException e) {
             if(userInput.toLowerCase().equals("q")){
@@ -44,7 +49,8 @@ public class ConsoleUI {
     }
 
     private void run() {
-        //IN THE README MENTION THAT 2 STORES ON THE SAME LOCATION IS NOT VALID! ! ! ! ! !
+        //IN THE READ ME MENTION THAT 2 STORES ON THE SAME LOCATION IS NOT VALID! ! ! ! ! !
+        //D:\Java - SDM\SDM_ConsoleApp\src\json
         //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-small.xml [V]
         //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.7.xml [V]
         //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.6.xml [V]
@@ -86,36 +92,95 @@ public class ConsoleUI {
         }
     }
 
-    private void handleLoadDataFromXMLAction(Scanner scn, StringBuilder outputMessage) throws JAXBException {
+    private void handleLoadDataFromXMLAction(Scanner scn, StringBuilder outputMessage) throws JAXBException, IOException {
         System.out.println("Please enter a path to the .xml file in order to load it.");
         this.dataWasLoaded = this.SDMLogic.loadData(scn.nextLine().trim(), outputMessage) || this.dataWasLoaded;
+        if(!this.SDMLogic.deleteOrdersHistoryFiles()) { throw new IOException("<There was a problem removing both of the order history files>"); }
+        this.SDMLogic.setWasHistorySaved(false);
+        this.SDMLogic.setOrderHistoryFilesPath("");
     }
 
-    private void performActionOfChoice (String userMenuChoice) {
+    private void performActionOfChoice (String userMenuChoice) throws Exception {
 
         switch (userMenuChoice)
         {
             case "2":
                 displayStoresInformation();
                 break;
-
             case "3":
                 displaySystemItemsInformation();
                 break;
-
             case "4":
                 receiveOrderFromUser();
                 break;
-
             case "5":
                 displayAllStoresOrderHistory();
                 break;
             case "6":
                 updateStoreProducts();
                 break;
+            case "7":
+                saveOrderHistoryToFile();
+                break;
+            case "8":
+                loadOrderHistoryFromFile();
+                break;
             default:
                 printUserMenuChoiceError();
                 break;
+        }
+    }
+
+    private void loadOrderHistoryFromFile() throws IOException {
+        if(this.SDMLogic.wasHistorySaved()){
+            Gson gson = new Gson();
+            //Our saved file paths.
+            String dynamicOrdersPath = this.SDMLogic.getOrderHistoryFilesPath() + "\\dynamic_orders_history.json";
+            String staticOrdersPath = this.SDMLogic.getOrderHistoryFilesPath() + "\\static_orders_history.json";
+            this.SDMLogic.loadStaticOrdersHistory(staticOrdersPath, gson); //Need to be implemented.
+            this.SDMLogic.loadDynamicOrdersHistory(dynamicOrdersPath, gson); //Need to be implemented.
+        }
+        else{
+            System.out.println("<There is no orders history to load>");
+        }
+
+        //If an exception occurs then the .run() method handles it.
+    }
+
+    private void saveOrderHistoryToFile() throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        Gson gson = new Gson();
+        StringBuilder pathToFileStringBuilder = new StringBuilder();
+
+        try {
+            if(getAndValidatePath(pathToFileStringBuilder, scanner))
+            {
+                String stringPathToFile = pathToFileStringBuilder.toString();
+                this.SDMLogic.writeStaticOrdersToFile(stringPathToFile, gson);
+                this.SDMLogic.writeDynamicOrdersToFile(stringPathToFile, gson);
+                this.SDMLogic.setOrderHistoryFilesPath(stringPathToFile);
+                this.SDMLogic.setWasHistorySaved(true);
+            }
+            else { System.out.println("<The input path does not exist>"); }
+
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private boolean getAndValidatePath(StringBuilder pathToFileStringBuilder, Scanner scanner) throws Exception {
+        try {
+            String userPathInput;
+            System.out.println("\nPlease enter a path where the orders history will be saved");
+            userPathInput = scanner.nextLine().trim();
+            File file = new File(userPathInput);
+            pathToFileStringBuilder.append(userPathInput);
+
+            return file.exists();
+        }
+        catch (Exception e) {
+            throw new Exception("<There was an error validating the input path>");
         }
     }
 
@@ -363,7 +428,6 @@ public class ConsoleUI {
     }
 
     private void receiveOrderFromUser() {
-
         String userPurchaseMethod;
         userPurchaseMethod = receiveUserPurchaseMethod();
         redirectToRelevantPurchaseMethod(userPurchaseMethod);
@@ -439,17 +503,17 @@ public class ConsoleUI {
 
             if(isOrderApproved(sc)){
                 itemsListForEachStore = this.SDMLogic.generateItemsListForEachStore(itemsToOrder, cheapestStoresForEachProduct);
-
+                int orderIDForAllOrdersIncluded = this.SDMLogic.getLastOrderID();
                 itemsListForEachStore.forEach((storeID, listOfItems) -> {
                     this.SDMLogic.updateStoreAndSystemItemAmountInformationAccordingToNewOrder(listOfItems, this.SDMLogic.getStores().get(storeID));
                     //updateStoreRevenue returns the delivery cost of the input order.
-                    sumOfDeliveryCost.set(sumOfDeliveryCost.get() + this.SDMLogic.updateStoreRevenue(listOfItems, this.SDMLogic.getStores().get(storeID), userLocationInput, userDateInput));
+                    sumOfDeliveryCost.set(sumOfDeliveryCost.get() + this.SDMLogic.updateStoreRevenue(listOfItems, this.SDMLogic.getStores().get(storeID), userLocationInput, userDateInput, orderIDForAllOrdersIncluded));
                 });
 
                 //At this point all of the system stores are updated with the amount that was ordered from each store and revenue updated as well.
                 // IF NEEDED SUB ORDERS SHOULD BE RECORD HERE AND SENT TO GENERATE DYNAMIC ORDER AND RECORD METHOD ! ! !
 
-                this.SDMLogic.generateDynamicOrderAndRecord(itemsToOrder, sumOfDeliveryCost.get(), userDateInput, userLocationInput, itemsListForEachStore.size());
+                this.SDMLogic.generateDynamicOrderAndRecord(itemsToOrder, sumOfDeliveryCost.get(), userDateInput, userLocationInput, itemsListForEachStore.size(), orderIDForAllOrdersIncluded);
                 System.out.println("\nThe order was successfully made!");
             }
             else { System.out.println("\nThe order was cancelled!\n"); }

@@ -4,20 +4,25 @@ import SDMImprovedFacade.Order;
 import SDMImprovedFacade.Store;
 import SDMImprovedFacade.StoreItem;
 import SDMImprovedFacade.SuperDuperMarket;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import jaxb.generatedClasses.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SuperMarketLogic {
     private SuperDuperMarket SDMImproved;
+    private String orderHistoryFilesPath;
+    private boolean wasHistorySaved;
 
     public boolean loadData(String filePath, StringBuilder outputMessage) throws JAXBException {
         boolean successFlag = true;
+
         try {
             if (filePath.isEmpty()) {
                 updateOutputMessage(outputMessage, "<The input file path was empty, please enter a valid path>");
@@ -313,7 +318,7 @@ public class SuperMarketLogic {
         return orderStringBuilder.toString();
     }
 
-    public String getStringOfDynamicLastOrder(List<StoreItem> orderItems){
+    public String getStringOfDynamicLastOrder(List<StoreItem> orderItems) {
         StringBuilder dynamicOrderStringBuilder = new StringBuilder();
 
         dynamicOrderStringBuilder.append("-----\tOrder Summary\t-----\n");
@@ -348,16 +353,15 @@ public class SuperMarketLogic {
         //Integer -> item ID, Store -> the store that sells the item in the lowest price.
         Map<Integer, Store> cheapestStoresPerProductMap = new HashMap<>();
 
-        itemsToOrderWithAmount.forEach( (itemID, amount) -> {
-            this.getStores().values().forEach( store -> {
-                if(store.getItemsBeingSold().containsKey(itemID)){
+        itemsToOrderWithAmount.forEach((itemID, amount) -> {
+            this.getStores().values().forEach(store -> {
+                if (store.getItemsBeingSold().containsKey(itemID)) {
                     if (cheapestStoresPerProductMap.containsKey(itemID)) {
-                        if( store.getItemsBeingSold().get(itemID).getPricePerUnit() <
-                                cheapestStoresPerProductMap.get(itemID).getItemsBeingSold().get(itemID).getPricePerUnit()){
+                        if (store.getItemsBeingSold().get(itemID).getPricePerUnit() <
+                                cheapestStoresPerProductMap.get(itemID).getItemsBeingSold().get(itemID).getPricePerUnit()) {
                             cheapestStoresPerProductMap.put(itemID, store);
                         }
-                    }
-                    else {
+                    } else {
                         cheapestStoresPerProductMap.put(itemID, store);
                     }
                 }
@@ -371,13 +375,21 @@ public class SuperMarketLogic {
                                                                    Map<Integer, Store> cheapestStoresForEachProduct) {
         List<StoreItem> outputOrderList = new ArrayList<>();
 
-        itemsToOrderWithAmount.forEach((itemID, amountOfTheItem)-> {
+        itemsToOrderWithAmount.forEach((itemID, amountOfTheItem) -> {
             StoreItem currentStoreItem = new StoreItem(cheapestStoresForEachProduct.get(itemID).getItemsBeingSold().get(itemID));
             currentStoreItem.setTotalItemsSold(itemsToOrderWithAmount.get(itemID));
             outputOrderList.add(currentStoreItem);
         });
 
         return outputOrderList;
+    }
+
+    public boolean wasHistorySaved() {
+        return wasHistorySaved;
+    }
+
+    public void setWasHistorySaved(boolean wasHistorySaved) {
+        this.wasHistorySaved = wasHistorySaved;
     }
 
     public Map<Integer, List<StoreItem>> generateItemsListForEachStore(List<StoreItem> itemsToOrder,
@@ -389,7 +401,7 @@ public class SuperMarketLogic {
             int currentStoreID = cheapestStoresForEachProduct.get(item.getId()).getId();
             List<StoreItem> currentItemList = itemsListForEachStore.get(currentStoreID);
 
-            if(currentItemList == null){
+            if (currentItemList == null) {
                 currentItemList = new ArrayList<StoreItem>();
             }
 
@@ -400,13 +412,18 @@ public class SuperMarketLogic {
         return itemsListForEachStore;
     }
 
-    public double updateStoreRevenue(List<StoreItem> listOfItems, Store storeOfChoice, Location userLocationInput, String userDateInput) {
-        storeOfChoice.generateOrder(userDateInput, this.getLastOrderID(), listOfItems, userLocationInput);
+    public Map<Integer, Order> getDynamicOrders() {
+        return this.SDMImproved.getSystemDynamicOrders();
+    }
+
+    public double updateStoreRevenue(List<StoreItem> listOfItems, Store storeOfChoice,
+                                     Location userLocationInput, String userDateInput, int orderIDForAllOrdersIncluded) {
+        storeOfChoice.generateOrder(userDateInput, orderIDForAllOrdersIncluded, listOfItems, userLocationInput);
         return storeOfChoice.calculateDistance(userLocationInput) * storeOfChoice.getDeliveryPpk();
     }
 
-    public void generateDynamicOrderAndRecord(List<StoreItem> itemsToOrder, Double totalDeliveryCost, String userDateInput, Location userLocationInput, int amountOfStoresParticipating) {
-        Order dynamicOrder = new Order(userDateInput, userLocationInput, this.getLastOrderID(),
+    public void generateDynamicOrderAndRecord(List<StoreItem> itemsToOrder, Double totalDeliveryCost, String userDateInput, Location userLocationInput, int amountOfStoresParticipating, int orderIDForAllOrdersIncluded) {
+        Order dynamicOrder = new Order(userDateInput, userLocationInput, orderIDForAllOrdersIncluded,
                 totalDeliveryCost, amountOfStoresParticipating, itemsToOrder);
         this.SDMImproved.addDynamicOrder(dynamicOrder);
     }
@@ -415,17 +432,111 @@ public class SuperMarketLogic {
         Map<Integer, Order> dynamicOrders = this.SDMImproved.getSystemDynamicOrders();
         StringBuilder dynamicOrderHistory = new StringBuilder();
 
-        if(dynamicOrders != null)
-        {
-            dynamicOrders.forEach((orderID, order)-> {
+        if (dynamicOrders != null) {
+            dynamicOrders.forEach((orderID, order) -> {
                 dynamicOrderHistory.append(order.toStringDynamicOrder());
             });
-        }
-        else {
+        } else {
             dynamicOrderHistory.setLength(0);
             dynamicOrderHistory.append("\tCurrently no dynamic orders were made in the system\n\n");
         }
 
         return dynamicOrderHistory.toString();
     }
+
+    public void writeStaticOrdersToFile(String pathToFile, Gson gson) throws Exception {
+        try {
+            File file = new File(pathToFile + "\\static_orders_history.json");
+            List<Order> ordersHistory = new ArrayList<>();
+
+            if (file.exists()) {
+                if (!file.delete()) {
+                    throw new Exception();
+                }
+            }
+
+            if (file.createNewFile()) {
+                Writer fileWriter = new FileWriter(file, true);
+
+                for (Store store : this.getStores().values()) {
+                    ordersHistory.addAll(store.getStoreOrdersHistory());
+                }
+
+                fileWriter.write(gson.toJson(ordersHistory)); //Writes all of the static orders in the system to "static_order_history.json"
+                fileWriter.close();
+            }
+            else { throw new Exception(); }
+        }
+        catch (Exception e) {
+            throw new Exception("<There was a problem writing the static orders to a json file>");
+        }
+    }
+
+    public void writeDynamicOrdersToFile(String pathToFile, Gson gson) throws Exception {
+        try {
+            File file = new File(pathToFile + "\\dynamic_orders_history.json");
+            List<Order> dynamicOrdersHistory;
+            Writer fileWriter = new FileWriter(file, true);
+
+            if (file.exists()) {
+                if (!file.delete()) {
+                    throw new Exception();
+                }
+            }
+
+            if (file.createNewFile()) {
+                dynamicOrdersHistory = new ArrayList<>(this.getDynamicOrders().values());
+                fileWriter.write(gson.toJson(dynamicOrdersHistory)); //Writes all of the dynamic orders in the system to "static_order_history.json"
+                fileWriter.close();
+            }
+            else { throw new Exception(); }
+        }
+        catch (Exception e) {
+            throw new Exception("<There was a problem writing the dynamic orders to json file>");
+        }
+    }
+
+    public String getOrderHistoryFilesPath () {
+        return orderHistoryFilesPath;
+    }
+
+    public void setOrderHistoryFilesPath (String orderHistoryFilesPath){
+        this.orderHistoryFilesPath = orderHistoryFilesPath;
+    }
+
+    public boolean deleteOrdersHistoryFiles () {
+        if (this.wasHistorySaved) {
+            try {
+                File staticHistory = new File(this.getOrderHistoryFilesPath() + "\\static_orders_history.json");
+                File dynamicHistory = new File(this.getOrderHistoryFilesPath() + "\\dynamic_orders_history.json");
+                return staticHistory.delete() && dynamicHistory.delete();
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void loadStaticOrdersHistory (String staticOrdersPath, Gson gson) throws IOException {
+        try {
+            File staticOrdersFile = new File(staticOrdersPath);
+            FileReader fReader = new FileReader(staticOrdersFile);
+
+            List<Order> staticOrders = gson.fromJson(fReader, new TypeToken<List<Order>>() {
+            }.getType());
+            System.out.println(staticOrders.toString());
+
+        } catch (IOException e) {
+            throw new IOException("<There was a problem loading the static orders file>");
+        }
+
+
+    }
+
+    public void loadDynamicOrdersHistory (String dynamicOrdersPath, Gson gson) {
+        //DO STH;
+    }
+
+
 }
