@@ -1,4 +1,6 @@
-<img src="design/SDMarket.PNG" width="300" height="300" title="SDMarket">
+<p align="center">
+  <img src="https://i.ibb.co/xghRGsN/New-Project.png" title="SDMarket">
+</p>
 
 # SDMarket 🏪🛒
 Java based super market system
