@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 public class SuperDuperMarket {
     private final Map<Integer, Store> systemStores;
     private final Map<Integer, StoreItem> systemItems;
+    private Map<Integer, Order> systemDynamicOrders = null;
+
     private int orderID = 1;
 
     public SuperDuperMarket(SuperDuperMarketDescriptor inputSDM){
@@ -77,5 +79,17 @@ public class SuperDuperMarket {
      */
     public int getOrderID() {
         return orderID++;
+    }
+
+    public Map<Integer, Order> getSystemDynamicOrders() {
+        return systemDynamicOrders;
+    }
+
+    public void addDynamicOrder(Order dynamicOrder) {
+        if (this.systemDynamicOrders == null){
+            this.systemDynamicOrders = new HashMap<>();
+        }
+
+        this.systemDynamicOrders.put(dynamicOrder.getOrderId(), dynamicOrder);
     }
 }

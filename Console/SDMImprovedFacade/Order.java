@@ -14,19 +14,35 @@ public class Order {
     final String dateOrderWasMade;
     final String storeName;
     final Location orderDestination;
-
+    private int amountOfStoresRelatedToOrder;
     final List<StoreItem> itemsInOrder;
 
-    public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost, String storeName, List<StoreItem> itemsInOrder, Location userLocation) {
+    public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost,
+                 String storeName, List<StoreItem> itemsInOrder, Location userLocation) {
         this.dateOrderWasMade = dateOrderWasMade;
         this.orderId = orderId;
         this.storeId = storeId;
         this.deliveryCost = deliveryCost;
         this.storeName = storeName;
         this.itemsInOrder = itemsInOrder;
-        costOfItemsInOrder = calculateTotalCostOfItemsInOrder();
-        totalOrderCost = deliveryCost + costOfItemsInOrder;
+        this.costOfItemsInOrder = calculateTotalCostOfItemsInOrder();
+        this.totalOrderCost = deliveryCost + costOfItemsInOrder;
         this.orderDestination = userLocation;
+        this.amountOfStoresRelatedToOrder = 1;
+    }
+
+    public Order(String dateOrderWasMade, Location userLocation, int orderId,
+                 Double deliveryCost, int amountOfStoresParticipating, List<StoreItem> itemsInOrder) {
+        this.dateOrderWasMade = dateOrderWasMade;
+        this.orderId = orderId;
+        this.storeId = -1;
+        this.deliveryCost = deliveryCost;
+        this.storeName = String.format("Dynamic Order %d",orderId);
+        this.itemsInOrder = itemsInOrder;
+        this.costOfItemsInOrder = calculateTotalCostOfItemsInOrder();
+        this.totalOrderCost = deliveryCost + costOfItemsInOrder;
+        this.orderDestination = userLocation;
+        this.amountOfStoresRelatedToOrder = amountOfStoresParticipating;
     }
 
     public int getNumberOfItemsInOrder(){
@@ -74,6 +90,14 @@ public class Order {
         return itemsInOrder;
     }
 
+    public int getAmountOfStoresRelated() {
+        return amountOfStoresRelatedToOrder;
+    }
+
+    public void setAmountOfStoresRelated(int amountOfStoresRelated) {
+        this.amountOfStoresRelatedToOrder = amountOfStoresRelated;
+    }
+
     private int getTotalNumberOfItemsInOrder(){
         return itemsInOrder.stream().
                 mapToInt((item) -> {
@@ -103,6 +127,17 @@ public class Order {
         return  "\tOrder ID: " + orderId + "\n" +
                 "\t\tDate Of Order: " + dateOrderWasMade + "\n" +
                 "\t\tStore ID: " + storeId + "(" + storeName + ")\n" +
+                "\t\tAmount Of Item Types: " + getNumberOfItemsInOrder() + "\n" +
+                "\t\tTotal Number Of Items In Order: " + getTotalNumberOfItemsInOrder() + "\n" +
+                "\t\tTotal Cost Of Items In Order: " + String.format("%.2f", costOfItemsInOrder) + "\n" +
+                "\t\tDelivery Cost: " + String.format("%.2f", deliveryCost) + "\n" +
+                "\t\tTotal Cost Of Order: " + String.format("%.2f",totalOrderCost) + "\n";
+    }
+
+    public String toStringDynamicOrder() {
+        return  "\tOrder ID: " + orderId + "\n" +
+                "\t\tDate Of Order: " + dateOrderWasMade + "\n" +
+                "\t\tAmount Of Stores Participating In Order: " + amountOfStoresRelatedToOrder + "\n" +
                 "\t\tAmount Of Item Types: " + getNumberOfItemsInOrder() + "\n" +
                 "\t\tTotal Number Of Items In Order: " + getTotalNumberOfItemsInOrder() + "\n" +
                 "\t\tTotal Cost Of Items In Order: " + String.format("%.2f", costOfItemsInOrder) + "\n" +

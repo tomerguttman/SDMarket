@@ -23,6 +23,10 @@ public class Store {
         storeOrdersHistory = new ArrayList<>();
     }
 
+    public void setTotalOrdersRevenue(double totalOrdersRevenue) {
+        this.totalOrdersRevenue = totalOrdersRevenue;
+    }
+
     public double getTotalOrdersRevenue() {
         return totalOrdersRevenue;
     }
@@ -71,8 +75,8 @@ public class Store {
         this.storeLocation = storeLocation;
     }
 
-    public void generateOrder(String orderDate, int orderId, List<StoreItem> itemsInOrder, Location userCoordinates, Location userLocation){
-        Order order = new Order(orderDate, orderId, this.Id, calculateDistance(userCoordinates) * deliveryPpk, this.name, itemsInOrder, userLocation);
+    public void generateOrder(String orderDate, int orderId, List<StoreItem> itemsInOrder, Location userCoordinates){
+        Order order = new Order(orderDate, orderId, this.Id, calculateDistance(userCoordinates) * deliveryPpk, this.name, itemsInOrder, userCoordinates);
         storeOrdersHistory.add(order);
         this.totalOrdersRevenue += order.getTotalOrderCost();
     }

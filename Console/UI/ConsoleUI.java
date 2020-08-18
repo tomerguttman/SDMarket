@@ -6,7 +6,7 @@ import SDMImprovedFacade.StoreItem;
 import jaxb.generatedClasses.Location;
 import javax.xml.bind.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.*;
 
 public class ConsoleUI {
@@ -20,7 +20,7 @@ public class ConsoleUI {
     }
 
     private void printMenu(){
-        System.out.println("Please select one of the following options by entering a number:");
+        System.out.println("\nPlease select one of the following options by entering a number:");
         System.out.println("1.Load system details from XML file.");
         System.out.println("2.Print the details of all the stores that are currently in the system.");
         System.out.println("3.Print the details of all the items that are currently in the system.");
@@ -286,7 +286,6 @@ public class ConsoleUI {
 
     private StoreItem getItemToUpdate(Scanner scn, Store storeOfChoice) {
         return getAndValidateItemById(scn, storeOfChoice);
-
     }
 
     private StoreItem getAndValidateItemById(Scanner scn, Store storeOfChoice) {
@@ -364,6 +363,145 @@ public class ConsoleUI {
     }
 
     private void receiveOrderFromUser() {
+
+        String userPurchaseMethod;
+        userPurchaseMethod = receiveUserPurchaseMethod();
+        redirectToRelevantPurchaseMethod(userPurchaseMethod);
+    }
+
+    private String receiveUserPurchaseMethod() {
+        Scanner scn = new Scanner(System.in);
+        boolean isValidPurchaseMethod = false;
+        String userInput = null;
+        int userInputToInteger;
+        printPurchaseMethodMenu();
+
+        while(!isValidPurchaseMethod) {
+            System.out.println("Please choose a purchase method");
+            userInput = scn.nextLine().trim();
+
+            if(isNumber(userInput)) {
+                userInputToInteger = Integer.parseInt(userInput);
+                if(1 == userInputToInteger || userInputToInteger == 2) {
+                    isValidPurchaseMethod = true;
+                }
+                else {
+                    System.out.println("<The number you entered is not a valid purchase choice>\n");
+                }
+            }
+            else {
+                System.out.println("<The input you entered is not an integer>\n");
+            }
+        }
+
+        return userInput;
+    }
+
+    private void printPurchaseMethodMenu() {
+        System.out.println("\n1.Static purchase - choose and buy from a specific store");
+        System.out.println("2.Dynamic purchase - choose the items and the system will find the cheapest shopping cart");
+    }
+
+    private void redirectToRelevantPurchaseMethod(String userPurchaseMethod) {
+        switch (userPurchaseMethod){
+            case "1":
+                performStaticPurchase();
+                break;
+            case "2":
+                performDynamicPurchase();
+                break;
+            default:
+                printUserMenuChoiceError();
+                break;
+        }
+    }
+
+    private void performDynamicPurchase() {
+        Scanner sc = new Scanner(System.in);
+        String userDateInput;
+        Location userLocationInput;
+        Map<Integer, Double> itemsToOrderWithAmount;//Integer -> itemID, Double -> amount of the item
+        Map<Integer, Store> cheapestStoresForEachProduct;
+        Map<Integer, List<StoreItem>> itemsListForEachStore;
+        List<StoreItem> itemsToOrder;
+        AtomicReference<Double> sumOfDeliveryCost = new AtomicReference<>((double) 0);
+
+        userDateInput = getDateFromUserAndValidate(sc);
+        userLocationInput = getLocationFromUserAndValidate(sc);
+        itemsToOrderWithAmount =  getAllItemsOfOrderDynamically(sc);
+
+        if(!itemsToOrderWithAmount.isEmpty()){
+            cheapestStoresForEachProduct = this.SDMLogic.getCheapestStoresPerProductMap(itemsToOrderWithAmount);
+            // cheapestStoresForEachProduct(Integer -> itemID, Store -> store that sells that item in the lowest price)
+            itemsToOrder = this.SDMLogic.createListOfOrderedItemsByCheapestPrice(itemsToOrderWithAmount, cheapestStoresForEachProduct);
+            //itemsToOrder -> contains StoreItem for each of the items in order with it's lowest price set.
+            displayDynamicLastOrder(itemsToOrder);
+
+            if(isOrderApproved(sc)){
+                itemsListForEachStore = this.SDMLogic.generateItemsListForEachStore(itemsToOrder, cheapestStoresForEachProduct);
+
+                itemsListForEachStore.forEach((storeID, listOfItems) -> {
+                    this.SDMLogic.updateStoreAndSystemItemAmountInformationAccordingToNewOrder(listOfItems, this.SDMLogic.getStores().get(storeID));
+                    //updateStoreRevenue returns the delivery cost of the input order.
+                    sumOfDeliveryCost.set(sumOfDeliveryCost.get() + this.SDMLogic.updateStoreRevenue(listOfItems, this.SDMLogic.getStores().get(storeID), userLocationInput, userDateInput));
+                });
+
+                //At this point all of the system stores are updated with the amount that was ordered from each store and revenue updated as well.
+                // IF NEEDED SUB ORDERS SHOULD BE RECORD HERE AND SENT TO GENERATE DYNAMIC ORDER AND RECORD METHOD ! ! !
+
+                this.SDMLogic.generateDynamicOrderAndRecord(itemsToOrder, sumOfDeliveryCost.get(), userDateInput, userLocationInput, itemsListForEachStore.size());
+                System.out.println("\nThe order was successfully made!");
+            }
+            else { System.out.println("\nThe order was cancelled!\n"); }
+        }
+        else { System.out.println("\nThe order was cancelled!\n"); }
+
+    }
+
+    private void displayDynamicLastOrder(List<StoreItem> itemsToOrder) {
+        System.out.println(this.SDMLogic.getStringOfDynamicLastOrder(itemsToOrder));
+    }
+
+    private Map<Integer, Double> getAllItemsOfOrderDynamically(Scanner sc) {
+        String userInput;
+        int inputParsedToInteger;
+        boolean orderIsFinished = false;
+        double amountOfTheItem;
+        Map<Integer, Double> orderItems = new HashMap<>();
+
+        displaySystemItemsInformation();
+
+        while(!orderIsFinished){
+            try {
+                System.out.println("Please choose an item by it's ID. PRESS 'q' TO FINISH THE ORDER");
+                userInput = sc.nextLine().trim();
+                if(validateItemIdToOrder(userInput)) {
+                    if(userInput.equals("q")){ orderIsFinished = true; }
+                    else {
+                        inputParsedToInteger = Integer.parseInt(userInput);
+                        amountOfTheItem = getAmountOfItem(sc,this.SDMLogic.getItems().get(inputParsedToInteger));
+
+                        if(orderItems.containsKey(inputParsedToInteger))
+                        {
+                            orderItems.put(inputParsedToInteger, orderItems.get(inputParsedToInteger) + amountOfTheItem);
+                        }
+                        else {
+                            orderItems.put(inputParsedToInteger, amountOfTheItem);
+                        }
+                    }
+                }
+            }
+            catch(Exception e) { System.out.println(e.getMessage()); }
+        }
+
+        return orderItems;
+    }
+
+    private boolean validateItemIdToOrder(String userInput) {
+        return userInput.toLowerCase().equals("q") || (isNumber(userInput) && this.SDMLogic.getItems().containsKey(Integer.parseInt(userInput)));
+    }
+
+    private void performStaticPurchase() {
         Scanner sc = new Scanner(System.in);
         Store storeToOrderFrom;
         String userDateInput;
@@ -382,7 +520,8 @@ public class ConsoleUI {
 
             if(isOrderApproved(sc)){
                 this.SDMLogic.updateStoreAndSystemItemAmountInformationAccordingToNewOrder(orderItems, storeToOrderFrom);
-                storeToOrderFrom.generateOrder(userDateInput, SDMLogic.getLastOrderID(), orderItems, userLocationInput, userLocationInput);
+                this.SDMLogic.generateOrderForStore(storeToOrderFrom, userDateInput, SDMLogic.getLastOrderID(), orderItems, userLocationInput);
+                System.out.println("\nThe order was successfully made!");
             }
             else { System.out.println("\nThe order was cancelled!\n"); }
         }
@@ -390,21 +529,11 @@ public class ConsoleUI {
     }
 
     private void displayLastOrder(List<StoreItem> orderItems, Store storeToOrderFrom, Location userLocationInput) {
-        StringBuilder orderStringBuilder = new StringBuilder();
-        double distanceFromUser = storeToOrderFrom.calculateDistance(userLocationInput);
-        int ppk = storeToOrderFrom.getDeliveryPpk();
-
-        orderItems.forEach(itemOrdered -> {
-            orderStringBuilder.append(itemOrdered.getStringItemForPurchase());
-            orderStringBuilder.append("\t\tAmount Bought: ").append(itemOrdered.getTotalItemsSold()).append("\n");
-            orderStringBuilder.append("\t\tTotal Price: ").append(itemOrdered.getTotalItemsSold() * itemOrdered.getPricePerUnit()).append("\n");
-        });
-
-        orderStringBuilder.append("Distance From Destination: ").append(String.format("%.2f", distanceFromUser)).append("\n");
-        orderStringBuilder.append("PPK: ").append(ppk).append("\n");
-        orderStringBuilder.append("Total Cost Of Delivery: ").append(String.format("%.2f", distanceFromUser * ppk)).append("\n");
-
-        System.out.println(orderStringBuilder.toString());
+        String lastOrderString;
+        double distanceFromUser = this.SDMLogic.calculateDistanceFromUser(storeToOrderFrom, userLocationInput);
+        int ppk = this.SDMLogic.getStorePpk(storeToOrderFrom);
+        lastOrderString = this.SDMLogic.getStringOfStaticLastOrder(orderItems, distanceFromUser, ppk);
+        System.out.println(lastOrderString);
     }
 
     private boolean isOrderApproved(Scanner sc) {
@@ -444,11 +573,11 @@ public class ConsoleUI {
     private StoreItem handleAmountForOneItem(Scanner sc, int userInput, Store storeToOrderFrom) {
         StoreItem sItem = storeToOrderFrom.getItemsBeingSold().get(userInput);
         StoreItem item = new StoreItem(sItem);
-        item.setTotalItemsSold(getAmountOfItems(sc, item));
+        item.setTotalItemsSold(getAmountOfItem(sc, item));
         return item;
     }
 
-    private double getAmountOfItems(Scanner sc, StoreItem itemToBuy) {
+    private double getAmountOfItem(Scanner sc, StoreItem itemToBuy) {
         double doubleUserInput = 0;
         boolean isInputValid = false;
         String userInput;
@@ -526,8 +655,7 @@ public class ConsoleUI {
                 String userStoreIDInput;
                 System.out.println("Please choose a store using it's ID");
                 userStoreIDInput = sc.nextLine();
-                if(isValidStoreChoice(userStoreIDInput))
-                {
+                if(SDMLogic.isValidStoreChoice(userStoreIDInput)) {
                     return this.SDMLogic.getStores().get(Integer.parseInt(userStoreIDInput));
                 }
                 else {
@@ -537,12 +665,6 @@ public class ConsoleUI {
                 System.out.println("<The input you entered wasn't a number>\n");
             }
         }
-    }
-
-    private boolean isValidStoreChoice(String userStoreIDInput) {
-        int storeID;
-        storeID = Integer.parseInt(userStoreIDInput);
-        return this.SDMLogic.getStores().containsKey(storeID);
     }
 
     private Location getLocationFromUserAndValidate(Scanner sc) {
@@ -565,7 +687,7 @@ public class ConsoleUI {
                 yString = userLocationInput.substring(indexOfSeparation + 1, userLocationInput.length() - 1);
                 x = Integer.parseInt(xString);
                 y = Integer.parseInt(yString);
-                if(validateLocationBorders(x, y)) {
+                if(this.SDMLogic.validateLocationBorders(x, y)) {
                     if(validateLocationAgainstAllStores(x, y)) {
                         isLocationValid = true;
                     }
@@ -585,10 +707,6 @@ public class ConsoleUI {
 
     private boolean validateLocationAgainstAllStores(int x, int y) {
         return SDMLogic.checkUserLocationAgainstAllStoresLocations(x, y);
-    }
-
-    private boolean validateLocationBorders(int x, int y) {
-        return (1 <= x && x <= 50) && (1 <= y && y <= 50);
     }
 
     private void displayShortPresentationOfSystemStores() {
@@ -615,19 +733,11 @@ public class ConsoleUI {
     }
 
     private void displayAllStoresOrderHistory() {
-        Map<Integer, Store> systemStores = SDMLogic.getStores();
-        AtomicInteger orderCounter = new AtomicInteger();
-        StringBuilder orderHistory = new StringBuilder();
-        System.out.println("-----   System Order History    -----\n");
-        systemStores.values().forEach(store -> store.getStoreOrdersHistory().forEach(order -> {
-            orderHistory.append(order.toString());
-            orderCounter.addAndGet(store.getStoreOrdersHistory().size());
-        }));
-
-        if(orderCounter.get() > 0) {
-            System.out.println(orderHistory.toString());
-        }
-        else { System.out.println("\tCurrently no orders were made in the system\n"); }
+        String allStoresOrdersString = "\n-----\tSystem Static Order History\t-----\n" +
+                SDMLogic.getStringOfAllStaticSystemOrders() +
+                "\n-----\tSystem Dynamic Order History\t-----\n" +
+                SDMLogic.getStringOfAllDynamicSystemOrders();
+        System.out.println(allStoresOrdersString);
     }
 
     private void displayStoresInformation() {
@@ -636,7 +746,7 @@ public class ConsoleUI {
     }
 
     private void displaySystemItemsInformation(){
-        System.out.println("-----   System Items    -----\n");
+        System.out.println("-----\tSystem Items\t-----\n");
         Map<Integer, StoreItem> systemStores = SDMLogic.getItems();
         systemStores.forEach((id, item) -> System.out.println(item.getStringItemForAllSystemItemsDisplay()));
     }
