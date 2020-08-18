@@ -1,3 +1,5 @@
+<img src="design/SDMarket.PNG" width="300" height="300" title="SDMarket">
+
 # SDMarket 🏪🛒
 Java based super market system
 
