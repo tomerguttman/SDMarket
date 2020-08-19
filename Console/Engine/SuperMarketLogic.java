@@ -476,20 +476,21 @@ public class SuperMarketLogic {
         try {
             File file = new File(pathToFile + "\\dynamic_orders_history.json");
             List<Order> dynamicOrdersHistory;
-            Writer fileWriter = new FileWriter(file, true);
-
-            if (file.exists()) {
-                if (!file.delete()) {
-                    throw new Exception();
+            if(this.getDynamicOrders() != null){
+                if (file.exists()) {
+                    if (!file.delete()) {
+                        throw new Exception();
+                    }
                 }
-            }
 
-            if (file.createNewFile()) {
-                dynamicOrdersHistory = new ArrayList<>(this.getDynamicOrders().values());
-                fileWriter.write(gson.toJson(dynamicOrdersHistory)); //Writes all of the dynamic orders in the system to "static_order_history.json"
-                fileWriter.close();
+                if (file.createNewFile()) {
+                    Writer fileWriter = new FileWriter(file, true);
+                    dynamicOrdersHistory = new ArrayList<>(this.getDynamicOrders().values());
+                    fileWriter.write(gson.toJson(dynamicOrdersHistory)); //Writes all of the dynamic orders in the system to "static_order_history.json"
+                    fileWriter.close();
+                }
+                else { throw new Exception(); }
             }
-            else { throw new Exception(); }
         }
         catch (Exception e) {
             throw new Exception("<There was a problem writing the dynamic orders to json file>");
@@ -520,23 +521,68 @@ public class SuperMarketLogic {
 
     public void loadStaticOrdersHistory (String staticOrdersPath, Gson gson) throws IOException {
         try {
+            Map<Integer, Store> systemStores;
             File staticOrdersFile = new File(staticOrdersPath);
             FileReader fReader = new FileReader(staticOrdersFile);
-
-            List<Order> staticOrders = gson.fromJson(fReader, new TypeToken<List<Order>>() {
-            }.getType());
-            System.out.println(staticOrders.toString());
+            List<Order> staticOrders = gson.fromJson(fReader, new TypeToken<List<Order>>() {}.getType());
+            resetStoresInformationBeforeLoad();//resets orderHistoryList, ordersRevenue = 0, each itemBeingSold -> amount = 0.
+            resetSystemItemAmountSoldStats();//each itemBeingSold -> amount = 0
+            systemStores = this.getStores();
+            addStaticOrdersToStoresAndUpdateSystemInfo(systemStores, staticOrders);
 
         } catch (IOException e) {
             throw new IOException("<There was a problem loading the static orders file>");
         }
-
-
     }
 
-    public void loadDynamicOrdersHistory (String dynamicOrdersPath, Gson gson) {
-        //DO STH;
+    private void resetSystemItemAmountSoldStats() {
+        this.SDMImproved.getSystemItems().values().forEach(systemItem -> {
+            systemItem.setTotalItemsSold(0);
+        });
     }
 
+    private void addStaticOrdersToStoresAndUpdateSystemInfo(Map<Integer, Store> systemStores, List<Order> staticOrders) {
+        staticOrders.forEach(order -> {
+            int storeID = order.getStoreId();
+            systemStores.get(storeID).getStoreOrdersHistory().add(order);
+            systemStores.get(storeID).setTotalOrdersRevenue( systemStores.get(storeID).getTotalOrdersRevenue() + order.getTotalOrderCost());
+            updateStoreAndSystemItemAmountInformationAccordingToNewOrder(order.getItemsInOrder(), systemStores.get(storeID));
+        });
+    }
 
+    private void resetStoresInformationBeforeLoad() {
+        this.getStores().values().forEach(store -> {
+            //in the Store c'tor the storeOrdersHistory is instantiated so null exception can't be thrown.
+            store.getStoreOrdersHistory().clear();
+            store.setTotalOrdersRevenue(0); //set store revenue to zero so after loading the history it will be updated accordingly
+            store.getItemsBeingSold().values().forEach(itemBeingSold -> { itemBeingSold.setTotalItemsSold(0); });
+        });
+    }
+
+    public void loadDynamicOrdersHistory (String dynamicOrdersPath, Gson gson) throws IOException {
+        try {
+            Map<Integer, Order> currentSystemDynamicOrders;
+            File staticOrdersFile = new File(dynamicOrdersPath);
+            FileReader fReader = new FileReader(staticOrdersFile);
+            List<Order> dynamicOrders = gson.fromJson(fReader, new TypeToken<List<Order>>() {}.getType());
+
+            if(dynamicOrders != null){
+                if(!dynamicOrders.isEmpty()) {
+                    currentSystemDynamicOrders = this.getDynamicOrders();
+
+                    if(currentSystemDynamicOrders == null) {
+                        currentSystemDynamicOrders = new HashMap<>();
+                    }
+                    else { currentSystemDynamicOrders.clear(); }
+
+                    for (Order dynamicOrder : dynamicOrders) {
+                        currentSystemDynamicOrders.put(dynamicOrder.getOrderId(), dynamicOrder);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            throw new IOException("<There was a problem loading the dynamic orders file>");
+        }
+    }
 }

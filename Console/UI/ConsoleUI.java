@@ -82,7 +82,10 @@ public class ConsoleUI {
                         System.out.println("\n" + outputMessage.toString() + "\n");
                     }
                     else {
-                        if(dataWasLoaded) { performActionOfChoice(userMenuChoice); }
+                        if(dataWasLoaded) {
+                            performActionOfChoice(userMenuChoice);
+
+                        }
                         else { System.out.println("\n<You can't perform this action without loading a system data file first>\n"); }
                     }
                 }
@@ -137,12 +140,11 @@ public class ConsoleUI {
             //Our saved file paths.
             String dynamicOrdersPath = this.SDMLogic.getOrderHistoryFilesPath() + "\\dynamic_orders_history.json";
             String staticOrdersPath = this.SDMLogic.getOrderHistoryFilesPath() + "\\static_orders_history.json";
-            this.SDMLogic.loadStaticOrdersHistory(staticOrdersPath, gson); //Need to be implemented.
-            this.SDMLogic.loadDynamicOrdersHistory(dynamicOrdersPath, gson); //Need to be implemented.
+            this.SDMLogic.loadStaticOrdersHistory(staticOrdersPath, gson);
+            this.SDMLogic.loadDynamicOrdersHistory(dynamicOrdersPath, gson);
+            System.out.println("\nOrders history was loaded successfully!\n");
         }
-        else{
-            System.out.println("<There is no orders history to load>");
-        }
+        else{ System.out.println("<There is no orders history to load>"); }
 
         //If an exception occurs then the .run() method handles it.
     }
@@ -162,7 +164,6 @@ public class ConsoleUI {
                 this.SDMLogic.setWasHistorySaved(true);
             }
             else { System.out.println("<The input path does not exist>"); }
-
         }
         catch (IOException e) {
             System.out.println(e.getMessage());
