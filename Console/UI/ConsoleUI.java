@@ -6,8 +6,10 @@ import SDMImprovedFacade.StoreItem;
 import com.google.gson.Gson;
 import jaxb.generatedClasses.Location;
 import javax.xml.bind.*;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.*;
@@ -49,16 +51,6 @@ public class ConsoleUI {
     }
 
     private void run() {
-        //IN THE READ ME MENTION THAT 2 STORES ON THE SAME LOCATION IS NOT VALID! ! ! ! ! !
-        //D:\Java - SDM\SDM_ConsoleApp\src\json
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-small.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.7.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.6.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.5.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.4.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.3.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-error-3.2.xml [V]
-        //D:\Java - SDM\SDM_ConsoleApp\src\tests\ex1-big.xml [V]
         SDMLogic = new SuperMarketLogic();
         Scanner scn = new Scanner(System.in);
         String userMenuChoice;
@@ -98,9 +90,6 @@ public class ConsoleUI {
     private void handleLoadDataFromXMLAction(Scanner scn, StringBuilder outputMessage) throws JAXBException, IOException {
         System.out.println("Please enter a path to the .xml file in order to load it.");
         this.dataWasLoaded = this.SDMLogic.loadData(scn.nextLine().trim(), outputMessage) || this.dataWasLoaded;
-        if(!this.SDMLogic.deleteOrdersHistoryFiles()) { throw new IOException("<There was a problem removing both of the order history files>"); }
-        this.SDMLogic.setWasHistorySaved(false);
-        this.SDMLogic.setOrderHistoryFilesPath("");
     }
 
     private void performActionOfChoice (String userMenuChoice) throws Exception {
@@ -134,19 +123,50 @@ public class ConsoleUI {
         }
     }
 
-    private void loadOrderHistoryFromFile() throws IOException {
+    private void loadOrderHistoryFromFile() throws Exception {
         if(this.SDMLogic.wasHistorySaved()){
             Gson gson = new Gson();
-            //Our saved file paths.
-            String dynamicOrdersPath = this.SDMLogic.getOrderHistoryFilesPath() + "\\dynamic_orders_history.json";
-            String staticOrdersPath = this.SDMLogic.getOrderHistoryFilesPath() + "\\static_orders_history.json";
-            this.SDMLogic.loadStaticOrdersHistory(staticOrdersPath, gson);
-            this.SDMLogic.loadDynamicOrdersHistory(dynamicOrdersPath, gson);
-            System.out.println("\nOrders history was loaded successfully!\n");
+            Scanner scanner = new Scanner(System.in);
+            StringBuilder pathToFiles = new StringBuilder();
+
+            if (getAndValidatePathForLoad(pathToFiles, scanner))
+            {
+                this.SDMLogic.loadStaticOrdersHistory(pathToFiles.toString() + "_static_orders_history.json", gson);
+                this.SDMLogic.loadDynamicOrdersHistory(pathToFiles.toString() + "_dynamic_orders_history.json", gson);
+                System.out.println("\nOrders history was loaded successfully!\n");
+            }
+            else {
+                System.out.println("<The file does not exist>");
+            }
         }
         else{ System.out.println("<There is no orders history to load>"); }
 
         //If an exception occurs then the .run() method handles it.
+    }
+
+    private boolean getAndValidatePathForLoad(StringBuilder pathToFiles, Scanner scanner) throws Exception {
+        try {
+            String userPathInput;
+            String directoryPath;
+            System.out.println("\nPlease enter a path to the saved file (without a file type).");
+            userPathInput = scanner.nextLine().trim();
+            directoryPath = userPathInput.substring(0, userPathInput.lastIndexOf('\\'));
+
+            Path staticPath = Paths.get(userPathInput + "_static_orders_history.json");
+            Path dynamicPath = Paths.get(userPathInput + "_dynamic_orders_history.json");
+
+            pathToFiles.append(userPathInput);
+
+            return Files.exists(staticPath) && Files.exists(dynamicPath);
+            /* This one works - but the above implementation is more accurate. - ! ! ! -
+            File file = new File(userPathInput);
+            pathToFileStringBuilder.append(userPathInput);
+            return file.exists();
+             */
+        }
+        catch (Exception e) {
+            throw new Exception("<There was an error validating the input path>");
+        }
     }
 
     private void saveOrderHistoryToFile() throws Exception {
@@ -160,8 +180,8 @@ public class ConsoleUI {
                 String stringPathToFile = pathToFileStringBuilder.toString();
                 this.SDMLogic.writeStaticOrdersToFile(stringPathToFile, gson);
                 this.SDMLogic.writeDynamicOrdersToFile(stringPathToFile, gson);
-                this.SDMLogic.setOrderHistoryFilesPath(stringPathToFile);
                 this.SDMLogic.setWasHistorySaved(true);
+                System.out.println("\nOrders history was successfully saved!");
             }
             else { System.out.println("<The input path does not exist>"); }
         }
@@ -173,12 +193,20 @@ public class ConsoleUI {
     private boolean getAndValidatePath(StringBuilder pathToFileStringBuilder, Scanner scanner) throws Exception {
         try {
             String userPathInput;
-            System.out.println("\nPlease enter a path where the orders history will be saved");
+            String directoryPath;
+            System.out.println("\nPlease enter the path of the file with the file name included (without a file type).");
             userPathInput = scanner.nextLine().trim();
-            File file = new File(userPathInput);
+            directoryPath = userPathInput.substring(0, userPathInput.lastIndexOf('\\'));
+
+            Path path = Paths.get(directoryPath);
             pathToFileStringBuilder.append(userPathInput);
 
+            return Files.exists(path);
+            /* This one works - but the above implementation is more accurate. - ! ! ! -
+            File file = new File(userPathInput);
+            pathToFileStringBuilder.append(userPathInput);
             return file.exists();
+             */
         }
         catch (Exception e) {
             throw new Exception("<There was an error validating the input path>");
@@ -251,7 +279,6 @@ public class ConsoleUI {
          */
         if(!(storeOfChoice.getItemsBeingSold().size() > 1)) {
             System.out.println("<This is the only item this store is selling, therefore it cannot be removed>\n");
-
         }
         else {
             if (this.SDMLogic.getItems().get(itemToRemove.getId()).getAmountOfStoresSellingThisItem() > 1) {
@@ -648,7 +675,7 @@ public class ConsoleUI {
         String userInput;
 
         while(!isInputValid){
-            System.out.format("How many %s would you like to order?\n", itemToBuy.getName());
+            System.out.format("How much %s would you like to order?\n", itemToBuy.getName());
             userInput = sc.nextLine();
 
             if(itemToBuy.getPurchaseCategory().equals("Quantity")) {

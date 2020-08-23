@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SuperMarketLogic {
     private SuperDuperMarket SDMImproved;
-    private String orderHistoryFilesPath;
     private boolean wasHistorySaved;
 
     public boolean loadData(String filePath, StringBuilder outputMessage) throws JAXBException {
@@ -446,7 +445,7 @@ public class SuperMarketLogic {
 
     public void writeStaticOrdersToFile(String pathToFile, Gson gson) throws Exception {
         try {
-            File file = new File(pathToFile + "\\static_orders_history.json");
+            File file = new File(pathToFile + "_static_orders_history.json");
             List<Order> ordersHistory = new ArrayList<>();
 
             if (file.exists()) {
@@ -474,7 +473,7 @@ public class SuperMarketLogic {
 
     public void writeDynamicOrdersToFile(String pathToFile, Gson gson) throws Exception {
         try {
-            File file = new File(pathToFile + "\\dynamic_orders_history.json");
+            File file = new File(pathToFile + "_dynamic_orders_history.json");
             List<Order> dynamicOrdersHistory;
             if(this.getDynamicOrders() != null){
                 if (file.exists()) {
@@ -495,28 +494,6 @@ public class SuperMarketLogic {
         catch (Exception e) {
             throw new Exception("<There was a problem writing the dynamic orders to json file>");
         }
-    }
-
-    public String getOrderHistoryFilesPath () {
-        return orderHistoryFilesPath;
-    }
-
-    public void setOrderHistoryFilesPath (String orderHistoryFilesPath){
-        this.orderHistoryFilesPath = orderHistoryFilesPath;
-    }
-
-    public boolean deleteOrdersHistoryFiles () {
-        if (this.wasHistorySaved) {
-            try {
-                File staticHistory = new File(this.getOrderHistoryFilesPath() + "\\static_orders_history.json");
-                File dynamicHistory = new File(this.getOrderHistoryFilesPath() + "\\dynamic_orders_history.json");
-                return staticHistory.delete() && dynamicHistory.delete();
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public void loadStaticOrdersHistory (String staticOrdersPath, Gson gson) throws IOException {
