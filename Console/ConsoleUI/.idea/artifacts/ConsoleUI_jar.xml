@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="ConsoleUI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ConsoleUI_jar</output-path>
+    <root id="root">
+      <element id="archive" name="ConsoleUI.jar">
+        <element id="module-output" name="ConsoleUI" />
+        <element id="module-output" name="Engine" />
+      </element>
+      <element id="library" level="project" name="gson-2.8.2 " />
+    </root>
+  </artifact>
+</component>

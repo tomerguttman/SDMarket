@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: ConsoleUI
+Class-Path: gson-2.8.2.jar
+

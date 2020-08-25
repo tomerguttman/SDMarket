@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Engine">
+    <output-path>$PROJECT_DIR$/../Engine/out/artifacts/Engine</output-path>
+    <properties id="ant-preprocessing">
+      <options enabled="true" />
+    </properties>
+    <root id="archive" name="Engine.jar">
+      <element id="module-output" name="Engine" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../gson-2.8.2 .jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
