@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="692.0" prefWidth="1198.0" style="-fx-background-color: #FFFFFF;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AppController">
+   <children>
+      <BorderPane prefWidth="286.0" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <left>
+            <VBox alignment="TOP_CENTER" prefHeight="692.0" prefWidth="300.0" style="-fx-background-color: FCF7F8;" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="123.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <image>
+                        <Image url="@../images/sdm.png" />
+                     </image>
+                  </ImageView>
+                  <Button fx:id="buttonLoadXML" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionLoadXML" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Load XML" textFill="#e7e5e5">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/upload.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonPurchase" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionPurchase" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Purchase">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/supermarket.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonCustomers" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionCustomers" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Customers">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/customer.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonStores" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionStores" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Stores">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/shop.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonItems" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionItems" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Items">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/fruit.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonSettings" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionSettings" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Settings">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/adjust.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonUpdateInformation" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionUpdateInformation" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Update Information">
+                     <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/update.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </VBox>
+         </left>
+      </BorderPane>
+      <AnchorPane id="anchorPaneMainWindow" fx:id="anchorPaneMainWindow" layoutX="300.0" prefHeight="692.0" prefWidth="913.0" stylesheets="@style.css" />
+   </children>
+   <effect>
+      <DropShadow color="#1b1eeb" />
+   </effect>
+</AnchorPane>
