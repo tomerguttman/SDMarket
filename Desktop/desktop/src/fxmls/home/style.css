@@ -1,0 +1,53 @@
+.button
+{
+-fx-background-color : #FCF7F8;
+-fx-text-fill : #000100;
+}
+
+.anchor-pane {
+-fx-border-color: #FFFFFF;
+}
+
+.button:hover{
+-fx-background-color : #80CFA9;
+}
+.button:pressed
+{
+-fx-background-color : #3EA372
+}
+
+.scroll-pane {
+    -fx-background-color: #02030A;
+}
+
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+
+.increment-button, .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #10165F;
+    -fx-background-radius: 5em;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: White;
+}
+
+.label {
+    -fx-text-fill : #000100;
+}
+
+
