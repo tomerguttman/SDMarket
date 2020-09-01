@@ -4,6 +4,7 @@ import generatedClasses.SDMItem;
 import generatedClasses.SDMSell;
 import generatedClasses.SDMStore;
 import generatedClasses.SuperDuperMarketDescriptor;
+import javafx.beans.property.SimpleStringProperty;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +17,11 @@ public class SuperDuperMarket {
     private Map<Integer, Order> systemDynamicOrders;
     //private Map<Integer, Customer> systemCustomers;
 
+    private SimpleStringProperty amountCustomersProperty;
+    private SimpleStringProperty amountOrdersProperty;
+    private SimpleStringProperty amountItemsProperty;
+    private SimpleStringProperty amountStoresProperty;
+
     private int orderID = 1;
 
     public SuperDuperMarket(SuperDuperMarketDescriptor inputSDM){
@@ -24,6 +30,13 @@ public class SuperDuperMarket {
         systemDynamicOrders = new HashMap<>();
         initializeStoresItems(inputSDM);
         initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+
+        amountStoresProperty = new SimpleStringProperty(Integer.toString(this.getSystemStores().values().size()));
+        amountItemsProperty = new SimpleStringProperty(Integer.toString(this.getSystemItems().values().size()));
+        amountOrdersProperty = new SimpleStringProperty(Integer.toString(orderID - 1));
+        //amountCustomersProperty = new SimpleStringProperty(Integer.toString(this.getSystemStores().values().size()));
+
+
     }
 
     public void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
@@ -92,5 +105,21 @@ public class SuperDuperMarket {
         }
 
         this.systemDynamicOrders.put(dynamicOrder.getOrderId(), dynamicOrder);
+    }
+
+    public SimpleStringProperty getAmountStoresProperty() {
+        return amountStoresProperty;
+    }
+
+    public SimpleStringProperty getAmountCustomersProperty() {
+        return amountCustomersProperty;
+    }
+
+    public SimpleStringProperty getAmountOrdersProperty() {
+        return amountOrdersProperty;
+    }
+
+    public SimpleStringProperty getAmountItemsProperty() {
+        return amountItemsProperty;
     }
 }

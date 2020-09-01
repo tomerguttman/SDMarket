@@ -6,6 +6,7 @@
 
 .anchor-pane {
 -fx-border-color: #FFFFFF;
+-fx-background-color: #FFFFFF;
 }
 
 .button:hover{
@@ -17,7 +18,9 @@
 }
 
 .scroll-pane {
-    -fx-background-color: #02030A;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #FFFFFF;
+
 }
 
 .scroll-bar:horizontal, .scroll-bar:vertical{
@@ -43,7 +46,7 @@
 }
 
 .scroll-pane > .corner {
-    -fx-background-color: White;
+
 }
 
 .label {

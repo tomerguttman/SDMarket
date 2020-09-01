@@ -4,70 +4,91 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane style="-fx-border-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.loadXMLController">
+<AnchorPane fx:id="mainRoot" prefHeight="428.0" prefWidth="760.0" style="-fx-border-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoadXMLController">
    <children>
-      <SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" style="-fx-border-color: #FFFFFF;" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-border-color: #FFFFFF; -fx-background-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css">
+      <VBox layoutX="105.0" layoutY="54.0" prefHeight="154.0" prefWidth="595.0" spacing="30.0">
+         <children>
+            <HBox spacing="50.0">
                <children>
-                  <Button fx:id="buttonChooseFile" alignment="CENTER" layoutX="212.0" layoutY="38.0" mnemonicParsing="false" onAction="#onActionChooseXMLFile" text="Choose File" />
-                  <Button fx:id="buttonLoadFile" alignment="CENTER" layoutX="308.0" layoutY="38.0" mnemonicParsing="false" onAction="#onActionLoadXML" text="Load File" />
-                  <ProgressBar fx:id="loadXMLProgressBar" layoutX="149.0" layoutY="76.0" prefHeight="18.0" prefWidth="300.0" progress="0.0" AnchorPane.leftAnchor="149.0" />
-                  <Label layoutX="149.0" layoutY="110.0" prefHeight="17.0" prefWidth="55.0" text="File Path:" />
-                  <Label fx:id="pathToFileLabel" layoutX="208.0" layoutY="110.0" prefHeight="17.0" prefWidth="240.0" stylesheets="@style.css" text="path" />
+                  <Button fx:id="buttonChooseFile" alignment="CENTER" mnemonicParsing="false" onAction="#onActionChooseXMLFile" text="Choose File" />
+                  <Button fx:id="buttonLoadFile" alignment="CENTER" mnemonicParsing="false" onAction="#onActionLoadXML" text="Load File" />
                </children>
-            </AnchorPane>
-          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="242.0" prefWidth="584.0" style="-fx-border-color: #FFFFFF; -fx-background-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" SplitPane.resizableWithParent="false">
+               <padding>
+                  <Insets left="150.0" />
+               </padding>
+            </HBox>
+            <ProgressBar fx:id="loadXMLProgressBar" prefHeight="18.0" prefWidth="288.0" progress="0.0">
+               <VBox.margin>
+                  <Insets left="100.0" />
+               </VBox.margin>
+            </ProgressBar>
+            <HBox prefHeight="17.0" prefWidth="546.0" spacing="20.0">
                <children>
-                  <GridPane fx:id="LoadXMLGridView" layoutX="156.0" layoutY="14.0" prefHeight="136.0" prefWidth="300.0">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label alignment="CENTER" text="Customers" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                           <GridPane.margin>
-                              <Insets />
-                           </GridPane.margin>
-                        </Label>
-                        <Label alignment="CENTER" text="Items" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                        <Label alignment="CENTER" text="Stores" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                        <Label fx:id="amountCustomersLabel" text="0" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="20.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="amountItemsLabel" text="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="20.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="amountStoresLabel" text="0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="20.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </GridPane>
+                  <Label prefHeight="17.0" prefWidth="55.0" text="File Path:" />
+                  <Label fx:id="pathToFileLabel" prefHeight="17.0" prefWidth="346.0" stylesheets="@style.css" text="-" />
                </children>
-            </AnchorPane>
-        </items>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-      </SplitPane>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets left="150.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+      <HBox alignment="CENTER_LEFT" layoutX="105.0" layoutY="257.0" prefHeight="92.0" prefWidth="550.0" spacing="50.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="amountOrdersLabel" text="0" textFill="#2a73ff">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Orders" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="amountCustomersLabel" text="0" textFill="#26bfbc">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Customers" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="amountStoresLabel" text="0" textFill="#fa5f7e">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Stores" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="amountItemsLabel" text="0" textFill="#de0000">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Items" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Separator layoutX="280.0" layoutY="213.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
 </AnchorPane>

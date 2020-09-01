@@ -7,6 +7,9 @@ import SDMImprovedFacade.SuperDuperMarket;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import generatedClasses.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -542,5 +545,17 @@ public class SuperMarketLogic {
         }
 
         this.SDMImproved.setOrderID(maxOrderID.get() + 1);
+    }
+
+    public ObservableValue<? extends String> getAmountItemsStringProperty() {
+        return this.SDMImproved.getAmountItemsProperty();
+    }
+
+    public ObservableValue<? extends String> getAmountOrdersStringProperty() {
+        return this.SDMImproved.getAmountOrdersProperty();
+    }
+
+    public ObservableValue<? extends String> getAmountStoresStringProperty() {
+        return SDMImproved.getAmountStoresProperty();
     }
 }

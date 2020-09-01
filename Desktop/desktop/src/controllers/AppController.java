@@ -5,26 +5,24 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppController {
 
     private SuperMarketLogic SDMLogic;
     private SimpleBooleanProperty isXMLLoaded;
     private Stage mainStage;
+
+    //Controllers
+    private LoadXMLController loadXMLController;
+    private StoresController storesController;
 
     @FXML
     private Button buttonLoadXML;
@@ -50,9 +48,52 @@ public class AppController {
     @FXML
     private AnchorPane anchorPaneMainWindow;
 
-    public AppController() {
+    public AppController() throws IOException {
         isXMLLoaded = new SimpleBooleanProperty(false);
         SDMLogic = new SuperMarketLogic();
+        loadXMLController = initializeLoadXMLController();
+        storesController = initializeStoresController();
+    }
+
+    private StoresController initializeStoresController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/stores.fxml");
+        loader.setLocation(mainFXML);
+        loader.load(); //need to be done before loader.getController() !
+        StoresController storesController = loader.getController();
+        storesController.setMainController(this);
+        /*
+            Binds here.
+         */
+        return storesController;
+    }
+
+    private LoadXMLController initializeLoadXMLController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/loadXML.fxml");
+        loader.setLocation(mainFXML);
+        loader.load(); //need to be done before loader.getController() !
+        LoadXMLController xmlLoadController = loader.getController();
+        xmlLoadController.setMainController(this);
+        isXMLLoaded.bind(xmlLoadController.getIsXMLLoadedProperty());
+
+        return xmlLoadController;
+    }
+
+    public SuperMarketLogic getSDMLogic() {
+        return SDMLogic;
+    }
+
+    public SimpleBooleanProperty getIsXMLLoaded() {
+        return isXMLLoaded;
+    }
+
+    public SimpleBooleanProperty isXMLLoadedProperty() {
+        return isXMLLoaded;
+    }
+
+    public void setIsXMLLoaded(boolean isXMLLoaded) {
+        this.isXMLLoaded.set(isXMLLoaded);
     }
 
     public Stage getMainStage() {
@@ -89,43 +130,10 @@ public class AppController {
 
     @FXML
     void onActionLoadXML(ActionEvent event) throws JAXBException, IOException {
-        /*
-        boolean isValidXML;
-        StringBuilder sb = new StringBuilder();
-        FileChooser dialog = new FileChooser();
-        File file = dialog.showOpenDialog(mainStage);
-        if( file != null) {
-            isValidXML = this.SDMLogic.loadData(file.getAbsolutePath().trim(), sb);
-            isXMLLoaded.set( isValidXML || isXMLLoaded.get());
-            if(!isValidXML) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("XML loading error");
-                alert.setHeaderText(null);
-                alert.setContentText(sb.toString());
-                alert.showAndWait();
-            }
+        if (!anchorPaneMainWindow.getChildren().contains(loadXMLController.getRoot())) {
+            anchorPaneMainWindow.getChildren().clear();
+            anchorPaneMainWindow.getChildren().add(loadXMLController.getRoot());
         }
-        */
-        /*
-        window = primaryStage;
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("MainWindowView.fxml"));
-        this.root = loader.load();
-
-        MainWindowController mwc = new MainWindowController();
-        mwc.setMain(this);
-
-        Scene scene = new Scene(root);
-        window.setTitle("JavaFX");
-        window.setScene(scene);
-        window.show();
-        */
-
-        FXMLLoader loader = new FXMLLoader();
-        URL mainFXML = getClass().getResource("/fxmls/home/loadXML.fxml");
-        loader.setLocation(mainFXML);
-        AnchorPane root = loader.load();
-        root.setPrefSize(anchorPaneMainWindow.getPrefWidth(), anchorPaneMainWindow.getPrefHeight());
-        anchorPaneMainWindow.getChildren().add(root);
     }
 
     @FXML
@@ -140,7 +148,28 @@ public class AppController {
 
     @FXML
     void onActionStores(ActionEvent event) {
+        if (!anchorPaneMainWindow.getChildren().contains(storesController.getMainRoot())) {
+            anchorPaneMainWindow.getChildren().clear();
+            AnchorPane anchorPane = storesController.getMainRoot();
+            anchorPaneMainWindow.getChildren().add(anchorPane);
+            AnchorPane.setTopAnchor(anchorPane,0.0);
+            AnchorPane.setRightAnchor(anchorPane,0.0);
+            AnchorPane.setBottomAnchor(anchorPane,0.0);
+            AnchorPane.setLeftAnchor(anchorPane,0.0);
 
+            List<StoreCardController> storeCards = new ArrayList<>();
+
+            this.getSDMLogic().getStores().values().forEach(store -> {
+                StoreCardController storeCard = new StoreCardController();
+                storeCard.setStoreIdCardLabelText(Integer.toString(store.getId()));
+                storeCard.setStoreNameCardLabelText(store.getName());
+                storeCards.add(storeCard);
+            });
+
+            storesController.addStoreCards(storeCards);
+            //D:\Java - SDM\SDM_ConsoleApp\src\tests
+
+        }
     }
 
     @FXML
