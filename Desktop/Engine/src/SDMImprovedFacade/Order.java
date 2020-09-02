@@ -15,6 +15,7 @@ public class Order {
     final String storeName;
     final Location orderDestination;
     private int amountOfStoresRelatedToOrder;
+    private final int amountItemsInOrder ;
     final List<StoreItem> itemsInOrder;
 
     public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost,
@@ -29,6 +30,7 @@ public class Order {
         this.totalOrderCost = deliveryCost + costOfItemsInOrder;
         this.orderDestination = userLocation;
         this.amountOfStoresRelatedToOrder = 1;
+        this.amountItemsInOrder = itemsInOrder.size();
     }
 
     public Order(String dateOrderWasMade, Location userLocation, int orderId,
@@ -43,6 +45,7 @@ public class Order {
         this.totalOrderCost = deliveryCost + costOfItemsInOrder;
         this.orderDestination = userLocation;
         this.amountOfStoresRelatedToOrder = amountOfStoresParticipating;
+        this.amountItemsInOrder = itemsInOrder.size();
     }
 
     public int getNumberOfItemsInOrder(){

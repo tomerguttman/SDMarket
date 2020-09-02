@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.geometry.Point3D?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
@@ -9,10 +10,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onMouseClickedStoreCard" prefHeight="90.0" prefWidth="140.0" style="-fx-background-color: #EEEEFB; -fx-background-radius: 10 10 10 10;" styleClass="storeCard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.StoreCardController">
    <children>
-      <Pane prefHeight="34.0" prefWidth="117.0" style="-fx-background-color: #33CA7F;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Pane prefHeight="34.0" prefWidth="117.0" style="-fx-background-color: #80CFA9; -fx-background-radius: 10 10 0 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <StackPane layoutX="6.0" layoutY="11.0" prefHeight="34.0" prefWidth="34.0">
                <children>
@@ -33,10 +33,13 @@
             </Label>
          </children>
       </Pane>
-      <Label fx:id="storeNameCardLabel" alignment="CENTER" layoutX="2.0" layoutY="52.0" prefHeight="21.0" prefWidth="140.0" text="STORE NAME">
+      <Label fx:id="storeNameCardLabel" alignment="CENTER" layoutX="2.0" layoutY="52.0" prefHeight="21.0" prefWidth="140.0" text="STORE NAME" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
    </children>
+   <opaqueInsets>
+      <Insets left="10.0" />
+   </opaqueInsets>
 </AnchorPane>

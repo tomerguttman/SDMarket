@@ -1,5 +1,6 @@
 package controllers;
 
+import SDMImprovedFacade.Store;
 import SuperMarketLogic.SuperMarketLogic;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -12,7 +13,9 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AppController {
 
@@ -23,6 +26,7 @@ public class AppController {
     //Controllers
     private LoadXMLController loadXMLController;
     private StoresController storesController;
+    private Map<Integer, StoreCardController> storeCardControllersMap = new HashMap<>();
 
     @FXML
     private Button buttonLoadXML;
@@ -148,28 +152,34 @@ public class AppController {
 
     @FXML
     void onActionStores(ActionEvent event) {
-        if (!anchorPaneMainWindow.getChildren().contains(storesController.getMainRoot())) {
-            anchorPaneMainWindow.getChildren().clear();
-            AnchorPane anchorPane = storesController.getMainRoot();
-            anchorPaneMainWindow.getChildren().add(anchorPane);
-            AnchorPane.setTopAnchor(anchorPane,0.0);
-            AnchorPane.setRightAnchor(anchorPane,0.0);
-            AnchorPane.setBottomAnchor(anchorPane,0.0);
-            AnchorPane.setLeftAnchor(anchorPane,0.0);
+        try{
+            FXMLLoader loader;
+            if (!anchorPaneMainWindow.getChildren().contains(storesController.getMainRoot())) {
+                anchorPaneMainWindow.getChildren().clear();
+                AnchorPane anchorPane = storesController.getMainRoot();
+                anchorPaneMainWindow.getChildren().add(anchorPane);
+                AnchorPane.setTopAnchor(anchorPane, 0.0);
+                AnchorPane.setRightAnchor(anchorPane, 0.0);
+                AnchorPane.setBottomAnchor(anchorPane, 0.0);
+                AnchorPane.setLeftAnchor(anchorPane, 0.0);
 
-            List<StoreCardController> storeCards = new ArrayList<>();
+                for(Store store : getSDMLogic().getStores().values()) {
+                    loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("/fxmls/home/storeCard.fxml"));
+                    loader.load();
+                    StoreCardController storeCardController = loader.getController();
+                    storeCardController.setStoreIdCardLabelText(Integer.toString(store.getId()));
+                    storeCardController.setStoreNameCardLabelText(store.getName());
+                    storeCardControllersMap.put(store.getId(), storeCardController);
+                }
 
-            this.getSDMLogic().getStores().values().forEach(store -> {
-                StoreCardController storeCard = new StoreCardController();
-                storeCard.setStoreIdCardLabelText(Integer.toString(store.getId()));
-                storeCard.setStoreNameCardLabelText(store.getName());
-                storeCards.add(storeCard);
-            });
-
-            storesController.addStoreCards(storeCards);
-            //D:\Java - SDM\SDM_ConsoleApp\src\tests
-
+                storesController.addStoreCards(storeCardControllersMap);
+                //D:\Java - SDM\SDM_ConsoleApp\src\tests
+            }
         }
+        catch(IOException e){
+                e.printStackTrace();
+            }
     }
 
     @FXML

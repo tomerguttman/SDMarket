@@ -10,50 +10,49 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="935.0" style="-fx-border-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.StoresController">
    <children>
-      <ScrollPane fx:id="storesScrollPane" hbarPolicy="NEVER" layoutY="-6.0" prefHeight="707.0" prefWidth="302.0" style="-fx-background-color: #FFFFFF;" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="-7.0">
+      <ScrollPane fx:id="storesScrollPane" fitToHeight="true" hbarPolicy="NEVER" layoutX="2.0" layoutY="2.0" prefHeight="698.0" prefWidth="180.0" style="-fx-background-color: #FFFFFF;" stylesheets="@style.css" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0">
          <content>
-            <AnchorPane prefHeight="695.0" prefWidth="298.0">
+            <AnchorPane prefHeight="692.0" prefWidth="175.0">
                <children>
-                  <VBox fx:id="storeCardsVBox" prefHeight="200.0" prefWidth="100.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox fx:id="storeCardsVBox" fillWidth="false" prefHeight="695.0" prefWidth="160.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <padding>
-                        <Insets bottom="10.0" left="79.0" right="79.0" top="10.0" />
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
                      </padding>
                   </VBox>
                </children>
             </AnchorPane>
          </content>
       </ScrollPane>
-      <TableView fx:id="itemsTableView" layoutX="317.0" layoutY="150.0" prefHeight="150.0" prefWidth="600.0">
+      <TableView fx:id="itemsTableView" layoutX="240.0" layoutY="150.0" prefHeight="150.0" prefWidth="600.0" AnchorPane.leftAnchor="247.5" AnchorPane.rightAnchor="87.5">
         <columns>
-          <TableColumn minWidth="120.0" prefWidth="120.0" text="ID" />
-          <TableColumn minWidth="120.0" prefWidth="120.0" text="Name" />
-            <TableColumn minWidth="120.0" prefWidth="120.0" text="Category" />
-            <TableColumn minWidth="120.0" prefWidth="120.0" text="Price" />
-            <TableColumn minWidth="120.0" prefWidth="120.0" text="Amount Sold" />
+          <TableColumn fx:id="itemsTableViewIdColumn" minWidth="120.0" prefWidth="120.0" text="ID" />
+          <TableColumn fx:id="itemsTableViewNameColumn" minWidth="120.0" prefWidth="120.0" text="Name" />
+            <TableColumn fx:id="itemsTableViewCategoryColumn" minWidth="120.0" prefWidth="120.0" text="Category" />
+            <TableColumn fx:id="itemsTableViewPriceColumn" minWidth="120.0" prefWidth="120.0" text="Price" />
+            <TableColumn fx:id="itemsTableViewAmountSoldColumn" minWidth="120.0" prefWidth="120.0" text="Amount Sold" />
         </columns>
       </TableView>
-      <TableView fx:id="ordersTableView" layoutX="317.0" layoutY="340.0" prefHeight="150.0" prefWidth="600.0">
+      <TableView fx:id="ordersTableView" layoutX="317.0" layoutY="340.0" prefHeight="150.0" prefWidth="600.0" AnchorPane.leftAnchor="247.5" AnchorPane.rightAnchor="87.5">
          <columns>
-            <TableColumn minWidth="100.0" prefWidth="100.0" text="ID" />
-            <TableColumn minWidth="100.0" prefWidth="100.0" text="Date" />
-            <TableColumn minWidth="100.0" prefWidth="100.0" text="Total Items" />
-            <TableColumn minWidth="100.0" prefWidth="100.0" text="Total Items Price" />
-            <TableColumn minWidth="100.0" prefWidth="100.0" text="Delivery Cost" />
-            <TableColumn minWidth="100.0" prefWidth="100.0" text="Total Price" />
+            <TableColumn fx:id="ordersTableViewIdColumn" minWidth="100.0" prefWidth="100.0" text="ID" />
+            <TableColumn fx:id="ordersTableViewDateColumn" minWidth="100.0" prefWidth="100.0" text="Date" />
+            <TableColumn fx:id="ordersTableViewTotalItemsColumn" minWidth="100.0" prefWidth="100.0" text="Total Items" />
+            <TableColumn fx:id="ordersTableViewTotalItemsPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Items Price" />
+            <TableColumn fx:id="ordersTableViewDeliveryCostColumn" minWidth="100.0" prefWidth="100.0" text="Delivery Cost" />
+            <TableColumn fx:id="ordersTableViewTotalPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Price" />
          </columns>
       </TableView>
-      <TableView fx:id="salesTableView" layoutX="317.0" layoutY="528.0" prefHeight="150.0" prefWidth="600.0">
+      <TableView fx:id="salesTableView" layoutX="317.0" layoutY="528.0" prefHeight="150.0" prefWidth="600.0" AnchorPane.leftAnchor="247.5" AnchorPane.rightAnchor="87.5">
          <columns>
-            <TableColumn minWidth="150.0" prefWidth="75.0" text="ID" />
+            <TableColumn fx:id="salesTableViewIdColumn" minWidth="150.0" prefWidth="75.0" text="ID" />
             <TableColumn minWidth="150.0" prefWidth="75.0" text="-" />
             <TableColumn minWidth="150.0" prefWidth="75.0" text="-" />
             <TableColumn minWidth="150.0" prefWidth="75.0" text="-" />
          </columns>
       </TableView>
-      <HBox alignment="CENTER_LEFT" layoutX="345.0" layoutY="41.0" prefHeight="92.0" prefWidth="584.0" spacing="50.0">
+      <HBox alignment="CENTER_LEFT" layoutX="249.0" layoutY="44.0" prefHeight="92.0" prefWidth="584.0" spacing="50.0">
          <children>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                <children>
@@ -97,22 +96,22 @@
             </VBox>
          </children>
       </HBox>
-      <Label id="storeId" layoutX="306.0" layoutY="12.0" prefHeight="38.0" prefWidth="269.0" text="1 : AMPM" AnchorPane.topAnchor="0.0">
+      <Label id="storeId" fx:id="storesHeaderLabel" layoutX="249.0" layoutY="8.0" prefHeight="58.0" prefWidth="598.0" AnchorPane.topAnchor="7.0">
          <font>
             <Font name="System Bold" size="40.0" />
          </font>
       </Label>
-      <Label layoutX="318.0" layoutY="129.0" text="Items ">
+      <Label layoutX="249.0" layoutY="129.0" text="Items ">
          <font>
             <Font name="System Italic" size="15.0" />
          </font>
       </Label>
-      <Label layoutX="317.0" layoutY="321.0" text="Orders">
+      <Label layoutX="249.0" layoutY="320.0" text="Orders">
          <font>
             <Font name="System Italic" size="15.0" />
          </font>
       </Label>
-      <Label layoutX="318.0" layoutY="508.0" text="Sales">
+      <Label layoutX="249.0" layoutY="508.0" text="Sales">
          <font>
             <Font name="System Italic" size="15.0" />
          </font>

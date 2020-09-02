@@ -117,7 +117,7 @@
             </VBox>
          </left>
       </BorderPane>
-      <AnchorPane id="anchorPaneMainWindow" fx:id="anchorPaneMainWindow" layoutX="300.0" prefHeight="689.0" prefWidth="895.0" styleClass="anchor-pane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0" />
+      <AnchorPane id="anchorPaneMainWindow" fx:id="anchorPaneMainWindow" layoutX="300.0" prefHeight="700.0" prefWidth="935.0" styleClass="anchor-pane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
    </children>
    <effect>
       <DropShadow color="#1b1eeb" />
