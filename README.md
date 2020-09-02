@@ -25,6 +25,14 @@ SDMarket allows you to set up stores that sell various items and will allow the 
 - [x] Load data from and XML file
 - [x] JavaFX GUI
 
+## Contributing
+
+Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to SDMarket.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
 ## Team & Credits
 
 - Authors: <a href="mailto:tomerguttman27@gmail.com" target="_blank">Tomer Guttman</a>, <a href="mailto:ohadslu@gmail.com" target="_blank">Ohad Slutzky</a>
