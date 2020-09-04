@@ -2,7 +2,6 @@ package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class StoreCardController {
@@ -22,11 +21,6 @@ public class StoreCardController {
 
     public void setStoreNameCardLabelText(String storeName){
         storeNameCardLabel.setText(storeName);
-    }
-
-    @FXML
-    void onMouseClickedStoreCard(MouseEvent event) {
-
     }
 
     public AnchorPane getMainRoot() {

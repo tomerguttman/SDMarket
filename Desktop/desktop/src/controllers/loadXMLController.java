@@ -85,6 +85,7 @@ public class LoadXMLController {
             //isXMLTaskLoaded.bind(Bindings.when(task.valueProperty().get() || isXMLTaskLoaded.get());
             isXMLTaskLoaded.set(true);
             loadXMLProgressBar.progressProperty().bind(task.progressProperty());
+
             Runnable target = new Runnable() {
                 @Override
                 public void run() {
@@ -116,16 +117,17 @@ public class LoadXMLController {
     }
 
     private class LoadXMLTask extends Task<Boolean> {
-
         @Override
         protected Boolean call() throws Exception {
             StringBuilder sb = new StringBuilder();
             File file = new File(pathToFileLabel.textProperty().get().trim());
             boolean isValidXML = mainController.getSDMLogic().loadData(file.getAbsolutePath().trim(), sb);
-//            mainController.getIsXMLLoaded().set( isValidXML || mainController.getIsXMLLoaded().get());
+
+            //mainController.getIsXMLLoaded().set( isValidXML || mainController.getIsXMLLoaded().get());
             delayProgress();
-            if(!isValidXML) {
+            if(!isValidXML && !isXMLTaskLoaded.get()) {
                 Platform.runLater(() -> {
+                    loadXMLProgressBar.setStyle("-fx-accent: red;");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("XML loading error");
                     alert.setHeaderText(null);
@@ -133,20 +135,31 @@ public class LoadXMLController {
                     alert.showAndWait();
                 });
             }
+            else if(isValidXML && sb.length() > 0){
+                Platform.runLater(() -> {
+                    loadXMLProgressBar.setStyle("-fx-accent: red;");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("XML loading error");
+                    alert.setHeaderText("The previous XML file is still loaded due to an error in the loading process of the new one");
+                    alert.setContentText("Error detected: " + sb.toString());
+                    alert.showAndWait();
+                });
+            }
             else{
                 Platform.runLater(() -> {
-                    //this.amountCustomersLabel.textProperty().bind(mainController.getSDMLogic().getAmountCustomers());
+                    amountCustomersLabel.textProperty().bind(mainController.getSDMLogic().getAmountCustomers());
                     amountStoresLabel.textProperty().bind(mainController.getSDMLogic().getAmountStoresStringProperty());
                     amountItemsLabel.textProperty().bind(mainController.getSDMLogic().getAmountItemsStringProperty());
                     amountOrdersLabel.textProperty().bind(mainController.getSDMLogic().getAmountOrdersStringProperty());
+                    loadXMLProgressBar.setStyle("-fx-accent: green;");
                 });
             }
-            this.updateProgress(100,100);
 
             return Boolean.TRUE;
         }
 
         private void delayProgress() throws InterruptedException {
+            loadXMLProgressBar.setStyle("-fx-accent: blue;");
             for (int i = 1; i <= 1000; i++) {
                 this.updateProgress(i,1000);
                 Thread.sleep(3);
@@ -154,3 +167,4 @@ public class LoadXMLController {
         }
     }
 }
+

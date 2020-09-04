@@ -44,7 +44,7 @@
 	</xs:element>
 	<xs:element name="if-you-buy">
 		<xs:complexType>
-			<xs:attribute name="quantity" type="xs:int" use="required"/>
+			<xs:attribute name="quantity" type="xs:double" use="required"/>
 			<xs:attribute name="item-id" type="xs:int" use="required"/>
 		</xs:complexType>
 	</xs:element>
@@ -83,7 +83,7 @@
 	</xs:element>
 	<xs:element name="SDM-offer">
 		<xs:complexType>
-			<xs:attribute name="quantity" type="xs:int" use="required"/>
+			<xs:attribute name="quantity" type="xs:double" use="required"/>
 			<xs:attribute name="item-id" type="xs:int" use="required"/>
 			<xs:attribute name="for-additional" type="xs:int" use="required"/>
 		</xs:complexType>

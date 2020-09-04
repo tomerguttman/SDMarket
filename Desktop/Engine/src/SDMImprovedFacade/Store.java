@@ -1,8 +1,9 @@
 package SDMImprovedFacade;
 
-import generatedClasses.Location;
-import generatedClasses.SDMStore;
+import generatedClasses.*;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,9 @@ public class Store {
     private String name;
     private Location storeLocation;
     private Map<Integer, StoreItem> itemsBeingSold;
+    private Map<Integer, List<Discount>> storeDiscounts; // Integer -> IfYouBuyItemId, List<Discount> -> Discount associated with the item.
     private final List<Order> storeOrdersHistory;
+
 
     public Store(SDMStore inputStore){
         this.Id = inputStore.getId();
@@ -21,6 +24,33 @@ public class Store {
         this.name = inputStore.getName();
         this.storeLocation = inputStore.getLocation();
         storeOrdersHistory = new ArrayList<>();
+        this.storeDiscounts = generateNewDiscountsMap(inputStore);
+    }
+
+    private Map<Integer, List<Discount>> generateNewDiscountsMap(SDMStore inputStore) {
+        Map<Integer, List<Discount>> discountsMap = new HashMap<>();
+        for (SDMSell sdmSell : inputStore.getSDMPrices().getSDMSell()) {
+            if(inputStore.getSDMDiscounts() != null){
+                for (SDMDiscount discount : inputStore.getSDMDiscounts().getSDMDiscount()) {
+                    if(discount.getIfYouBuy().getItemId() == sdmSell.getItemId()) {
+                        if(discountsMap.containsKey(sdmSell.getItemId())) {
+                            discountsMap.get(sdmSell.getItemId()).add(new Discount(discount));
+                        }
+                        else {
+                            ArrayList<Discount> discountsList = new ArrayList<>();
+                            discountsList.add(new Discount(discount));
+                            discountsMap.put(sdmSell.getItemId(), discountsList);
+                        }
+                    }
+                }
+            }
+        }
+
+        return discountsMap;
+    }
+
+    public Map<Integer, List<Discount>> getStoreDiscounts() {
+        return storeDiscounts;
     }
 
     public void setTotalOrdersRevenue(double totalOrdersRevenue) {

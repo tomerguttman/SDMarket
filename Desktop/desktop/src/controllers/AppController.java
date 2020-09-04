@@ -1,8 +1,12 @@
 package controllers;
 
+import SDMImprovedFacade.Customer;
 import SDMImprovedFacade.Store;
+import SDMImprovedFacade.StoreItem;
 import SuperMarketLogic.SuperMarketLogic;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AppController {
 
@@ -26,7 +31,10 @@ public class AppController {
     //Controllers
     private LoadXMLController loadXMLController;
     private StoresController storesController;
+    private ItemsController itemsController;
+    private CustomersController customersController;
     private Map<Integer, StoreCardController> storeCardControllersMap = new HashMap<>();
+    private Map<Integer, CustomerCardController> customerCardControllersMap = new HashMap<>();
 
     @FXML
     private Button buttonLoadXML;
@@ -57,6 +65,29 @@ public class AppController {
         SDMLogic = new SuperMarketLogic();
         loadXMLController = initializeLoadXMLController();
         storesController = initializeStoresController();
+        itemsController = initializeItemsController();
+        customersController = initializeCustomersController();
+    }
+
+    private CustomersController initializeCustomersController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/customers.fxml");
+        loader.setLocation(mainFXML);
+        loader.load();
+        CustomersController customersController = loader.getController();
+        customersController.setMainController(this);
+
+        return customersController;
+    }
+
+    private ItemsController initializeItemsController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/items.fxml");
+        loader.setLocation(mainFXML);
+        loader.load();
+        ItemsController itemsController = loader.getController();
+        itemsController.setMainController(this);
+        return itemsController;
     }
 
     private StoresController initializeStoresController() throws IOException {
@@ -124,12 +155,47 @@ public class AppController {
 
     @FXML
     void onActionCustomers(ActionEvent event) {
-        System.out.println("check check!");
+        try{
+            FXMLLoader loader;
+            if (!anchorPaneMainWindow.getChildren().contains(customersController.getMainRoot())) {
+                anchorPaneMainWindow.getChildren().clear();
+                AnchorPane anchorPane = customersController.getMainRoot();
+                anchorPaneMainWindow.getChildren().add(anchorPane);
+                AnchorPane.setTopAnchor(anchorPane, 0.0);
+                AnchorPane.setRightAnchor(anchorPane, 0.0);
+                AnchorPane.setBottomAnchor(anchorPane, 0.0);
+                AnchorPane.setLeftAnchor(anchorPane, 0.0);
+
+                for(Customer customer : getSDMLogic().getCustomers().values()) {
+                    loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("/fxmls/home/customerCard.fxml"));
+                    loader.load();
+                    CustomerCardController customerCardController = loader.getController();
+                    customerCardController.setCustomerIdCardLabelText(Integer.toString(customer.getId()));
+                    customerCardController.setCustomerNameCardLabelText(customer.getName());
+                    customerCardControllersMap.put(customer.getId(), customerCardController);
+                }
+
+                customersController.addCustomerCards(customerCardControllersMap);
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void onActionItems(ActionEvent event) {
-
+        if (!anchorPaneMainWindow.getChildren().contains(itemsController.getRoot())) {
+            anchorPaneMainWindow.getChildren().clear();
+            AnchorPane itemsControllerMainRoot = itemsController.getRoot();
+            anchorPaneMainWindow.getChildren().add(itemsControllerMainRoot);
+            AnchorPane.setTopAnchor(itemsControllerMainRoot, 0.0);
+            AnchorPane.setRightAnchor(itemsControllerMainRoot, 0.0);
+            AnchorPane.setBottomAnchor(itemsControllerMainRoot, 0.0);
+            AnchorPane.setLeftAnchor(itemsControllerMainRoot, 0.0);
+            itemsController.updateSystemItemsScene(new ArrayList<>(this.getSDMLogic().getItems().values()));
+        }
     }
 
     @FXML
@@ -174,7 +240,6 @@ public class AppController {
                 }
 
                 storesController.addStoreCards(storeCardControllersMap);
-                //D:\Java - SDM\SDM_ConsoleApp\src\tests
             }
         }
         catch(IOException e){

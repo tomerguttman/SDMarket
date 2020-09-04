@@ -1,22 +1,23 @@
 package SDMImprovedFacade;
 
-import generatedClasses.SDMItem;
-import generatedClasses.SDMSell;
-import generatedClasses.SDMStore;
-import generatedClasses.SuperDuperMarketDescriptor;
+import generatedClasses.*;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SuperDuperMarket {
+    //ClassMembers
     private final Map<Integer, Store> systemStores;
     private final Map<Integer, StoreItem> systemItems;
     private Map<Integer, Order> systemDynamicOrders;
-    //private Map<Integer, Customer> systemCustomers;
 
+    private Map<Integer, Customer> systemCustomers;
+
+    //Properties
     private SimpleStringProperty amountCustomersProperty;
     private SimpleStringProperty amountOrdersProperty;
     private SimpleStringProperty amountItemsProperty;
@@ -27,16 +28,25 @@ public class SuperDuperMarket {
     public SuperDuperMarket(SuperDuperMarketDescriptor inputSDM){
         systemStores = inputSDM.getSDMStores().getSDMStore().stream().collect(Collectors.toMap(SDMStore::getId, Store::new));
         systemItems = inputSDM.getSDMItems().getSDMItem().stream().collect(Collectors.toMap(SDMItem::getId, StoreItem::new));
+        systemCustomers = inputSDM.getSDMCustomers().getSDMCustomer().stream().collect(Collectors.toMap(SDMCustomer::getId, Customer::new));
         systemDynamicOrders = new HashMap<>();
         initializeStoresItems(inputSDM);
+        updateStoreDiscountsItemToBuyName(systemStores);
         initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
 
         amountStoresProperty = new SimpleStringProperty(Integer.toString(this.getSystemStores().values().size()));
         amountItemsProperty = new SimpleStringProperty(Integer.toString(this.getSystemItems().values().size()));
         amountOrdersProperty = new SimpleStringProperty(Integer.toString(orderID - 1));
-        //amountCustomersProperty = new SimpleStringProperty(Integer.toString(this.getSystemStores().values().size()));
+        amountCustomersProperty = new SimpleStringProperty(Integer.toString(this.getSystemCustomers().values().size()));
+    }
 
-
+    private void updateStoreDiscountsItemToBuyName(Map<Integer, Store> systemStores) {
+        for (Store store : systemStores.values()) {
+            Map<Integer, List<Discount>> currentStoreDiscounts = store.getStoreDiscounts();
+            currentStoreDiscounts.forEach((itemToBuyID, listOfDiscountOffers) -> {
+                listOfDiscountOffers.forEach(discount -> discount.setItemToBuyName(store.getItemsBeingSold().get(itemToBuyID).getName()));
+            });
+        }
     }
 
     public void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
@@ -88,9 +98,7 @@ public class SuperDuperMarket {
     public void setOrderID(int orderID) {
         this.orderID = orderID;
     }
-    /*
-        NEED TO BE CHECKED ! ! ! !
-     */
+
     public int getOrderID() {
         return orderID++;
     }
@@ -105,6 +113,10 @@ public class SuperDuperMarket {
         }
 
         this.systemDynamicOrders.put(dynamicOrder.getOrderId(), dynamicOrder);
+    }
+
+    public Map<Integer, Customer> getSystemCustomers() {
+        return systemCustomers;
     }
 
     public SimpleStringProperty getAmountStoresProperty() {

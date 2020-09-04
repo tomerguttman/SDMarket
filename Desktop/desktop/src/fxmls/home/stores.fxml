@@ -25,31 +25,31 @@
             </AnchorPane>
          </content>
       </ScrollPane>
-      <TableView fx:id="itemsTableView" layoutX="240.0" layoutY="150.0" prefHeight="150.0" prefWidth="600.0" AnchorPane.leftAnchor="247.5" AnchorPane.rightAnchor="87.5">
+      <TableView fx:id="itemsTableView" layoutX="193.0" layoutY="150.0" prefHeight="150.0" prefWidth="738.0" AnchorPane.leftAnchor="190.0" AnchorPane.rightAnchor="5.0">
         <columns>
-          <TableColumn fx:id="itemsTableViewIdColumn" minWidth="120.0" prefWidth="120.0" text="ID" />
-          <TableColumn fx:id="itemsTableViewNameColumn" minWidth="120.0" prefWidth="120.0" text="Name" />
-            <TableColumn fx:id="itemsTableViewCategoryColumn" minWidth="120.0" prefWidth="120.0" text="Category" />
-            <TableColumn fx:id="itemsTableViewPriceColumn" minWidth="120.0" prefWidth="120.0" text="Price" />
-            <TableColumn fx:id="itemsTableViewAmountSoldColumn" minWidth="120.0" prefWidth="120.0" text="Amount Sold" />
+          <TableColumn fx:id="itemsTableViewIdColumn" editable="false" minWidth="120.0" prefWidth="120.0" text="ID" />
+          <TableColumn fx:id="itemsTableViewNameColumn" editable="false" minWidth="120.0" prefWidth="120.0" text="Name" />
+            <TableColumn fx:id="itemsTableViewCategoryColumn" editable="false" minWidth="120.0" prefWidth="120.0" text="Category" />
+            <TableColumn fx:id="itemsTableViewPriceColumn" editable="false" minWidth="120.0" prefWidth="120.0" text="Price" />
+            <TableColumn fx:id="itemsTableViewAmountSoldColumn" editable="false" minWidth="120.0" prefWidth="120.0" text="Amount Sold" />
         </columns>
       </TableView>
-      <TableView fx:id="ordersTableView" layoutX="317.0" layoutY="340.0" prefHeight="150.0" prefWidth="600.0" AnchorPane.leftAnchor="247.5" AnchorPane.rightAnchor="87.5">
+      <TableView fx:id="ordersTableView" layoutX="196.0" layoutY="333.0" prefHeight="150.0" prefWidth="736.0" AnchorPane.leftAnchor="190.0" AnchorPane.rightAnchor="5.0">
          <columns>
-            <TableColumn fx:id="ordersTableViewIdColumn" minWidth="100.0" prefWidth="100.0" text="ID" />
-            <TableColumn fx:id="ordersTableViewDateColumn" minWidth="100.0" prefWidth="100.0" text="Date" />
-            <TableColumn fx:id="ordersTableViewTotalItemsColumn" minWidth="100.0" prefWidth="100.0" text="Total Items" />
-            <TableColumn fx:id="ordersTableViewTotalItemsPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Items Price" />
-            <TableColumn fx:id="ordersTableViewDeliveryCostColumn" minWidth="100.0" prefWidth="100.0" text="Delivery Cost" />
-            <TableColumn fx:id="ordersTableViewTotalPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Price" />
+            <TableColumn fx:id="ordersTableViewIdColumn" editable="false" minWidth="100.0" prefWidth="100.0" text="ID" />
+            <TableColumn fx:id="ordersTableViewDateColumn" editable="false" minWidth="100.0" prefWidth="100.0" text="Date" />
+            <TableColumn fx:id="ordersTableViewTotalItemsColumn" editable="false" minWidth="100.0" prefWidth="100.0" text="Total Items" />
+            <TableColumn fx:id="ordersTableViewTotalItemsPriceColumn" editable="false" minWidth="100.0" prefWidth="100.0" text="Total Items Price" />
+            <TableColumn fx:id="ordersTableViewDeliveryCostColumn" editable="false" minWidth="100.0" prefWidth="100.0" text="Delivery Cost" />
+            <TableColumn fx:id="ordersTableViewTotalPriceColumn" editable="false" minWidth="100.0" prefWidth="100.0" text="Total Price" />
          </columns>
       </TableView>
-      <TableView fx:id="salesTableView" layoutX="317.0" layoutY="528.0" prefHeight="150.0" prefWidth="600.0" AnchorPane.leftAnchor="247.5" AnchorPane.rightAnchor="87.5">
+      <TableView fx:id="discountsTableView" layoutX="193.0" layoutY="519.0" onMouseClicked="#onMouseClickedDiscountsTableView" prefHeight="150.0" prefWidth="440.0" AnchorPane.leftAnchor="190.0" AnchorPane.rightAnchor="306.0">
          <columns>
-            <TableColumn fx:id="salesTableViewIdColumn" minWidth="150.0" prefWidth="75.0" text="ID" />
-            <TableColumn minWidth="150.0" prefWidth="75.0" text="-" />
-            <TableColumn minWidth="150.0" prefWidth="75.0" text="-" />
-            <TableColumn minWidth="150.0" prefWidth="75.0" text="-" />
+            <TableColumn fx:id="discountsTableViewNameColumn" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" text="Name" />
+            <TableColumn fx:id="discountsTableViewIfYouBuyColumn" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" text="If You Buy" />
+            <TableColumn fx:id="discountsTableViewQuantityNeededColumn" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" text="Quantity Needed" />
+            <TableColumn fx:id="discountsTableViewThenYouGetColumn" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" text="Then You Get" />
          </columns>
       </TableView>
       <HBox alignment="CENTER_LEFT" layoutX="249.0" layoutY="44.0" prefHeight="92.0" prefWidth="584.0" spacing="50.0">
@@ -98,20 +98,32 @@
       </HBox>
       <Label id="storeId" fx:id="storesHeaderLabel" layoutX="249.0" layoutY="8.0" prefHeight="58.0" prefWidth="598.0" AnchorPane.topAnchor="7.0">
          <font>
-            <Font name="System Bold" size="40.0" />
+            <Font size="40.0" />
          </font>
       </Label>
-      <Label layoutX="249.0" layoutY="129.0" text="Items ">
+      <Label layoutX="192.0" layoutY="129.0" text="Items ">
          <font>
             <Font name="System Italic" size="15.0" />
          </font>
       </Label>
-      <Label layoutX="249.0" layoutY="320.0" text="Orders">
+      <Label layoutX="192.0" layoutY="312.0" text="Orders">
          <font>
             <Font name="System Italic" size="15.0" />
          </font>
       </Label>
-      <Label layoutX="249.0" layoutY="508.0" text="Sales">
+      <Label layoutX="192.0" layoutY="498.0" text="Discounts">
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font>
+      </Label>
+      <TableView fx:id="thenYouGetTableView" layoutX="636.0" layoutY="519.0" prefHeight="150.0" prefWidth="296.0" AnchorPane.rightAnchor="6.0">
+        <columns>
+          <TableColumn fx:id="thenYouGetTableViewItemNameColumn" maxWidth="98.5" minWidth="98.5" prefWidth="98.5" text="Item Name" />
+            <TableColumn fx:id="thenYouGetTableViewQuantityColumn" maxWidth="98.5" minWidth="98.5" prefWidth="98.5" text="Quantity" />
+            <TableColumn fx:id="thenYouGetTableViewForAdditionalColumn" maxWidth="98.5" minWidth="98.5" prefWidth="98.5" text="For Additional" />
+        </columns>
+      </TableView>
+      <Label layoutX="633.0" layoutY="498.0" text="Offers">
          <font>
             <Font name="System Italic" size="15.0" />
          </font>

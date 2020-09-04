@@ -1,5 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainRoot" prefHeight="428.0" prefWidth="760.0" style="-fx-border-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CustomersController" />
+<AnchorPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="935.0" style="-fx-border-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CustomersController">
+   <children>
+      <ScrollPane fx:id="storesScrollPane" fitToHeight="true" hbarPolicy="NEVER" layoutX="2.0" layoutY="2.0" prefHeight="698.0" prefWidth="180.0" style="-fx-background-color: #FFFFFF;" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+            <AnchorPane prefHeight="692.0" prefWidth="175.0">
+               <children>
+                  <VBox fx:id="customerCardsVBox" fillWidth="false" prefHeight="695.0" prefWidth="160.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </ScrollPane>
+      <TableView fx:id="customerOrdersTableView" layoutX="262.0" layoutY="203.0" prefHeight="344.0" prefWidth="595.0" AnchorPane.leftAnchor="260.0" AnchorPane.rightAnchor="80.0">
+         <columns>
+            <TableColumn fx:id="ordersTableViewIdColumn" minWidth="100.0" prefWidth="100.0" text="ID" />
+            <TableColumn fx:id="ordersTableViewDateColumn" minWidth="100.0" prefWidth="100.0" text="Date" />
+            <TableColumn fx:id="ordersTableViewTotalItemsColumn" minWidth="100.0" prefWidth="100.0" text="Total Items" />
+            <TableColumn fx:id="ordersTableViewTotalItemsPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Items Price" />
+            <TableColumn fx:id="ordersTableViewDeliveryCostColumn" minWidth="100.0" prefWidth="100.0" text="Delivery Cost" />
+            <TableColumn fx:id="ordersTableViewTotalPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Price" />
+         </columns>
+      </TableView>
+      <HBox alignment="CENTER_LEFT" layoutX="211.0" layoutY="44.0" prefHeight="92.0" prefWidth="625.0" spacing="50.0" AnchorPane.leftAnchor="245.0" AnchorPane.rightAnchor="65.0" AnchorPane.topAnchor="75.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="locationLabel" style="-fx-text-fill: #2a73ff;" text="0" textFill="#2a73ff">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Location" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="numberOfOrdersLabel" style="-fx-text-fill: #26bfbc;" text="0" textFill="#26bfbc">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Number Of Orders" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="92.0" prefWidth="136.0">
+               <children>
+                  <Label id="salesAvailableLabel" fx:id="averagePriceOfDeliveryLabel" style="-fx-text-fill: #fa5f7e;" text="0" textFill="#fa5f7e">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label prefHeight="17.0" prefWidth="135.0" text="Average Price Of Delivery" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="92.0" prefWidth="119.0">
+               <children>
+                  <Label id="itemsLabel" fx:id="averageCartPriceLabel" style="-fx-text-fill: #de0000;" text="0" textFill="#de0000">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Average Price Of Cart" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Label id="storeId" fx:id="customerHeaderLabel" layoutX="249.0" layoutY="9.0" prefHeight="58.0" prefWidth="593.0" AnchorPane.leftAnchor="260.0" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="8.0">
+         <font>
+            <Font size="40.0" />
+         </font>
+      </Label>
+      <Label layoutX="262.0" layoutY="182.0" text="Orders">
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

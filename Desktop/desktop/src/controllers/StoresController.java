@@ -1,8 +1,11 @@
 package controllers;
 
+import SDMImprovedFacade.Discount;
 import SDMImprovedFacade.Order;
 import SDMImprovedFacade.Store;
 import SDMImprovedFacade.StoreItem;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -17,8 +20,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StoresController {
     private AppController mainController;
@@ -72,10 +77,19 @@ public class StoresController {
     private TableColumn<Order, Double> ordersTableViewTotalPriceColumn;
 
     @FXML
-    private TableView<?> salesTableView;
+    private TableView<Discount> discountsTableView;
 
     @FXML
-    private TableColumn<?, ?> salesTableViewIdColumn;
+    private TableColumn<Discount, String> discountsTableViewNameColumn;
+
+    @FXML
+    private TableColumn<Discount, String> discountsTableViewIfYouBuyColumn;
+
+    @FXML
+    private TableColumn<Discount, Double> discountsTableViewQuantityNeededColumn;
+
+    @FXML
+    private TableColumn<Discount, String> discountsTableViewThenYouGetColumn;
 
     @FXML
     private Label ppkLabel;
@@ -93,10 +107,34 @@ public class StoresController {
     private Label storesHeaderLabel;
 
     @FXML
+    private TableView<?> thenYouGetTableView;
+
+    @FXML
+    private TableColumn<?, ?> thenYouGetTableViewItemNameColumn;
+
+    @FXML
+    private TableColumn<?, ?> thenYouGetTableViewQuantityColumn;
+
+    @FXML
+    private TableColumn<?, ?> thenYouGetTableViewForAdditionalColumn;
+
+    @FXML
     private void initialize() {
         setItemsTableColumnsProperties();
         setOrdersTableColumnsProperties();
-        //setSalesTableColumnsProperties();
+        setDiscountsTableColumnsProperties();
+        setThenYouGetTableColumnsProperties();
+    }
+
+    private void setThenYouGetTableColumnsProperties() {
+    }
+
+    private void setDiscountsTableColumnsProperties() {
+        this.discountsTableViewIfYouBuyColumn.setCellValueFactory(new PropertyValueFactory<Discount, String>("itemToBuyName"));
+        this.discountsTableViewNameColumn.setCellValueFactory(new PropertyValueFactory<Discount, String>("name"));
+        this.discountsTableViewQuantityNeededColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<Double>(cellData.getValue().getBuyThis().getQuantity()));
+        this.discountsTableViewThenYouGetColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getGetThat().getOperator()));
+        //ordersTableView.getSelectionModel().getSelectedItem()
     }
 
     private void setOrdersTableColumnsProperties() {
@@ -146,7 +184,23 @@ public class StoresController {
         updateStoresHeader(store);
         updateItemsTableView(store.getItemsBeingSold());
         updateOrdersTableView(store.getStoreOrdersHistory());
-        //updateSalesTableView(store.getSales());
+        updateDiscountsTableView(store.getStoreDiscounts());
+    }
+
+    private void updateDiscountsTableView(Map<Integer, List<Discount>> storeDiscounts) {
+        try {
+            List<Discount> allDiscounts = new ArrayList<>();
+            for (List<Discount> currentList : storeDiscounts.values()) {
+                allDiscounts.addAll(currentList);
+            }
+            this.discountsTableView.getItems().clear();
+            ObservableList<Discount> observableDiscountsList = FXCollections.observableArrayList();
+            observableDiscountsList.addAll(allDiscounts);
+            discountsTableView.setItems(observableDiscountsList);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateOrdersTableView(List<Order> storeOrdersHistory) {
@@ -184,5 +238,10 @@ public class StoresController {
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    void onMouseClickedDiscountsTableView(MouseEvent event) {
+
     }
 }
