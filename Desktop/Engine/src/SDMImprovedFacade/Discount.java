@@ -56,6 +56,7 @@ public class Discount {
 
     public class ThenGet {
         private String operator;
+
         List<Offer> offerList;
 
         public ThenGet(ThenYouGet sdmThenYouGet) {
@@ -66,11 +67,15 @@ public class Discount {
             }
         }
 
+        public List<Offer> getOfferList() {
+            return offerList;
+        }
+
         public String getOperator() {
             return operator;
         }
 
-        private class Offer {
+        public class Offer {
             private final int itemId;
             private final double quantity;
             private final int forAdditional;
@@ -92,6 +97,8 @@ public class Discount {
             public int getForAdditional() {
                 return forAdditional;
             }
+
+
         }
     }
 }

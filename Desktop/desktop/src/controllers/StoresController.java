@@ -4,6 +4,7 @@ import SDMImprovedFacade.Discount;
 import SDMImprovedFacade.Order;
 import SDMImprovedFacade.Store;
 import SDMImprovedFacade.StoreItem;
+import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,11 +20,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StoresController {
     private AppController mainController;
@@ -107,16 +106,16 @@ public class StoresController {
     private Label storesHeaderLabel;
 
     @FXML
-    private TableView<?> thenYouGetTableView;
+    private TableView<Discount.ThenGet.Offer> thenYouGetTableView;
 
     @FXML
-    private TableColumn<?, ?> thenYouGetTableViewItemNameColumn;
+    private TableColumn<Discount.ThenGet.Offer, String> thenYouGetTableViewItemNameColumn;
 
     @FXML
-    private TableColumn<?, ?> thenYouGetTableViewQuantityColumn;
+    private TableColumn<Discount.ThenGet.Offer, Double> thenYouGetTableViewQuantityColumn;
 
     @FXML
-    private TableColumn<?, ?> thenYouGetTableViewForAdditionalColumn;
+    private TableColumn<Discount.ThenGet.Offer, Integer> thenYouGetTableViewForAdditionalColumn;
 
     @FXML
     private void initialize() {
@@ -126,7 +125,28 @@ public class StoresController {
         setThenYouGetTableColumnsProperties();
     }
 
+    @FXML
+    void onMouseClickedDiscountsTableView(MouseEvent event) {
+        try {
+            this.thenYouGetTableView.getItems().clear();
+            TableView tView = (TableView) event.getSource();
+            ObservableListWrapper discount = (ObservableListWrapper) tView.getItems();
+            Discount dis = (Discount) discount.get(0);
+            this.thenYouGetTableView.getItems().clear();
+            List<Discount.ThenGet.Offer> discountOffers = new ArrayList<>(dis.getGetThat().getOfferList());
+            ObservableList<Discount.ThenGet.Offer> observableDiscountOffersList = FXCollections.observableArrayList();
+            observableDiscountOffersList.addAll(discountOffers);
+            thenYouGetTableView.setItems(observableDiscountOffersList);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setThenYouGetTableColumnsProperties() {
+        this.thenYouGetTableViewForAdditionalColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Integer>("forAdditional"));
+        this.thenYouGetTableViewItemNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<String>(this.mainController.getSDMLogic().getItems().get(cellData.getValue().getItemId()).getName()));
+        this.thenYouGetTableViewQuantityColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Double>("quantity"));
     }
 
     private void setDiscountsTableColumnsProperties() {
@@ -134,7 +154,6 @@ public class StoresController {
         this.discountsTableViewNameColumn.setCellValueFactory(new PropertyValueFactory<Discount, String>("name"));
         this.discountsTableViewQuantityNeededColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<Double>(cellData.getValue().getBuyThis().getQuantity()));
         this.discountsTableViewThenYouGetColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getGetThat().getOperator()));
-        //ordersTableView.getSelectionModel().getSelectedItem()
     }
 
     private void setOrdersTableColumnsProperties() {
@@ -185,6 +204,11 @@ public class StoresController {
         updateItemsTableView(store.getItemsBeingSold());
         updateOrdersTableView(store.getStoreOrdersHistory());
         updateDiscountsTableView(store.getStoreDiscounts());
+        clearThenYouGetTableView();
+    }
+
+    private void clearThenYouGetTableView() {
+        this.thenYouGetTableView.getItems().clear();
     }
 
     private void updateDiscountsTableView(Map<Integer, List<Discount>> storeDiscounts) {
@@ -238,10 +262,5 @@ public class StoresController {
         catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void onMouseClickedDiscountsTableView(MouseEvent event) {
-
     }
 }
