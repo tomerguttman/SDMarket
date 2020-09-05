@@ -4,7 +4,6 @@ import SDMImprovedFacade.Discount;
 import SDMImprovedFacade.Order;
 import SDMImprovedFacade.Store;
 import SDMImprovedFacade.StoreItem;
-import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -130,13 +129,16 @@ public class StoresController {
         try {
             this.thenYouGetTableView.getItems().clear();
             TableView tView = (TableView) event.getSource();
-            ObservableListWrapper discount = (ObservableListWrapper) tView.getItems();
-            Discount dis = (Discount) discount.get(0);
+            Discount discount = (Discount) tView.getSelectionModel().getSelectedItem();
             this.thenYouGetTableView.getItems().clear();
-            List<Discount.ThenGet.Offer> discountOffers = new ArrayList<>(dis.getGetThat().getOfferList());
-            ObservableList<Discount.ThenGet.Offer> observableDiscountOffersList = FXCollections.observableArrayList();
-            observableDiscountOffersList.addAll(discountOffers);
-            thenYouGetTableView.setItems(observableDiscountOffersList);
+            List<Discount.ThenGet.Offer> discountOffers;
+
+            if (discount != null) {
+                discountOffers = new ArrayList<>(discount.getGetThat().getOfferList());
+                ObservableList<Discount.ThenGet.Offer> observableDiscountOffersList = FXCollections.observableArrayList();
+                observableDiscountOffersList.addAll(discountOffers);
+                thenYouGetTableView.setItems(observableDiscountOffersList);
+            }
         }
         catch(Exception e) {
             e.printStackTrace();

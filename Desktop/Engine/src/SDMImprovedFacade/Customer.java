@@ -78,4 +78,9 @@ public class Customer {
 
 
     }
+
+    @Override
+    public String toString() {
+        return String.format("%d | %s", this.id, this.name);
+    }
 }

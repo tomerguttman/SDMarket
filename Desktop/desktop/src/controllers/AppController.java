@@ -2,11 +2,8 @@ package controllers;
 
 import SDMImprovedFacade.Customer;
 import SDMImprovedFacade.Store;
-import SDMImprovedFacade.StoreItem;
 import SuperMarketLogic.SuperMarketLogic;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,23 +15,22 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 public class AppController {
 
-    private SuperMarketLogic SDMLogic;
-    private SimpleBooleanProperty isXMLLoaded;
+    private final SuperMarketLogic SDMLogic;
+    private final SimpleBooleanProperty isXMLLoaded;
     private Stage mainStage;
 
     //Controllers
-    private LoadXMLController loadXMLController;
-    private StoresController storesController;
-    private ItemsController itemsController;
-    private CustomersController customersController;
-    private Map<Integer, StoreCardController> storeCardControllersMap = new HashMap<>();
-    private Map<Integer, CustomerCardController> customerCardControllersMap = new HashMap<>();
+    private final LoadXMLController loadXMLController;
+    private final StoresController storesController;
+    private final ItemsController itemsController;
+    private final CustomersController customersController;
+    private final PurchaseController purchaseController;
+    private final Map<Integer, StoreCardController> storeCardControllersMap = new HashMap<>();
+    private final Map<Integer, CustomerCardController> customerCardControllersMap = new HashMap<>();
+    private final Map<Integer, StoreCardController> storeCardControllerMapForPurchase = new HashMap<>();
 
     @FXML
     private Button buttonLoadXML;
@@ -67,6 +63,17 @@ public class AppController {
         storesController = initializeStoresController();
         itemsController = initializeItemsController();
         customersController = initializeCustomersController();
+        purchaseController = initializePurchaseController();
+    }
+
+    private PurchaseController initializePurchaseController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/purchase.fxml");
+        loader.setLocation(mainFXML);
+        loader.load(); //need to be done before loader.getController() !
+        PurchaseController tempPurchaseController = loader.getController();
+        tempPurchaseController.setMainController(this);
+        return tempPurchaseController;
     }
 
     private CustomersController initializeCustomersController() throws IOException {
@@ -97,9 +104,6 @@ public class AppController {
         loader.load(); //need to be done before loader.getController() !
         StoresController storesController = loader.getController();
         storesController.setMainController(this);
-        /*
-            Binds here.
-         */
         return storesController;
     }
 
@@ -110,7 +114,6 @@ public class AppController {
         loader.load(); //need to be done before loader.getController() !
         LoadXMLController xmlLoadController = loader.getController();
         xmlLoadController.setMainController(this);
-        isXMLLoaded.bind(xmlLoadController.getIsXMLLoadedProperty());
 
         return xmlLoadController;
     }
@@ -154,7 +157,7 @@ public class AppController {
     }
 
     @FXML
-    void onActionCustomers(ActionEvent event) {
+    void onActionCustomers() {
         try{
             FXMLLoader loader;
             if (!anchorPaneMainWindow.getChildren().contains(customersController.getMainRoot())) {
@@ -185,7 +188,7 @@ public class AppController {
     }
 
     @FXML
-    void onActionItems(ActionEvent event) {
+    void onActionItems() {
         if (!anchorPaneMainWindow.getChildren().contains(itemsController.getRoot())) {
             anchorPaneMainWindow.getChildren().clear();
             AnchorPane itemsControllerMainRoot = itemsController.getRoot();
@@ -199,7 +202,7 @@ public class AppController {
     }
 
     @FXML
-    void onActionLoadXML(ActionEvent event) throws JAXBException, IOException {
+    void onActionLoadXML() throws JAXBException, IOException {
         if (!anchorPaneMainWindow.getChildren().contains(loadXMLController.getRoot())) {
             anchorPaneMainWindow.getChildren().clear();
             anchorPaneMainWindow.getChildren().add(loadXMLController.getRoot());
@@ -208,7 +211,34 @@ public class AppController {
 
     @FXML
     void onActionPurchase(ActionEvent event) {
+        try{
+            FXMLLoader loader;
+            if (!anchorPaneMainWindow.getChildren().contains(purchaseController.getMainRoot())) {
+                anchorPaneMainWindow.getChildren().clear();
+                AnchorPane anchorPane = purchaseController.getMainRoot();
+                anchorPaneMainWindow.getChildren().add(anchorPane);
+                AnchorPane.setTopAnchor(anchorPane, 0.0);
+                AnchorPane.setRightAnchor(anchorPane, 0.0);
+                AnchorPane.setBottomAnchor(anchorPane, 0.0);
+                AnchorPane.setLeftAnchor(anchorPane, 0.0);
 
+                for(Store store : getSDMLogic().getStores().values()) {
+                    loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("/fxmls/home/storeCard.fxml"));
+                    loader.load();
+                    StoreCardController storeCardController = loader.getController();
+                    storeCardController.setStoreNameCardLabelText(store.getName());
+                    storeCardController.setStoreIdCardLabelText(Integer.toString(store.getId()));
+                    storeCardControllerMapForPurchase.put(store.getId(), storeCardController);
+                }
+
+                purchaseController.addStoreCards(storeCardControllerMapForPurchase);
+                purchaseController.insertCustomersToComboBox();
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -244,7 +274,7 @@ public class AppController {
         }
         catch(IOException e){
                 e.printStackTrace();
-            }
+        }
     }
 
     @FXML
@@ -252,4 +282,7 @@ public class AppController {
 
     }
 
+    public void enableMenuButtons() {
+        this.isXMLLoaded.set(true);
+    }
 }

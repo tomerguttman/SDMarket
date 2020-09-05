@@ -717,4 +717,8 @@ public class SuperMarketLogic {
     public Map<Integer, Customer> getCustomers() {
         return SDMImproved.getSystemCustomers();
     }
+
+    public Double getCheapestPriceForItem(int id) {
+        return 0.0;
+    }
 }

@@ -1,19 +1,9 @@
 package controllers;
 
-import SuperMarketLogic.SuperMarketLogic;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.When;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,11 +17,6 @@ import java.io.File;
 public class LoadXMLController {
 
     private AppController mainController;
-    private SimpleBooleanProperty isXMLTaskLoaded;
-
-    public LoadXMLController() {
-        isXMLTaskLoaded = new SimpleBooleanProperty(false);
-    }
 
     @FXML
     private AnchorPane mainRoot;
@@ -82,8 +67,6 @@ public class LoadXMLController {
 
         if(!this.pathToFileLabel.textProperty().get().equals("-"))
         {
-            //isXMLTaskLoaded.bind(Bindings.when(task.valueProperty().get() || isXMLTaskLoaded.get());
-            isXMLTaskLoaded.set(true);
             loadXMLProgressBar.progressProperty().bind(task.progressProperty());
 
             Runnable target = new Runnable() {
@@ -112,20 +95,17 @@ public class LoadXMLController {
         return this.mainRoot;
     }
 
-    public ObservableValue<? extends Boolean> getIsXMLLoadedProperty() {
-        return isXMLTaskLoaded;
-    }
-
     private class LoadXMLTask extends Task<Boolean> {
+        boolean isValidXML = false;
+
         @Override
         protected Boolean call() throws Exception {
             StringBuilder sb = new StringBuilder();
             File file = new File(pathToFileLabel.textProperty().get().trim());
-            boolean isValidXML = mainController.getSDMLogic().loadData(file.getAbsolutePath().trim(), sb);
+            isValidXML = mainController.getSDMLogic().loadData(file.getAbsolutePath().trim(), sb);
 
-            //mainController.getIsXMLLoaded().set( isValidXML || mainController.getIsXMLLoaded().get());
             delayProgress();
-            if(!isValidXML && !isXMLTaskLoaded.get()) {
+            if(!isValidXML) {
                 Platform.runLater(() -> {
                     loadXMLProgressBar.setStyle("-fx-accent: red;");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -135,7 +115,7 @@ public class LoadXMLController {
                     alert.showAndWait();
                 });
             }
-            else if(isValidXML && sb.length() > 0){
+            else if(sb.length() > 0){ // isValidXML = True ...
                 Platform.runLater(() -> {
                     loadXMLProgressBar.setStyle("-fx-accent: red;");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -152,9 +132,9 @@ public class LoadXMLController {
                     amountItemsLabel.textProperty().bind(mainController.getSDMLogic().getAmountItemsStringProperty());
                     amountOrdersLabel.textProperty().bind(mainController.getSDMLogic().getAmountOrdersStringProperty());
                     loadXMLProgressBar.setStyle("-fx-accent: green;");
+                    mainController.enableMenuButtons();
                 });
             }
-
             return Boolean.TRUE;
         }
 

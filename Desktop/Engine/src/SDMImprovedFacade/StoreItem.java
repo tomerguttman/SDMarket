@@ -11,18 +11,21 @@ public class StoreItem {
     private double pricePerUnit = 0;
     private final String name;
     private final String purchaseCategory;
+    private boolean isAvailable;
 
     public StoreItem(SDMItem inputItem, SDMSell inputPrice){
         this.Id = inputItem.getId();
         this.name = inputItem.getName();
         this.purchaseCategory = inputItem.getPurchaseCategory();
         this.pricePerUnit = inputPrice.getPrice();
+        this.isAvailable = false;
     }
 
     public StoreItem(SDMItem inputItem) {
         this.Id = inputItem.getId();
         this.name = inputItem.getName();
         this.purchaseCategory = inputItem.getPurchaseCategory();
+        this.isAvailable = false;
     }
 
     public StoreItem(StoreItem sItem) {
@@ -30,6 +33,11 @@ public class StoreItem {
         this.name = sItem.name;
         this.pricePerUnit = sItem.pricePerUnit;
         this.purchaseCategory = sItem.purchaseCategory;
+        this.isAvailable = false;
+    }
+
+    public double getTotalPrice() {
+        return this.pricePerUnit * this.totalItemsSold;
     }
 
     public void setTotalItemsSold(double totalItemsSold) {
@@ -42,6 +50,14 @@ public class StoreItem {
 
     public int getId() {
         return Id;
+    }
+
+    public void setIsAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    public boolean getIsAvailable() {
+        return isAvailable;
     }
 
     public double getTotalItemsSold() {
