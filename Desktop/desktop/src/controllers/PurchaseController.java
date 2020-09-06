@@ -1,15 +1,16 @@
 package controllers;
 
 import SDMImprovedFacade.*;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -18,15 +19,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.util.*;
 
 public class PurchaseController {
 
     private AppController mainController;
+    private final List<DiscountCardController> discountCardControllersList = new ArrayList<>();
     private boolean isDynamicPurchaseButtonToggled;
-    private int currentStaticStoreId;
+    private int currentStaticStoreId = -1;
     private SimpleBooleanProperty wasOneOfPurchaseButtonsClicked;
     private final Order currentOrder = new Order();
+    private Map<Integer, List<StoreItem>> dynamicOrder;
     private final List<Discount> discountsAvailable = new ArrayList<>();
     private final Map<Integer, Store> storesParticipatingInOrder = new HashMap<>();
 
@@ -190,6 +194,172 @@ public class PurchaseController {
         setDiscountOffersTableColumnsProperties();
         setStoreFinalOrderDetailsTableColumnsProperties();
         bindRelevantObjectsToWasOneOfPurchaseButtonsClicked();
+        setBuyCartEventHandler();
+
+    }
+
+    private void setBuyCartEventHandler() {
+        this.buyCartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                buyCartMethod();
+            }
+        });
+    }
+
+    private void buyCartMethod() {
+        if(!shoppingCartTableView.getItems().isEmpty()){
+            if(this.isDynamicPurchaseButtonToggled) {
+                this.dynamicOrder = initializeDynamicOrderAndAddDiscountCards();
+            }
+            else {
+                initializeStaticOrderAndAddDiscountsCards();
+            }
+        }
+        else { displayEmptyCartError(); }
+    }
+
+    private void initializeStaticOrderAndAddDiscountsCards() {
+    }
+
+    private Map<Integer, List<StoreItem>> initializeDynamicOrderAndAddDiscountCards() {
+        Map<Integer, List<StoreItem>> itemListForEachStoreMap = createItemsListForEachStore();
+        addRelevantDiscountCardsToHBox(itemListForEachStoreMap);
+        return itemListForEachStoreMap;
+    }
+
+    private void addRelevantDiscountCardsToHBox(Map<Integer, List<StoreItem>> itemListForEachStoreMap) {
+        this.discountsCardsHBox.getChildren().clear();
+        itemListForEachStoreMap.forEach((storeId, itemListForTheStore) -> {
+            Store currentStore = this.mainController.getSDMLogic().getStores().get(storeId);
+            //There are no duplicates in the input map;
+            for (StoreItem sItem : itemListForTheStore ) {
+                if(currentStore.getStoreDiscounts() != null) {
+                    if(currentStore.getStoreDiscounts().containsKey(sItem.getId())) {
+                        try {
+                            createAndAddDiscountCards(currentStore.getStoreDiscounts().get(sItem.getId()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        pushDiscountCardsToHBoxAndInitMouseClick();
+    }
+
+    private void pushDiscountCardsToHBoxAndInitMouseClick() {
+        //this.discountsCardsHBox.getChildren().clear();
+
+        for (DiscountCardController discountCard : this.discountCardControllersList) {
+            this.discountsCardsHBox.getChildren().add(discountCard.getMainRoot());
+            discountCard.getMainRoot().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) { discountCardClickMethod(event); }
+            });
+        }
+
+        this.discountsCardsHBox.getChildren();
+    }
+
+    private void discountCardClickMethod(MouseEvent event) {
+        //DO SOMETHING!!
+    }
+
+    private void createAndAddDiscountCards(List<Discount> discountForCurrentItem) throws IOException {
+        try {
+            for (Discount discount : discountForCurrentItem) {
+                DiscountCardController discountCardController = createDiscountController(discount);
+                this.discountCardControllersList.add(discountCardController);
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private DiscountCardController createDiscountController(Discount discount) throws IOException {
+        FXMLLoader loader;
+        loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/fxmls/home/discountCard.fxml"));
+        loader.load();
+        DiscountCardController discountCardController = loader.getController();
+        discountCardController.setDiscountNameLabel(discount.getName());
+        return discountCardController;
+    }
+
+    private Map<Integer, List<StoreItem>> createItemsListForEachStore() {
+        Map<Integer, Double> itemsToOrderWithAmount;
+        itemsToOrderWithAmount = generateItemsToOrderWithAmountWithoutDuplicates(this.currentOrder);
+        Map<Integer, Store> cheapestStoreForEachItemInOrder = this.mainController.getSDMLogic().getCheapestStoresPerProductMap(itemsToOrderWithAmount);
+        List<StoreItem> itemsToOrder = this.mainController.getSDMLogic().createListOfOrderedItemsByCheapestPrice(itemsToOrderWithAmount, cheapestStoreForEachItemInOrder);
+        //itemsToOrder -> contains StoreItem for each of the items in order with it's lowest price set.
+        //Integer -> StoreID, List<StoreItem> -> List of Items to order from that store.
+        //itemsListForEachStore is our main focus now :)
+        return this.mainController.getSDMLogic().generateItemsListForEachStore(itemsToOrder, cheapestStoreForEachItemInOrder);
+    }
+
+    private Map<Integer, Double> generateItemsToOrderWithAmountWithoutDuplicates(Order currentOrder) {
+        Map<Integer, Double> outputItemsMapWithAmount = new HashMap<>();
+        for (StoreItem sItem : currentOrder.getItemsInOrder()) {
+            if(outputItemsMapWithAmount.containsKey(sItem.getId())) {
+                outputItemsMapWithAmount.put(sItem.getId(), outputItemsMapWithAmount.get(sItem.getId()) + sItem.getTotalItemsSold());
+            }
+            else { outputItemsMapWithAmount.put(sItem.getId(), sItem.getTotalItemsSold()); }
+        }
+
+        return outputItemsMapWithAmount;
+    }
+
+    @FXML
+    void onActionDynamicPurchaseButton() {
+        try {
+            if(!isDynamicPurchaseButtonToggled){
+                this.shoppingCartTableView.getItems().clear();
+                resetOrderProperties();
+                resetSelectedStoreCards();
+                this.currentOrder.clearOrderDetails();
+                this.discountsAvailable.clear();
+                this.discountsCardsHBox.getChildren().clear();
+            }
+
+            this.isDynamicPurchaseButtonToggled = true;
+            if(wasOneOfPurchaseButtonsClicked.get()) {
+                wasOneOfPurchaseButtonsClicked.set(false);
+            }
+
+            this.storeCardsVBox.setDisable(true);
+            this.purchaseItemsAvailableTableView.getItems().clear();
+            ObservableList<StoreItem> observableSystemItemsList = FXCollections.observableArrayList();
+            observableSystemItemsList.addAll(this.mainController.getSDMLogic().getItems().values());
+            purchaseItemsAvailableTableView.setItems(observableSystemItemsList);
+            this.chooseItemToBuyComboBox.setItems(observableSystemItemsList);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void onActionStaticPurchaseButton() {
+
+        if(isDynamicPurchaseButtonToggled) {
+            resetOrderProperties();
+            this.discountsCardsHBox.getChildren().clear();
+            this.shoppingCartTableView.getItems().clear();
+            this.purchaseItemsAvailableTableView.getItems().clear();
+            this.currentOrder.clearOrderDetails();
+            this.discountsAvailable.clear();
+        }
+
+        this.isDynamicPurchaseButtonToggled = false;
+
+        if(wasOneOfPurchaseButtonsClicked.get()) {
+            wasOneOfPurchaseButtonsClicked.set(false);
+        }
+
+        this.storeCardsVBox.setDisable(false);
     }
 
     public void bindRelevantLabelsToOrderProperties() {
@@ -202,6 +372,74 @@ public class PurchaseController {
         itemTypesProperty.set(0);
         totalItemsProperty.set(0);
         cartPriceProperty.set(0);
+    }
+
+    @FXML
+    void onActionAddToCartButton() {
+        try {
+            Store storeToBuyFrom;
+            StringBuilder sb = new StringBuilder();
+            String textFieldValue = this.itemAmountToBuyTextField.getText();
+            StoreItem selectedItem = this.chooseItemToBuyComboBox.getSelectionModel().getSelectedItem();
+            if(selectedItem != null) {
+                if(isValidTextFieldValue(selectedItem.getPurchaseCategory(), textFieldValue, sb)) {
+                    StoreItem newStoreItem = new StoreItem(selectedItem, Double.parseDouble(textFieldValue));
+                    this.itemAmountToBuyTextField.setStyle("-fx-border-color: none;");
+                    this.itemAmountToBuyTextField.setPromptText("Amount");
+                    storeToBuyFrom = getStoreToBuyFrom(newStoreItem); //according to static/dynamic purchase.
+                    invokeAllOnActionAddToCartButtonMethods(newStoreItem, storeToBuyFrom);
+                }
+                else { displayVisualInvalidInput(sb); }
+                this.itemAmountToBuyTextField.setText("");
+            }
+            else { displayChooseItemFirstError(); }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void invokeAllOnActionAddToCartButtonMethods(StoreItem newStoreItem, Store storeToBuyFrom) {
+        updateDiscountsTableViewIfNeeded(newStoreItem, storeToBuyFrom);
+        newStoreItem.setPricePerUnit(storeToBuyFrom.getItemsBeingSold().get(newStoreItem.getId()).getPricePerUnit());
+        updateCartTableView(newStoreItem);
+        addItemToOrder(newStoreItem);
+        updateProperties(newStoreItem, storeToBuyFrom);
+        addStoreParticipatingInOrder(storeToBuyFrom);
+    }
+
+    private Store getStoreToBuyFrom(StoreItem newStoreItem) {
+        Store storeToBuyFrom;
+
+        if(this.isDynamicPurchaseButtonToggled){
+            storeToBuyFrom = this.mainController.getSDMLogic().getStoreForDynamicPurchase(newStoreItem.getId());
+        }
+        else {
+            storeToBuyFrom = this.mainController.getSDMLogic().getStores().get(this.currentStaticStoreId);
+        }
+
+        return storeToBuyFrom;
+    }
+
+    private void displayChooseItemFirstError() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Purchase Demand Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Please choose an item first");
+        alert.showAndWait();
+    }
+
+    private void displayEmptyCartError() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Purchase Demand Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Please add at least one item to the cart");
+        alert.showAndWait();
+    }
+
+    private void displayVisualInvalidInput(StringBuilder sb) {
+        this.itemAmountToBuyTextField.setStyle("-fx-border-color: red;");
+        this.itemAmountToBuyTextField.setPromptText(sb.toString());
     }
 
     public void insertCustomersToComboBox() {
@@ -221,62 +459,6 @@ public class PurchaseController {
         this.applyDiscountButton.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
         this.shoppingCartTableView.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
         this.buyCartButton.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
-    }
-
-    @FXML
-    void onActionDynamicPurchaseButton() {
-        try {
-            if(!isDynamicPurchaseButtonToggled){
-
-                this.shoppingCartTableView.getItems().clear();
-                resetOrderProperties();
-                resetSelectedStoreCards();
-                this.currentOrder.clearOrderDetails();
-                this.discountsAvailable.clear();
-            }
-            this.isDynamicPurchaseButtonToggled = true;
-
-            if(wasOneOfPurchaseButtonsClicked.get()) {
-                wasOneOfPurchaseButtonsClicked.set(false);
-            }
-
-            this.storeCardsVBox.setDisable(true);
-            this.purchaseItemsAvailableTableView.getItems().clear();
-
-
-            ObservableList<StoreItem> observableSystemItemsList = FXCollections.observableArrayList();
-            observableSystemItemsList.addAll(this.mainController.getSDMLogic().getItems().values());
-            purchaseItemsAvailableTableView.setItems(observableSystemItemsList);
-            this.chooseItemToBuyComboBox.setItems(observableSystemItemsList);
-
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-
-    }
-
-    @FXML
-    void onActionStaticPurchaseButton() {
-
-        if(isDynamicPurchaseButtonToggled) {
-            resetOrderProperties();
-            this.shoppingCartTableView.getItems().clear();
-            this.purchaseItemsAvailableTableView.getItems().clear();
-            this.currentOrder.clearOrderDetails();
-            this.discountsAvailable.clear();
-        }
-
-        this.isDynamicPurchaseButtonToggled = false;
-
-        if(wasOneOfPurchaseButtonsClicked.get()) {
-            wasOneOfPurchaseButtonsClicked.set(false);
-        }
-
-        this.storeCardsVBox.setDisable(false);
     }
 
     private void setStoreFinalOrderDetailsTableColumnsProperties() {
@@ -314,94 +496,53 @@ public class PurchaseController {
 
     public void addStoreCards(Map<Integer, StoreCardController> storeCardControllerMapForPurchase) {
         storeCardsVBox.getChildren().clear();
-
         for (StoreCardController storeCard : storeCardControllerMapForPurchase.values()) {
             storeCardsVBox.getChildren().add(storeCard.getMainRoot());
             storeCard.getMainRoot().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
                 @Override
-                public void handle(MouseEvent event) {
-                    AnchorPane storeCardMainRoot = (AnchorPane) event.getSource();
-                    Pane pane = (Pane)storeCardMainRoot.getChildren().get(0);
-                    int storeId = Integer.parseInt(((Label)pane.getChildren().get(1)).textProperty().get());
-                    Store store = mainController.getSDMLogic().getStores().get(storeId);
-                    updatePurchaseItemAvailableTableView(store);
-                    updatePurchaseItemsAvailableComboBox(store);
-                    updateShoppingCartWhenCardClicked(storeId);
-                    resetSelectedStoreCards();
-                    setSelectedStoreCardBorder(storeCardMainRoot);
-                    resetOrderProperties();
-                }
+                public void handle(MouseEvent event) { staticStoreCardOnClick(event); }
             });
         }
-
         storeCardsVBox.setDisable(true);
     }
 
+    private void staticStoreCardOnClick(MouseEvent event) {
+        AnchorPane storeCardMainRoot = (AnchorPane) event.getSource();
+        Pane pane = (Pane)storeCardMainRoot.getChildren().get(0);
+        int storeId = Integer.parseInt(((Label)pane.getChildren().get(1)).textProperty().get());
+        Store store = mainController.getSDMLogic().getStores().get(storeId);
+        updatePurchaseItemAvailableTableView(store);
+        updatePurchaseItemsAvailableComboBox(store);
+        updateShoppingCartWhenCardClicked(storeId);
+        resetSelectedStoreCards();
+        setSelectedStoreCardBorder(storeCardMainRoot);
+        updateCurrentStaticStoreAndResetOrderProperties(storeId);
+        this.currentStaticStoreId = storeId;
+    }
+
+    private void updateCurrentStaticStoreAndResetOrderProperties(int storeId) {
+        if(currentStaticStoreId != storeId) {
+            resetOrderProperties();
+            currentStaticStoreId = storeId;
+        }
+    }
+
     private void setSelectedStoreCardBorder(AnchorPane storeCardMainRoot) {
-        storeCardMainRoot.setStyle("-fx-border-color: blue");
+        storeCardMainRoot.setStyle("-fx-border-color: blue; -fx-background-color: #EEEEFB;");
     }
 
     private void resetSelectedStoreCards() {
         this.mainController.getStoreCardControllerMapForPurchase().values().forEach(storeCardController -> {
-            storeCardController.getMainRoot().setStyle("-fx-border-color: none;");
+            storeCardController.getMainRoot().setStyle("-fx-border-color: none; -fx-background-color: #EEEEFB;");
         });
     }
 
     private void updateShoppingCartWhenCardClicked(int storeId) {
         if(this.currentStaticStoreId != storeId){
-            this.currentStaticStoreId = storeId;
             this.shoppingCartTableView.getItems().clear();
             this.currentOrder.clearOrderDetails();
             this.discountsAvailable.clear();
         }
-    }
-
-    @FXML
-    void onActionAddToCartButton() {
-        try {
-            Store storeToBuyFrom;
-            StringBuilder sb = new StringBuilder();
-            String textFieldValue = this.itemAmountToBuyTextField.getText();
-            StoreItem selectedItem = this.chooseItemToBuyComboBox.getSelectionModel().getSelectedItem();
-            if(selectedItem != null) {
-                if(isValidTextFieldValue(selectedItem.getPurchaseCategory(), textFieldValue, sb)) {
-                    StoreItem newStoreItem = new StoreItem(selectedItem, Double.parseDouble(textFieldValue));
-                    this.itemAmountToBuyTextField.setStyle("-fx-border-color: none;");
-                    this.itemAmountToBuyTextField.setPromptText("Amount");
-
-                    if(this.isDynamicPurchaseButtonToggled){
-                        storeToBuyFrom = this.mainController.getSDMLogic().getStoreForDynamicPurchase(newStoreItem.getId());
-                    }
-                    else {
-                        storeToBuyFrom = this.mainController.getSDMLogic().getStores().get(this.currentStaticStoreId);
-                    }
-
-                    updateDiscountsTableViewIfNeeded(newStoreItem, storeToBuyFrom);
-                    newStoreItem.setPricePerUnit(storeToBuyFrom.getItemsBeingSold().get(newStoreItem.getId()).getPricePerUnit());
-                    updateCartTableView(newStoreItem);
-                    addItemToOrder(newStoreItem);
-                    updateProperties(newStoreItem, storeToBuyFrom);
-                    addStoreParticipatingInOrder(storeToBuyFrom);
-                }
-                else {
-                    this.itemAmountToBuyTextField.setStyle("-fx-border-color: red;");
-                    this.itemAmountToBuyTextField.setPromptText(sb.toString());
-                }
-
-                this.itemAmountToBuyTextField.setText("");
-            }
-            else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Purchase Demand Error");
-                alert.setHeaderText(null);
-                alert.setContentText("Please choose an item first");
-                alert.showAndWait();
-            }
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void updateProperties(StoreItem newStoreItem, Store storeToBuyFrom) {

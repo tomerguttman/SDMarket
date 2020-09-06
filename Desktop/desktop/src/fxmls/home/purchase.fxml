@@ -110,7 +110,7 @@
          <content>
             <AnchorPane prefHeight="92.0" prefWidth="312.0">
                <children>
-                  <HBox fx:id="discountsCardsHBox" prefHeight="92.0" prefWidth="310.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <HBox fx:id="discountsCardsHBox" prefHeight="92.0" prefWidth="310.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
          </content>
