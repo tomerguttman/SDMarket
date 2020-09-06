@@ -53,6 +53,10 @@
     -fx-text-fill : #000100;
 }
 
+.storeCard {
+    -fx-border-radius: 10 10 10 10;
+    -fx-border-width: 2 2 2 2;
+}
 .storeCard:hover{
     -fx-border-width: 0px 0px 0px 3px;
     -fx-border-color: #000000;
@@ -63,6 +67,11 @@
 }
 .storeCard:hover .sidebar-btn-text{
     -fx-text-fill:#000000;
+}
+
+#amount-text-field {
+    -fx-border-radius: 10 10 10 10;
+    -fx-background-radius: 10 10 10 10;
 }
 
 

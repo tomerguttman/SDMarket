@@ -1,6 +1,8 @@
 package SDMImprovedFacade;
 
 import generatedClasses.Location;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,14 +10,14 @@ import java.util.Set;
 public class Order {
     final int orderId;
     final int storeId;
-    final double deliveryCost;
-    final double costOfItemsInOrder;
-    final double totalOrderCost;
+    double deliveryCost;
+    double costOfItemsInOrder;
+    double totalOrderCost;
     final String dateOrderWasMade;
     final String storeName;
     final Location orderDestination;
     private int amountOfStoresRelatedToOrder;
-    private final int amountItemsInOrder ;
+    private int amountItemsInOrder ;
     final List<StoreItem> itemsInOrder;
 
     public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost,
@@ -48,7 +50,21 @@ public class Order {
         this.amountItemsInOrder = itemsInOrder.size();
     }
 
-    public int getNumberOfItemsInOrder(){
+    public Order() {
+        this.dateOrderWasMade = "";
+        this.orderId = -1;
+        this.storeId = -1;
+        this.deliveryCost = -1;
+        this.storeName = "";
+        this.itemsInOrder = new ArrayList<>();
+        this.costOfItemsInOrder = -1;
+        this.totalOrderCost = -1;
+        this.orderDestination = null;
+        this.amountOfStoresRelatedToOrder = -1;
+        this.amountItemsInOrder = -1;
+    }
+
+    public int getNumberOfItemsTypesInOrder(){
         Set<Integer> itemsInOrderSet = new HashSet<>();
         itemsInOrder.forEach(item -> itemsInOrderSet.add(item.getId()));
 
@@ -93,6 +109,39 @@ public class Order {
         return itemsInOrder;
     }
 
+    public void addItem(StoreItem newStoreItem) {
+        this.itemsInOrder.add(newStoreItem);
+        if(checkIfFirstItemInOrder()) {
+            initializeOrderForTheFirstTime();
+        }
+
+        this.amountItemsInOrder = getTotalNumberOfItemsInOrder();
+        this.costOfItemsInOrder += newStoreItem.getTotalPrice();
+        //this.amountOfStoresRelatedToOrder is being updated in PurchaseController
+        //this.totalOrderCost is being updated in PurchaseController
+        //this.deliveryCost is being updated in PurchaseController
+    }
+    public void clearOrderDetails() {
+        this.deliveryCost = -1;
+        this.itemsInOrder.clear();
+        this.costOfItemsInOrder = -1;
+        this.totalOrderCost = -1;
+        this.amountOfStoresRelatedToOrder = -1;
+        this.amountItemsInOrder = -1;
+    }
+
+    private void initializeOrderForTheFirstTime() {
+        this.totalOrderCost = 0.0;
+        this.deliveryCost = 0.0;
+        this.costOfItemsInOrder = 0.0;
+        this.amountOfStoresRelatedToOrder = 0;
+        this.amountItemsInOrder = 0;
+    }
+
+    private boolean checkIfFirstItemInOrder() {
+        return (this.totalOrderCost == (-1));
+    }
+
     public int getAmountOfStoresRelated() {
         return amountOfStoresRelatedToOrder;
     }
@@ -101,7 +150,7 @@ public class Order {
         this.amountOfStoresRelatedToOrder = amountOfStoresRelated;
     }
 
-    private int getTotalNumberOfItemsInOrder(){
+    public int getTotalNumberOfItemsInOrder(){
         return itemsInOrder.stream().
                 mapToInt((item) -> {
                     if(item.getPurchaseCategory().equals("Weight")){
@@ -130,7 +179,7 @@ public class Order {
         return  "\tOrder ID: " + orderId + "\n" +
                 "\t\tDate Of Order: " + dateOrderWasMade + "\n" +
                 "\t\tStore ID: " + storeId + "(" + storeName + ")\n" +
-                "\t\tAmount Of Item Types: " + getNumberOfItemsInOrder() + "\n" +
+                "\t\tAmount Of Item Types: " + getNumberOfItemsTypesInOrder() + "\n" +
                 "\t\tTotal Number Of Items In Order: " + getTotalNumberOfItemsInOrder() + "\n" +
                 "\t\tTotal Cost Of Items In Order: " + String.format("%.2f", costOfItemsInOrder) + "\n" +
                 "\t\tDelivery Cost: " + String.format("%.2f", deliveryCost) + "\n" +
@@ -141,7 +190,7 @@ public class Order {
         return  "\tOrder ID: " + orderId + "\n" +
                 "\t\tDate Of Order: " + dateOrderWasMade + "\n" +
                 "\t\tAmount Of Stores Participating In Order: " + amountOfStoresRelatedToOrder + "\n" +
-                "\t\tAmount Of Item Types: " + getNumberOfItemsInOrder() + "\n" +
+                "\t\tAmount Of Item Types: " + getNumberOfItemsTypesInOrder() + "\n" +
                 "\t\tTotal Number Of Items In Order: " + getTotalNumberOfItemsInOrder() + "\n" +
                 "\t\tTotal Cost Of Items In Order: " + String.format("%.2f", costOfItemsInOrder) + "\n" +
                 "\t\tDelivery Cost: " + String.format("%.2f", deliveryCost) + "\n" +

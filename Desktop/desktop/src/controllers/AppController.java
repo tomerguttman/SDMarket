@@ -73,6 +73,7 @@ public class AppController {
         loader.load(); //need to be done before loader.getController() !
         PurchaseController tempPurchaseController = loader.getController();
         tempPurchaseController.setMainController(this);
+        tempPurchaseController.bindRelevantLabelsToOrderProperties();
         return tempPurchaseController;
     }
 
@@ -284,5 +285,17 @@ public class AppController {
 
     public void enableMenuButtons() {
         this.isXMLLoaded.set(true);
+    }
+
+    public Map<Integer, StoreCardController> getStoreCardControllersMap() {
+        return storeCardControllersMap;
+    }
+
+    public Map<Integer, CustomerCardController> getCustomerCardControllersMap() {
+        return customerCardControllersMap;
+    }
+
+    public Map<Integer, StoreCardController> getStoreCardControllerMapForPurchase() {
+        return storeCardControllerMapForPurchase;
     }
 }

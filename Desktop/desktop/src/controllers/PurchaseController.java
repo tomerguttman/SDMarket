@@ -1,23 +1,16 @@
 package controllers;
 
-import SDMImprovedFacade.Customer;
-import SDMImprovedFacade.Store;
-import SDMImprovedFacade.StoreItem;
+import SDMImprovedFacade.*;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -25,14 +18,22 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PurchaseController {
+
     private AppController mainController;
     private boolean isDynamicPurchaseButtonToggled;
+    private int currentStaticStoreId;
     private SimpleBooleanProperty wasOneOfPurchaseButtonsClicked;
+    private final Order currentOrder = new Order();
+    private final List<Discount> discountsAvailable = new ArrayList<>();
+    private final Map<Integer, Store> storesParticipatingInOrder = new HashMap<>();
+
+    private SimpleDoubleProperty cartPriceProperty = new SimpleDoubleProperty();
+    private SimpleDoubleProperty deliveryCostProperty = new SimpleDoubleProperty();
+    private SimpleIntegerProperty itemTypesProperty = new SimpleIntegerProperty();
+    private SimpleIntegerProperty totalItemsProperty = new SimpleIntegerProperty();
 
     @FXML
     private AnchorPane mainRoot;
@@ -42,9 +43,6 @@ public class PurchaseController {
 
     @FXML
     private VBox storeCardsVBox;
-
-    @FXML
-    private Label totalDeliveryPriceLabel;
 
     @FXML
     private Label totalCartPriceLabel;
@@ -71,6 +69,9 @@ public class PurchaseController {
     private TableView<StoreItem> purchaseItemsAvailableTableView;
 
     @FXML
+    private TableColumn<StoreItem, Integer> purchaseItemTableViewItemIdColumn;
+
+    @FXML
     private TableColumn<StoreItem, String> purchaseItemTableViewItemNameColumn;
 
     @FXML
@@ -83,7 +84,7 @@ public class PurchaseController {
     private TableColumn<StoreItem, String> purchaseItemTableViewIsAvailableColumn;
 
     @FXML
-    private ComboBox<?> chooseItemToBuyComboBox;
+    private ComboBox<StoreItem> chooseItemToBuyComboBox;
 
     @FXML
     private TextField itemAmountToBuyTextField;
@@ -92,7 +93,7 @@ public class PurchaseController {
     private Button addItemToCartButton;
 
     @FXML
-    private TableView<?> shoppingCartTableView;
+    private TableView<StoreItem> shoppingCartTableView;
 
     @FXML
     private TableColumn<StoreItem, String> shoppingCartTableViewItemNameColumn;
@@ -191,6 +192,18 @@ public class PurchaseController {
         bindRelevantObjectsToWasOneOfPurchaseButtonsClicked();
     }
 
+    public void bindRelevantLabelsToOrderProperties() {
+        this.totalCartPriceLabel.textProperty().bind(cartPriceProperty.asString());
+        this.totalItemsLabel.textProperty().bind(totalItemsProperty.asString());
+        this.totalItemTypesLabel.textProperty().bind(itemTypesProperty.asString());
+    }
+
+    private void resetOrderProperties(){
+        itemTypesProperty.set(0);
+        totalItemsProperty.set(0);
+        cartPriceProperty.set(0);
+    }
+
     public void insertCustomersToComboBox() {
         ObservableList<Customer> customerObservableList = FXCollections.observableArrayList();
         Collection<Customer> a = this.mainController.getSDMLogic().getCustomers().values();
@@ -213,6 +226,14 @@ public class PurchaseController {
     @FXML
     void onActionDynamicPurchaseButton() {
         try {
+            if(!isDynamicPurchaseButtonToggled){
+
+                this.shoppingCartTableView.getItems().clear();
+                resetOrderProperties();
+                resetSelectedStoreCards();
+                this.currentOrder.clearOrderDetails();
+                this.discountsAvailable.clear();
+            }
             this.isDynamicPurchaseButtonToggled = true;
 
             if(wasOneOfPurchaseButtonsClicked.get()) {
@@ -226,6 +247,7 @@ public class PurchaseController {
             ObservableList<StoreItem> observableSystemItemsList = FXCollections.observableArrayList();
             observableSystemItemsList.addAll(this.mainController.getSDMLogic().getItems().values());
             purchaseItemsAvailableTableView.setItems(observableSystemItemsList);
+            this.chooseItemToBuyComboBox.setItems(observableSystemItemsList);
 
         }
         catch (Exception e) {
@@ -239,7 +261,15 @@ public class PurchaseController {
 
     @FXML
     void onActionStaticPurchaseButton() {
-        this.purchaseItemsAvailableTableView.getItems().clear();
+
+        if(isDynamicPurchaseButtonToggled) {
+            resetOrderProperties();
+            this.shoppingCartTableView.getItems().clear();
+            this.purchaseItemsAvailableTableView.getItems().clear();
+            this.currentOrder.clearOrderDetails();
+            this.discountsAvailable.clear();
+        }
+
         this.isDynamicPurchaseButtonToggled = false;
 
         if(wasOneOfPurchaseButtonsClicked.get()) {
@@ -259,14 +289,7 @@ public class PurchaseController {
     private void setShoppingCartTableColumnsProperties() {
         this.shoppingCartTableViewItemNameColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, String>("name"));
         this.shoppingCartTableViewAmountColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, Double>("totalItemsSold"));
-        this.shoppingCartTableViewTotalPriceColumn.setCellValueFactory(cellData -> {
-            if(this.isDynamicPurchaseButtonToggled) {
-                return new SimpleObjectProperty<Double>(this.mainController.getSDMLogic().getCheapestPriceForItem(cellData.getValue().getId()));
-            }
-            else { //Static purchase
-                return new SimpleObjectProperty<Double>(cellData.getValue().getTotalPrice());
-            }
-        });
+        this.shoppingCartTableViewTotalPriceColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<Double>(cellData.getValue().getTotalPrice()));
     }
 
     public void setMainController(AppController mainController) {
@@ -274,6 +297,7 @@ public class PurchaseController {
     }
 
     private void setPurchaseItemsAvailableTableColumnsProperties() {
+        this.purchaseItemTableViewItemIdColumn.setCellValueFactory(new PropertyValueFactory<>("Id"));
         this.purchaseItemTableViewItemNameColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, String>("name"));
         this.purchaseItemTableViewPricePerUnitColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, Double>("pricePerUnit"));
         this.purchaseItemTableViewCategoryColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, String>("purchaseCategory"));
@@ -296,17 +320,149 @@ public class PurchaseController {
             storeCard.getMainRoot().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    AnchorPane storeCard = (AnchorPane) event.getSource(); //?
-                    Pane pane = (Pane)storeCard.getChildren().get(0);
+                    AnchorPane storeCardMainRoot = (AnchorPane) event.getSource();
+                    Pane pane = (Pane)storeCardMainRoot.getChildren().get(0);
                     int storeId = Integer.parseInt(((Label)pane.getChildren().get(1)).textProperty().get());
                     Store store = mainController.getSDMLogic().getStores().get(storeId);
                     updatePurchaseItemAvailableTableView(store);
-
+                    updatePurchaseItemsAvailableComboBox(store);
+                    updateShoppingCartWhenCardClicked(storeId);
+                    resetSelectedStoreCards();
+                    setSelectedStoreCardBorder(storeCardMainRoot);
+                    resetOrderProperties();
                 }
             });
         }
 
         storeCardsVBox.setDisable(true);
+    }
+
+    private void setSelectedStoreCardBorder(AnchorPane storeCardMainRoot) {
+        storeCardMainRoot.setStyle("-fx-border-color: blue");
+    }
+
+    private void resetSelectedStoreCards() {
+        this.mainController.getStoreCardControllerMapForPurchase().values().forEach(storeCardController -> {
+            storeCardController.getMainRoot().setStyle("-fx-border-color: none;");
+        });
+    }
+
+    private void updateShoppingCartWhenCardClicked(int storeId) {
+        if(this.currentStaticStoreId != storeId){
+            this.currentStaticStoreId = storeId;
+            this.shoppingCartTableView.getItems().clear();
+            this.currentOrder.clearOrderDetails();
+            this.discountsAvailable.clear();
+        }
+    }
+
+    @FXML
+    void onActionAddToCartButton() {
+        try {
+            Store storeToBuyFrom;
+            StringBuilder sb = new StringBuilder();
+            String textFieldValue = this.itemAmountToBuyTextField.getText();
+            StoreItem selectedItem = this.chooseItemToBuyComboBox.getSelectionModel().getSelectedItem();
+            if(selectedItem != null) {
+                if(isValidTextFieldValue(selectedItem.getPurchaseCategory(), textFieldValue, sb)) {
+                    StoreItem newStoreItem = new StoreItem(selectedItem, Double.parseDouble(textFieldValue));
+                    this.itemAmountToBuyTextField.setStyle("-fx-border-color: none;");
+                    this.itemAmountToBuyTextField.setPromptText("Amount");
+
+                    if(this.isDynamicPurchaseButtonToggled){
+                        storeToBuyFrom = this.mainController.getSDMLogic().getStoreForDynamicPurchase(newStoreItem.getId());
+                    }
+                    else {
+                        storeToBuyFrom = this.mainController.getSDMLogic().getStores().get(this.currentStaticStoreId);
+                    }
+
+                    updateDiscountsTableViewIfNeeded(newStoreItem, storeToBuyFrom);
+                    newStoreItem.setPricePerUnit(storeToBuyFrom.getItemsBeingSold().get(newStoreItem.getId()).getPricePerUnit());
+                    updateCartTableView(newStoreItem);
+                    addItemToOrder(newStoreItem);
+                    updateProperties(newStoreItem, storeToBuyFrom);
+                    addStoreParticipatingInOrder(storeToBuyFrom);
+                }
+                else {
+                    this.itemAmountToBuyTextField.setStyle("-fx-border-color: red;");
+                    this.itemAmountToBuyTextField.setPromptText(sb.toString());
+                }
+
+                this.itemAmountToBuyTextField.setText("");
+            }
+            else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Purchase Demand Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Please choose an item first");
+                alert.showAndWait();
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void updateProperties(StoreItem newStoreItem, Store storeToBuyFrom) {
+        this.cartPriceProperty.set(this.cartPriceProperty.get() + newStoreItem.getTotalPrice());
+        this.totalItemsProperty.set(this.currentOrder.getTotalNumberOfItemsInOrder());
+        this.itemTypesProperty.set(this.currentOrder.getNumberOfItemsTypesInOrder());
+    }
+
+    private void addStoreParticipatingInOrder(Store storeToBuyFrom) {
+        if(!storesParticipatingInOrder.containsKey(storeToBuyFrom.getId())) {
+            storesParticipatingInOrder.put(storeToBuyFrom.getId(), storeToBuyFrom);
+        }
+    }
+
+    private void addItemToOrder(StoreItem newStoreItem) {
+        this.currentOrder.addItem(newStoreItem);
+    }
+
+    private void updateCartTableView(StoreItem newStoreItem) {
+        this.shoppingCartTableView.getItems().add(newStoreItem);
+    }
+
+    private void updateDiscountsTableViewIfNeeded(StoreItem newStoreItem, Store storeToBuyFrom) {
+
+    }
+
+    private boolean isValidTextFieldValue(String purchaseCategory, String textFieldValue, StringBuilder outMessage) {
+        if(purchaseCategory.equals("Quantity")) {
+            if(isIntegerNumber(textFieldValue)) {
+                return true;
+            }
+            else {
+                outMessage.append("Input is not an integer");
+                return false;
+            }
+        }
+        else {
+            if(isNumber(textFieldValue)) {
+                return true;
+            }
+            else {
+                outMessage.append("Input is not a number");
+                return false;
+            }
+        }
+    }
+
+    private boolean isNumber(String textFieldValue) {
+        try {
+            Double.parseDouble(textFieldValue);
+            return true;
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void updatePurchaseItemsAvailableComboBox(Store store) {
+        ObservableList<StoreItem> observableSystemItemsList = FXCollections.observableArrayList();
+        observableSystemItemsList.addAll(store.getItemsBeingSold().values());
+        this.chooseItemToBuyComboBox.setItems(observableSystemItemsList);
     }
 
     private void updatePurchaseItemAvailableTableView(Store store) {
@@ -332,4 +488,13 @@ public class PurchaseController {
         }
     }
 
+    private boolean isIntegerNumber(String numberToCheck) {
+        try {
+            Integer.parseInt(numberToCheck);
+            return true;
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
 }

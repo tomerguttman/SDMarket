@@ -13,6 +13,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SuperMarketLogic {
     private SuperDuperMarket SDMImproved;
@@ -718,7 +719,35 @@ public class SuperMarketLogic {
         return SDMImproved.getSystemCustomers();
     }
 
-    public Double getCheapestPriceForItem(int id) {
-        return 0.0;
+    public Double getCheapestPriceForItem(int itemId) {
+        StoreItem sItem;
+        double cheapestPrice = 0;
+        for (Store store : this.getStores().values()) {
+            if(store.getItemsBeingSold().containsKey(itemId)) {
+                sItem = store.getItemsBeingSold().get(itemId);
+                if(sItem.getPricePerUnit() < cheapestPrice) {
+                    cheapestPrice = sItem.getPricePerUnit();
+                }
+            }
+        }
+
+        return cheapestPrice;
+    }
+
+    public Store getStoreForDynamicPurchase(int itemId) {
+        StoreItem sItem;
+        Store storeToBuyFrom = null;
+        double cheapestPrice = 0;
+        for (Store store : this.getStores().values()) {
+            if(store.getItemsBeingSold().containsKey(itemId)) {
+                 sItem = store.getItemsBeingSold().get(itemId);
+                 if(sItem.getPricePerUnit() < cheapestPrice || cheapestPrice == 0) { //cheapestPrice == 0 for the first time...
+                     cheapestPrice = sItem.getPricePerUnit();
+                     storeToBuyFrom = store;
+                 }
+            }
+        }
+
+        return storeToBuyFrom;
     }
 }

@@ -36,6 +36,15 @@ public class StoreItem {
         this.isAvailable = false;
     }
 
+    public StoreItem(StoreItem selectedItem, Double amountToBuy) {
+        this.Id = selectedItem.Id;
+        this.name = selectedItem.name;
+        this.pricePerUnit = selectedItem.pricePerUnit;
+        this.purchaseCategory = selectedItem.purchaseCategory;
+        this.isAvailable = false;
+        this.totalItemsSold = amountToBuy;
+    }
+
     public double getTotalPrice() {
         return this.pricePerUnit * this.totalItemsSold;
     }
@@ -117,10 +126,6 @@ public class StoreItem {
 
     @Override
     public String toString() {
-        return  "\tItem ID: " + Id + "\n" +
-                "\t\tItem Name: " + name + "\n" +
-                "\t\tPurchase Category: " + purchaseCategory +"\n" +
-                "\t\tPrice Per Unit: " + pricePerUnit + "\n" +
-                "\t\tAmount Of Units Sold: " + totalItemsSold + "\n";
+        return  String.format("%d | %s", this.Id, this.getName());
     }
 }
