@@ -31,6 +31,7 @@ public class SuperDuperMarket {
         systemCustomers = inputSDM.getSDMCustomers().getSDMCustomer().stream().collect(Collectors.toMap(SDMCustomer::getId, Customer::new));
         systemDynamicOrders = new HashMap<>();
         initializeStoresItems(inputSDM);
+        updateStoreDiscountsOffersItemName(systemStores);
         updateStoreDiscountsItemToBuyName(systemStores);
         initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
 
@@ -38,6 +39,19 @@ public class SuperDuperMarket {
         amountItemsProperty = new SimpleStringProperty(Integer.toString(this.getSystemItems().values().size()));
         amountOrdersProperty = new SimpleStringProperty(Integer.toString(orderID - 1));
         amountCustomersProperty = new SimpleStringProperty(Integer.toString(this.getSystemCustomers().values().size()));
+    }
+
+    private void updateStoreDiscountsOffersItemName(Map<Integer, Store> systemStores) {
+        for (Store store : systemStores.values()) {
+            Map<Integer, List<Discount>> currentStoreDiscounts = store.getStoreDiscounts();
+            currentStoreDiscounts.forEach((itemToBuyID, listOfDiscountOffers) -> {
+                for (Discount discount : listOfDiscountOffers) {
+                    for (Discount.ThenGet.Offer offer : discount.getGetThat().getOfferList()) {
+                        offer.setItemName(store.getItemsBeingSold().get(offer.getOfferItemId()).getName());
+                    }
+                }
+            });
+        }
     }
 
     private void updateStoreDiscountsItemToBuyName(Map<Integer, Store> systemStores) {

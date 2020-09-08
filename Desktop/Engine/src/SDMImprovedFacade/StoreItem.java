@@ -12,6 +12,7 @@ public class StoreItem {
     private final String name;
     private final String purchaseCategory;
     private boolean isAvailable;
+    private boolean wasPartOfDiscount;
 
     public StoreItem(SDMItem inputItem, SDMSell inputPrice){
         this.Id = inputItem.getId();
@@ -19,6 +20,7 @@ public class StoreItem {
         this.purchaseCategory = inputItem.getPurchaseCategory();
         this.pricePerUnit = inputPrice.getPrice();
         this.isAvailable = false;
+        this.wasPartOfDiscount = false;
     }
 
     public StoreItem(SDMItem inputItem) {
@@ -26,6 +28,7 @@ public class StoreItem {
         this.name = inputItem.getName();
         this.purchaseCategory = inputItem.getPurchaseCategory();
         this.isAvailable = false;
+        this.wasPartOfDiscount = false;
     }
 
     public StoreItem(StoreItem sItem) {
@@ -34,6 +37,7 @@ public class StoreItem {
         this.pricePerUnit = sItem.pricePerUnit;
         this.purchaseCategory = sItem.purchaseCategory;
         this.isAvailable = false;
+        this.wasPartOfDiscount = false;
     }
 
     public StoreItem(StoreItem selectedItem, Double amountToBuy) {
@@ -43,6 +47,16 @@ public class StoreItem {
         this.purchaseCategory = selectedItem.purchaseCategory;
         this.isAvailable = false;
         this.totalItemsSold = amountToBuy;
+    }
+
+    public StoreItem(int itemId, double quantity, double pricePerUnit, String itemName, String purchaseCategory, boolean wasPartOfDiscount) {
+        this.Id = itemId;
+        this.totalItemsSold = quantity;
+        this.pricePerUnit = pricePerUnit;
+        this.name = itemName;
+        this.purchaseCategory = purchaseCategory;
+        this.wasPartOfDiscount = wasPartOfDiscount;
+        this.isAvailable = true;
     }
 
     public double getTotalPrice() {
@@ -79,6 +93,14 @@ public class StoreItem {
 
     public String getName() {
         return name;
+    }
+
+    public boolean getWasPartOfDiscount() {
+        return wasPartOfDiscount;
+    }
+
+    public void setWasPartOfDiscount(boolean wasPartOfDiscount) {
+        this.wasPartOfDiscount = wasPartOfDiscount;
     }
 
     public int getAmountOfStoresSellingThisItem() {

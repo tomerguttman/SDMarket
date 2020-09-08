@@ -72,7 +72,7 @@
             <DatePicker fx:id="deliveryDatePicker" prefHeight="25.0" prefWidth="120.0" promptText="Delivery Date" />
          </children>
       </HBox>
-      <TableView fx:id="purchaseItemsAvailableTableView" disable="true" layoutX="198.0" layoutY="172.0" prefHeight="200.0" prefWidth="380.0" AnchorPane.leftAnchor="197.0">
+      <TableView fx:id="purchaseItemsAvailableTableView" disable="true" layoutX="197.0" layoutY="172.0" prefHeight="200.0" prefWidth="380.0" AnchorPane.leftAnchor="195.0">
         <columns>
             <TableColumn fx:id="purchaseItemTableViewItemIdColumn" maxWidth="95.0" minWidth="0.0" prefWidth="34.0" text="ID" />
           <TableColumn fx:id="purchaseItemTableViewItemNameColumn" maxWidth="163.0" minWidth="0.0" prefWidth="100.0" text="Item Name" />
@@ -88,25 +88,25 @@
             <Button fx:id="addItemToCartButton" disable="true" mnemonicParsing="false" onAction="#onActionAddToCartButton" prefHeight="25.0" prefWidth="80.0" text="Add To Cart" />
          </children>
       </HBox>
-      <TableView fx:id="shoppingCartTableView" disable="true" layoutX="195.0" layoutY="456.0" prefHeight="96.0" prefWidth="286.0" AnchorPane.leftAnchor="194.0">
+      <TableView fx:id="shoppingCartTableView" disable="true" layoutX="600.0" layoutY="172.0" prefHeight="200.0" prefWidth="307.0">
          <columns>
             <TableColumn fx:id="shoppingCartTableViewItemNameColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" text="Item Name" />
             <TableColumn fx:id="shoppingCartTableViewAmountColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" text="Amount" />
             <TableColumn fx:id="shoppingCartTableViewTotalPriceColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" text="Total Price" />
          </columns>
       </TableView>
-      <Label layoutX="194.0" layoutY="435.0" text="Shopping Cart">
+      <Label layoutX="601.0" layoutY="151.0" text="Shopping Cart">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Label layoutX="195.0" layoutY="151.0" text="Items">
+      <Label layoutX="197.0" layoutY="151.0" text="Items" AnchorPane.leftAnchor="197.0">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Button fx:id="buyCartButton" disable="true" layoutX="492.0" layoutY="456.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="432.0" text="Buy " />
-      <ScrollPane layoutX="602.0" layoutY="170.0" prefHeight="96.0" prefWidth="316.0" vbarPolicy="NEVER" AnchorPane.leftAnchor="602.0">
+      <Button fx:id="buyCartButton" disable="true" layoutX="600.0" layoutY="387.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="307.0" text="Buy " />
+      <ScrollPane fx:id="discountAvailableScrollPane" layoutX="197.0" layoutY="446.0" prefHeight="96.0" prefWidth="316.0" vbarPolicy="NEVER" AnchorPane.leftAnchor="196.0">
          <content>
             <AnchorPane prefHeight="92.0" prefWidth="312.0">
                <children>
@@ -115,27 +115,27 @@
             </AnchorPane>
          </content>
       </ScrollPane>
-      <Label layoutX="605.0" layoutY="151.0" text="Discounts Available" AnchorPane.leftAnchor="605.0">
+      <Label fx:id="discountAvailableLabel" layoutX="195.0" layoutY="425.0" text="Discounts Available" AnchorPane.leftAnchor="197.0">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <TableView fx:id="discountOffersTableView" disable="true" layoutX="603.0" layoutY="285.0" prefHeight="96.0" prefWidth="316.0">
+      <TableView fx:id="discountOffersTableView" disable="true" layoutX="197.0" layoutY="559.0" prefHeight="96.0" prefWidth="316.0" AnchorPane.leftAnchor="197.0">
          <columns>
             <TableColumn fx:id="discountOffersTableViewItemNameColumn" maxWidth="105.5" minWidth="105.5" prefWidth="105.5" text="Item Name" />
-            <TableColumn fx:id="discountOffersTableViewQuantityColumn" maxWidth="105.5" minWidth="105.5" prefWidth="105.5" text="Quantity" />
-            <TableColumn fx:id="discountOffersTableViewForAdditionalColumn" maxWidth="105.5" minWidth="105.5" prefWidth="105.5" text="For Additional" />
+            <TableColumn fx:id="discountOffersTableViewQuantityColumn" maxWidth="105.5" minWidth="85.0" prefWidth="85.0" text="Quantity" />
+            <TableColumn fx:id="discountOffersTableViewForAdditionalColumn" maxWidth="106.0" minWidth="83.0" prefWidth="101.0" text="For Additional" />
          </columns>
       </TableView>
-      <HBox layoutX="599.0" layoutY="387.0" spacing="5.0">
+      <HBox fx:id="discountOffersHBox" layoutX="199.0" layoutY="662.0" spacing="5.0">
          <children>
-            <Label fx:id="discountOperatorLabel" minWidth="90.0" prefHeight="25.0" prefWidth="90.0" text="All-Or-Nothing">
+            <Label fx:id="discountOperatorLabel" minWidth="90.0" prefHeight="25.0" prefWidth="95.0">
                <font>
-                  <Font size="13.0" />
+                  <Font size="11.0" />
                </font>
             </Label>
             <ComboBox fx:id="chooseOfferComboBox" disable="true" prefHeight="25.0" prefWidth="100.0" promptText="Choose" />
-            <Button fx:id="applyDiscountButton" disable="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Apply Discount" />
+            <Button fx:id="applyDiscountButton" disable="true" mnemonicParsing="false" onAction="#onActionApplyDiscountButton" prefHeight="25.0" prefWidth="109.0" text="Apply Discount" />
          </children>
       </HBox>
       <Separator layoutX="586.0" layoutY="151.0" orientation="VERTICAL" prefHeight="263.0" prefWidth="0.0" />
@@ -193,10 +193,11 @@
             </VBox>
          </children>
       </HBox>
-      <Label layoutX="604.0" layoutY="264.0" text="Discount Offers">
+      <Label fx:id="discountOffersLabel" layoutX="199.0" layoutY="539.0" text="Discount Offers">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
+      <Button fx:id="displayOrderSummaryButton" layoutX="518.0" layoutY="446.0" mnemonicParsing="false" onAction="#onActionDisplayOrderSummaryButton" prefHeight="92.0" prefWidth="370.0" text="Display Order Summary" />
    </children>
 </AnchorPane>

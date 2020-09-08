@@ -71,6 +71,13 @@ public class Order {
         return itemsInOrderSet.size();
     }
 
+    public Set<Integer> getItemsTypesSet(){
+        Set<Integer> itemsInOrderSet = new HashSet<>();
+        itemsInOrder.forEach(item -> itemsInOrderSet.add(item.getId()));
+
+        return itemsInOrderSet;
+    }
+
     private double calculateTotalCostOfItemsInOrder(){
         return itemsInOrder.stream().mapToDouble(itemInOrder -> itemInOrder.getTotalItemsSold() * itemInOrder.getPricePerUnit()).sum();
     }

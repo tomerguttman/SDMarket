@@ -147,7 +147,7 @@ public class StoresController {
 
     private void setThenYouGetTableColumnsProperties() {
         this.thenYouGetTableViewForAdditionalColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Integer>("forAdditional"));
-        this.thenYouGetTableViewItemNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<String>(this.mainController.getSDMLogic().getItems().get(cellData.getValue().getItemId()).getName()));
+        this.thenYouGetTableViewItemNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<String>(this.mainController.getSDMLogic().getItems().get(cellData.getValue().getOfferItemId()).getName()));
         this.thenYouGetTableViewQuantityColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Double>("quantity"));
     }
 

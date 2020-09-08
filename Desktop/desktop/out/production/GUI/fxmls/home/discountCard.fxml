@@ -9,10 +9,20 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="75.0" prefWidth="140.0" style="-fx-background-color: #EEEEFB; -fx-background-radius: 10 10 10 10;" styleClass="discountCard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.DiscountCardController">
+<AnchorPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="75.0" prefWidth="140.0" style="-fx-background-color: #EEEEFB; -fx-background-radius: 10 10 10 10;" styleClass="storeCard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.DiscountCardController">
    <children>
       <Pane prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #CCCCCC; -fx-background-radius: 10 10 0 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
+            <Label fx:id="discountCardItemToBuyId" alignment="CENTER" layoutX="35.0" layoutY="6.0" prefHeight="21.0" prefWidth="34.0" text="1">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="discountCardItemToBuyName" alignment="CENTER" layoutX="48.0" layoutY="6.0" prefHeight="21.0" prefWidth="77.0" text="iName">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
             <StackPane layoutY="6.0" prefHeight="43.0" prefWidth="45.0" />
             <ImageView fitHeight="34.0" fitWidth="66.0" layoutX="8.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -22,6 +32,11 @@
          </children>
       </Pane>
       <Label fx:id="discountCardDiscountNameLabel" alignment="CENTER" layoutY="45.0" prefHeight="21.0" prefWidth="140.0" text="DISCOUNT NAME" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="discountCardStoreId" alignment="CENTER" layoutX="10.0" layoutY="55.0" prefHeight="21.0" prefWidth="140.0" text="DISCOUNT STORE ID" visible="false">
          <font>
             <Font size="15.0" />
          </font>

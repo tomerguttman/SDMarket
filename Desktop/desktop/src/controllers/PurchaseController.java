@@ -21,23 +21,28 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PurchaseController {
 
     private AppController mainController;
-    private final List<DiscountCardController> discountCardControllersList = new ArrayList<>();
-    private boolean isDynamicPurchaseButtonToggled;
     private int currentStaticStoreId = -1;
-    private SimpleBooleanProperty wasOneOfPurchaseButtonsClicked;
+    private boolean isDynamicPurchaseButtonToggled;
     private final Order currentOrder = new Order();
-    private Map<Integer, List<StoreItem>> dynamicOrder;
-    private final List<Discount> discountsAvailable = new ArrayList<>();
     private final Map<Integer, Store> storesParticipatingInOrder = new HashMap<>();
+    private Map<Integer, Double> itemsAmountBucketMap = new HashMap<>();
+    private Map<Integer, List<StoreItem>> dynamicOrder;
+    private HashMap<Integer, List<StoreItem>> tempStaticOrder = new HashMap<>();
+    private final List<DiscountCardController> discountCardControllersList = new ArrayList<>();
 
+    //Properties
     private SimpleDoubleProperty cartPriceProperty = new SimpleDoubleProperty();
     private SimpleDoubleProperty deliveryCostProperty = new SimpleDoubleProperty();
     private SimpleIntegerProperty itemTypesProperty = new SimpleIntegerProperty();
     private SimpleIntegerProperty totalItemsProperty = new SimpleIntegerProperty();
+    private SimpleBooleanProperty wasOneOfPurchaseButtonsClicked;
+    private SimpleBooleanProperty wasBuyCartButtonClicked = new SimpleBooleanProperty();
+    private SimpleBooleanProperty isShowFinalSummaryStage = new SimpleBooleanProperty();
 
     @FXML
     private AnchorPane mainRoot;
@@ -58,7 +63,22 @@ public class PurchaseController {
     private Label totalItemsLabel;
 
     @FXML
+    private Label discountOffersLabel;
+
+    @FXML
     private ComboBox<Customer> customerComboBox;
+
+    @FXML
+    private HBox discountOffersHBox;
+
+    @FXML
+    private Label discountAvailableLabel;
+
+    @FXML
+    private Button displayOrderSummaryButton;
+
+    @FXML
+    private ScrollPane discountAvailableScrollPane;
 
     @FXML
     private Button staticPurchaseButton;
@@ -115,22 +135,22 @@ public class PurchaseController {
     private HBox discountsCardsHBox;
 
     @FXML
-    private TableView<?> discountOffersTableView;
+    private TableView<Discount.ThenGet.Offer> discountOffersTableView;
 
     @FXML
-    private TableColumn<?, ?> discountOffersTableViewItemNameColumn;
+    private TableColumn<Discount.ThenGet.Offer, String> discountOffersTableViewItemNameColumn;
 
     @FXML
-    private TableColumn<?, ?> discountOffersTableViewQuantityColumn;
+    private TableColumn<Discount.ThenGet.Offer, Double> discountOffersTableViewQuantityColumn;
 
     @FXML
-    private TableColumn<?, ?> discountOffersTableViewForAdditionalColumn;
+    private TableColumn<Discount.ThenGet.Offer, Double> discountOffersTableViewForAdditionalColumn;
 
     @FXML
     private Label discountOperatorLabel;
 
     @FXML
-    private ComboBox<?> chooseOfferComboBox;
+    private ComboBox<Discount.ThenGet.Offer> chooseOfferComboBox;
 
     @FXML
     private Button applyDiscountButton;
@@ -194,8 +214,31 @@ public class PurchaseController {
         setDiscountOffersTableColumnsProperties();
         setStoreFinalOrderDetailsTableColumnsProperties();
         bindRelevantObjectsToWasOneOfPurchaseButtonsClicked();
+        bindRelevantObjectToWasBuyCartButtonClicked();
         setBuyCartEventHandler();
 
+    }
+
+    private void bindRelevantObjectToWasBuyCartButtonClicked() {
+        //disabled property
+        isShowFinalSummaryStage.set(false);
+        this.buyCartButton.disableProperty().bind(this.wasBuyCartButtonClicked);
+        this.addItemToCartButton.disableProperty().bind(this.wasBuyCartButtonClicked);
+        this.applyDiscountButton.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        //Discount section
+        this.discountOffersHBox.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        this.discountAvailableLabel.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        this.discountOffersLabel.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        this.discountOffersTableView.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        this.displayOrderSummaryButton.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        this.discountAvailableScrollPane.disableProperty().bind(this.wasBuyCartButtonClicked.not());
+        //visible properties
+        this.discountOffersHBox.visibleProperty().bind(this.wasBuyCartButtonClicked);
+        this.discountAvailableLabel.visibleProperty().bind(this.wasBuyCartButtonClicked);
+        this.discountOffersLabel.visibleProperty().bind(this.wasBuyCartButtonClicked);
+        this.discountOffersTableView.visibleProperty().bind(this.wasBuyCartButtonClicked);
+        this.displayOrderSummaryButton.visibleProperty().bind(this.wasBuyCartButtonClicked);
+        this.discountAvailableScrollPane.visibleProperty().bind(this.wasBuyCartButtonClicked);
     }
 
     private void setBuyCartEventHandler() {
@@ -208,36 +251,83 @@ public class PurchaseController {
     }
 
     private void buyCartMethod() {
+        Map<Integer, List<StoreItem>> purchaseItemsMap; // Integer -> storeId, List<StoreItem> -> StoreItems to buy from the store.
         if(!shoppingCartTableView.getItems().isEmpty()){
-            if(this.isDynamicPurchaseButtonToggled) {
-                this.dynamicOrder = initializeDynamicOrderAndAddDiscountCards();
-            }
+            if(this.isDynamicPurchaseButtonToggled) { this.dynamicOrder = initializeDynamicOrderAndAddDiscountCards(); }
             else {
-                initializeStaticOrderAndAddDiscountsCards();
+                tempStaticOrder.put(this.currentStaticStoreId, currentOrder.getItemsInOrder());
+                addStaticOrderDiscountsCards();
             }
+
+            if(!discountCardControllersList.isEmpty()) {
+                this.wasBuyCartButtonClicked.set(true);
+                //There are available discounts to apply
+                //initializeItemAmountBucketMap(dynamic/static); already happened
+            }
+            else { showAndInitializeFinalBuySummary(); }
         }
         else { displayEmptyCartError(); }
     }
 
-    private void initializeStaticOrderAndAddDiscountsCards() {
+    private void showAndInitializeFinalBuySummary() {
+        makeInvisibleAndDisableDiscountsSection();
+    }
+
+    private void makeInvisibleAndDisableDiscountsSection() {
+        this.wasBuyCartButtonClicked.set(false);
+    }
+
+    private void addStaticOrderDiscountsCards() {
+        //In static order we have the final order and the store we buy from.
+        Map<Integer, List<StoreItem>> staticPurchaseItemsMap = new HashMap<>();
+        staticPurchaseItemsMap.put(this.currentStaticStoreId, this.currentOrder.getItemsInOrder());
+        initializeItemAmountBucketMap(staticPurchaseItemsMap);
+        addRelevantDiscountCardsToHBox(staticPurchaseItemsMap);
     }
 
     private Map<Integer, List<StoreItem>> initializeDynamicOrderAndAddDiscountCards() {
         Map<Integer, List<StoreItem>> itemListForEachStoreMap = createItemsListForEachStore();
+        initializeItemAmountBucketMap(itemListForEachStoreMap);
         addRelevantDiscountCardsToHBox(itemListForEachStoreMap);
         return itemListForEachStoreMap;
     }
 
+    private void initializeItemAmountBucketMap(Map<Integer, List<StoreItem>> itemListForEachStoreMap) {
+        this.itemsAmountBucketMap.clear();
+        itemListForEachStoreMap.forEach((storeId, listOfItems) -> {
+            for (StoreItem sItem : listOfItems) {
+                if(this.itemsAmountBucketMap.containsKey(sItem.getId())) {
+                    this.itemsAmountBucketMap.put(sItem.getId(),this.itemsAmountBucketMap.get(sItem.getId()) + sItem.getTotalItemsSold());
+                }
+                else {
+                    this.itemsAmountBucketMap.put(sItem.getId(), sItem.getTotalItemsSold());
+                }
+            }
+        });
+    }
+
     private void addRelevantDiscountCardsToHBox(Map<Integer, List<StoreItem>> itemListForEachStoreMap) {
         this.discountsCardsHBox.getChildren().clear();
+        this.discountCardControllersList.clear();
+
         itemListForEachStoreMap.forEach((storeId, itemListForTheStore) -> {
             Store currentStore = this.mainController.getSDMLogic().getStores().get(storeId);
             //There are no duplicates in the input map;
             for (StoreItem sItem : itemListForTheStore ) {
                 if(currentStore.getStoreDiscounts() != null) {
                     if(currentStore.getStoreDiscounts().containsKey(sItem.getId())) {
+                        List<Discount> discountsForThatItem = currentStore.getStoreDiscounts().get(sItem.getId());
+                        List<Discount> discountToAdd = new ArrayList<>();
                         try {
-                            createAndAddDiscountCards(currentStore.getStoreDiscounts().get(sItem.getId()));
+                            for (Discount discount : discountsForThatItem) {
+                                if(this.itemsAmountBucketMap.containsKey(sItem.getId())){
+                                    if (this.itemsAmountBucketMap.get(sItem.getId()) >=  discount.getBuyThis().getQuantity()) {
+                                        discountToAdd.add(discount);
+                                    }
+                                }
+                            }
+
+                            createAndAddDiscountCards(discountToAdd, currentStore.getId());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -250,8 +340,6 @@ public class PurchaseController {
     }
 
     private void pushDiscountCardsToHBoxAndInitMouseClick() {
-        //this.discountsCardsHBox.getChildren().clear();
-
         for (DiscountCardController discountCard : this.discountCardControllersList) {
             this.discountsCardsHBox.getChildren().add(discountCard.getMainRoot());
             discountCard.getMainRoot().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
@@ -259,24 +347,85 @@ public class PurchaseController {
                 public void handle(MouseEvent event) { discountCardClickMethod(event); }
             });
         }
-
-        this.discountsCardsHBox.getChildren();
     }
 
     private void discountCardClickMethod(MouseEvent event) {
-        //DO SOMETHING!!
+        resetDiscountRelevantComponents();
+        AnchorPane discountCardMainRoot = (AnchorPane) event.getSource();
+        resetSelectedDiscountCards();
+        setSelectedDiscountCardBorder(discountCardMainRoot);
+        String discountName = ((Label)discountCardMainRoot.getChildren().get(1)).getText();
+        String discountStoreIdString = ((Label)discountCardMainRoot.getChildren().get(2)).getText();
+        String itemToBuyIdString = ((Label)((Pane)discountCardMainRoot.getChildren().get(0)).getChildren().get(0)).getText();
+        int discountStoreId = Integer.parseInt(discountStoreIdString);
+        int itemToBuyId = Integer.parseInt(itemToBuyIdString);
+        loadDiscountDetailsInRelevantComponents(Objects.requireNonNull(getClickedDiscount(discountName, discountStoreId, itemToBuyId)));
     }
 
-    private void createAndAddDiscountCards(List<Discount> discountForCurrentItem) throws IOException {
+    private void resetDiscountRelevantComponents() {
+        this.chooseOfferComboBox.getItems().clear();
+        this.discountOffersTableView.getItems().clear();
+        this.discountOperatorLabel.setText("");
+    }
+
+    private Discount getClickedDiscount(String discountName, int discountStoreId, int itemToBuyId) {
+        List<Discount> discountsRelevantToTheItemToBuyId =
+                this.mainController.getSDMLogic().getStores().get(discountStoreId).getStoreDiscounts().get(itemToBuyId);
+        for (Discount discount : discountsRelevantToTheItemToBuyId) {
+            if(discount.getName().equals(discountName)) { return discount; }
+        }
+
+        return null;
+    }
+
+    private void loadDiscountDetailsInRelevantComponents(Discount clickedDiscount) {
+        ObservableList<Discount.ThenGet.Offer> observableDiscountOffersList = FXCollections.observableArrayList();
+        observableDiscountOffersList.addAll(clickedDiscount.getGetThat().getOfferList());
+        discountOffersTableView.setItems(observableDiscountOffersList);
+        String thenYouGetOperator = clickedDiscount.getGetThat().getOperator();
+        this.discountOperatorLabel.setText(thenYouGetOperator);
+        this.chooseOfferComboBox.setDisable(thenYouGetOperator.equals("ALL-OR-NOTHING") || thenYouGetOperator.equals("IRRELEVANT"));
+        this.chooseOfferComboBox.setItems(observableDiscountOffersList);
+    }
+
+    private void setSelectedDiscountCardBorder(AnchorPane discountCardMainRoot) {
+        discountCardMainRoot.setStyle("-fx-border-color: blue; -fx-background-color: #EEEEFB;");
+    }
+
+    private void resetSelectedDiscountCards() {
+        this.discountCardControllersList.forEach(discountCardController -> {
+            discountCardController.getMainRoot().setStyle("-fx-border-color: none; -fx-background-color: #EEEEFB;");
+        });
+    }
+
+    private void createAndAddDiscountCards(List<Discount> discountToAdd, int discountStoreId) throws IOException {
         try {
-            for (Discount discount : discountForCurrentItem) {
-                DiscountCardController discountCardController = createDiscountController(discount);
-                this.discountCardControllersList.add(discountCardController);
+            for (Discount discount : discountToAdd) {
+                if(!isDiscountControllerAlreadyExistInList(discount)) {
+                    DiscountCardController discountCardController = createDiscountController(discount);
+                    discountCardController.setDiscountCardItemToBuyId(discount.getBuyThis().getItemId());
+                    discountCardController.setDiscountCardItemToBuyName(String.format(" | %s",discount.getItemToBuyName()));
+                    discountCardController.setStoreId(discountStoreId);
+                    this.discountCardControllersList.add(discountCardController);
+                }
             }
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isDiscountControllerAlreadyExistInList(Discount discount) {
+        AtomicBoolean isDiscountAlreadyExistInListFlag = new AtomicBoolean(false);
+        for (DiscountCardController discountCardController : this.discountCardControllersList) {
+            if(discount.getStoreIdOfDiscount() == discountCardController.getStoreIdOfDiscount()
+                    && discount.getName().equals(discountCardController.getDiscountName())) {
+                isDiscountAlreadyExistInListFlag.set(true);
+                break;
+            }
+        }
+
+        return isDiscountAlreadyExistInListFlag.get();
     }
 
     private DiscountCardController createDiscountController(Discount discount) throws IOException {
@@ -316,14 +465,12 @@ public class PurchaseController {
     void onActionDynamicPurchaseButton() {
         try {
             if(!isDynamicPurchaseButtonToggled){
-                this.shoppingCartTableView.getItems().clear();
                 resetOrderProperties();
                 resetSelectedStoreCards();
-                this.currentOrder.clearOrderDetails();
-                this.discountsAvailable.clear();
-                this.discountsCardsHBox.getChildren().clear();
+                onChangedBuyResetProperties();
             }
 
+            this.chooseOfferComboBox.setDisable(false);
             this.isDynamicPurchaseButtonToggled = true;
             if(wasOneOfPurchaseButtonsClicked.get()) {
                 wasOneOfPurchaseButtonsClicked.set(false);
@@ -345,14 +492,11 @@ public class PurchaseController {
     void onActionStaticPurchaseButton() {
 
         if(isDynamicPurchaseButtonToggled) {
-            resetOrderProperties();
-            this.discountsCardsHBox.getChildren().clear();
-            this.shoppingCartTableView.getItems().clear();
             this.purchaseItemsAvailableTableView.getItems().clear();
-            this.currentOrder.clearOrderDetails();
-            this.discountsAvailable.clear();
+            onChangedBuyResetProperties();
         }
 
+        this.chooseOfferComboBox.setDisable(false);
         this.isDynamicPurchaseButtonToggled = false;
 
         if(wasOneOfPurchaseButtonsClicked.get()) {
@@ -360,6 +504,110 @@ public class PurchaseController {
         }
 
         this.storeCardsVBox.setDisable(false);
+    }
+
+    @FXML
+    void onActionApplyDiscountButton() {
+        String offerOperator = this.discountOperatorLabel.getText();
+        if( offerOperator.equals("ONE-OF")){
+            Discount.ThenGet.Offer selectedOffer = this.chooseOfferComboBox.getSelectionModel().getSelectedItem();
+            //Offer can be applied due to our logic flow. (All discount cards appear iff they can be applied)
+            if(selectedOffer != null){
+                createNewItemFromAppliedOfferAndUpdateTableViewAndOrderAndAddToRelevantOrder(selectedOffer);
+                updatePropertiesFromOffer(selectedOffer);
+            }
+            else {
+                displayChooseComboBoxItemFirstError();
+            }
+        }
+        else {
+            for (Discount.ThenGet.Offer offer : this.discountOffersTableView.getItems()) {
+                //Offer can be applied due to our logic flow. (All discount cards appear iff they can be applied)
+                createNewItemFromAppliedOfferAndUpdateTableViewAndOrderAndAddToRelevantOrder(offer);
+                updatePropertiesFromOffer(offer);
+            }
+        }
+
+        this.discountOffersTableView.getItems().clear();
+        if(discountCardControllersList.isEmpty()){
+            showAndInitializeFinalBuySummary();
+        }
+    }
+
+    private void updatePropertiesFromOffer(Discount.ThenGet.Offer selectedOffer) {
+        if(!isDynamicPurchaseButtonToggled){
+            //static
+            this.itemTypesProperty.set(this.currentOrder.getNumberOfItemsTypesInOrder());
+            this.totalItemsProperty.set(this.currentOrder.getTotalNumberOfItemsInOrder());
+            this.cartPriceProperty.set(currentOrder.getCostOfItemsInOrder());
+        }
+        else {
+            int amountToAdd;
+            this.itemTypesProperty.set(calculateAmountOfItemsTypesInDynamicOrder()); //dynamicOrder is a member of the controller
+            if(this.mainController.getSDMLogic().getItems().get(selectedOffer.getOfferItemId()).getPurchaseCategory().equals("Weight")) { amountToAdd = 1; }
+            else { amountToAdd = (int)selectedOffer.getQuantity(); }
+            this.totalItemsProperty.set( this.totalItemsProperty.get() + amountToAdd);
+            this.cartPriceProperty.set(this.cartPriceProperty.get() + selectedOffer.getForAdditional());
+        }
+    }
+
+    private int calculateAmountOfItemsTypesInDynamicOrder() {
+        HashSet<Integer> itemTypesHashSet = new HashSet<>();
+        dynamicOrder.forEach((storeId,itemsToBuyList) -> {
+            itemsToBuyList.forEach(item -> itemTypesHashSet.add(item.getId()));
+        });
+
+        return itemTypesHashSet.size();
+    }
+
+    private void createNewItemFromAppliedOfferAndUpdateTableViewAndOrderAndAddToRelevantOrder(Discount.ThenGet.Offer offer) {
+        if(offer != null){
+            Discount.IfBuy ifBuyItem = offer.getBuyThisItem();
+            this.itemsAmountBucketMap.put(offer.getBuyThisItem().getItemId(),
+                    this.itemsAmountBucketMap.get(ifBuyItem.getItemId()) - ifBuyItem.getQuantity());
+            StoreItem newStoreItemFromOffer = new StoreItem(offer.getOfferItemId(), offer.getQuantity(),
+                    offer.getForAdditional() / offer.getQuantity(), offer.getItemName(),
+                    this.mainController.getSDMLogic().getItems().get(offer.getOfferItemId()).getPurchaseCategory(), true);
+            addAppliedOfferToOrderAndUpdateCart(offer, newStoreItemFromOffer);
+        }
+    }
+
+    private void addAppliedOfferToOrderAndUpdateCart(Discount.ThenGet.Offer selectedOffer, StoreItem newStoreItemFromOffer) {
+        if(this.isDynamicPurchaseButtonToggled){
+            //push to dynamic
+            if(dynamicOrder.containsKey(selectedOffer.getStoreIdOfOffer())){
+                dynamicOrder.get(selectedOffer.getStoreIdOfOffer()).add(newStoreItemFromOffer);
+            }
+            else {
+                List<StoreItem> storeItemList = new ArrayList<>();
+                storeItemList.add(newStoreItemFromOffer);
+                dynamicOrder.put(selectedOffer.getStoreIdOfOffer(), storeItemList);
+            }
+            this.addRelevantDiscountCardsToHBox(this.dynamicOrder);
+        }
+        else {
+            //push to static
+            currentOrder.addItem(newStoreItemFromOffer);
+            this.addRelevantDiscountCardsToHBox(tempStaticOrder);
+        }
+
+        addItemToCartTableView(newStoreItemFromOffer);
+    }
+
+    @FXML
+    void onActionDisplayOrderSummaryButton(ActionEvent event) {
+        showAndInitializeFinalBuySummary();
+    }
+
+    private void onChangedBuyResetProperties() {
+        resetDiscountRelevantComponents();
+        resetOrderProperties();//
+        this.discountsCardsHBox.getChildren().clear();//
+        this.shoppingCartTableView.getItems().clear();//
+        this.currentOrder.clearOrderDetails();//
+        this.wasBuyCartButtonClicked.set(false);//
+        this.chooseItemToBuyComboBox.getItems().clear();
+        this.discountCardControllersList.clear();
     }
 
     public void bindRelevantLabelsToOrderProperties() {
@@ -387,7 +635,7 @@ public class PurchaseController {
                     this.itemAmountToBuyTextField.setStyle("-fx-border-color: none;");
                     this.itemAmountToBuyTextField.setPromptText("Amount");
                     storeToBuyFrom = getStoreToBuyFrom(newStoreItem); //according to static/dynamic purchase.
-                    invokeAllOnActionAddToCartButtonMethods(newStoreItem, storeToBuyFrom);
+                    performAllOnActionAddToCartButtonMethods(newStoreItem, storeToBuyFrom);
                 }
                 else { displayVisualInvalidInput(sb); }
                 this.itemAmountToBuyTextField.setText("");
@@ -399,10 +647,9 @@ public class PurchaseController {
         }
     }
 
-    private void invokeAllOnActionAddToCartButtonMethods(StoreItem newStoreItem, Store storeToBuyFrom) {
-        updateDiscountsTableViewIfNeeded(newStoreItem, storeToBuyFrom);
+    private void performAllOnActionAddToCartButtonMethods(StoreItem newStoreItem, Store storeToBuyFrom) {
         newStoreItem.setPricePerUnit(storeToBuyFrom.getItemsBeingSold().get(newStoreItem.getId()).getPricePerUnit());
-        updateCartTableView(newStoreItem);
+        addItemToCartTableView(newStoreItem);
         addItemToOrder(newStoreItem);
         updateProperties(newStoreItem, storeToBuyFrom);
         addStoreParticipatingInOrder(storeToBuyFrom);
@@ -410,7 +657,6 @@ public class PurchaseController {
 
     private Store getStoreToBuyFrom(StoreItem newStoreItem) {
         Store storeToBuyFrom;
-
         if(this.isDynamicPurchaseButtonToggled){
             storeToBuyFrom = this.mainController.getSDMLogic().getStoreForDynamicPurchase(newStoreItem.getId());
         }
@@ -426,6 +672,14 @@ public class PurchaseController {
         alert.setTitle("Purchase Demand Error");
         alert.setHeaderText(null);
         alert.setContentText("Please choose an item first");
+        alert.showAndWait();
+    }
+
+    private void displayChooseComboBoxItemFirstError() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("ComboBox Item Select Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Please choose an offer first");
         alert.showAndWait();
     }
 
@@ -455,7 +709,8 @@ public class PurchaseController {
         this.chooseItemToBuyComboBox.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
         this.itemAmountToBuyTextField.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
         this.addItemToCartButton.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
-        this.chooseOfferComboBox.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
+        //this.chooseOfferComboBox.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
+        this.chooseOfferComboBox.setDisable(true);
         this.applyDiscountButton.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
         this.shoppingCartTableView.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
         this.buyCartButton.disableProperty().bind(wasOneOfPurchaseButtonsClicked);
@@ -466,6 +721,12 @@ public class PurchaseController {
     }
 
     private void setDiscountOffersTableColumnsProperties() {
+        this.discountOffersTableViewQuantityColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Double>("quantity"));
+        this.discountOffersTableViewForAdditionalColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Double>("forAdditional"));
+        this.discountOffersTableViewItemNameColumn.setCellValueFactory(cellData -> {
+            String itemName = this.mainController.getSDMLogic().getItems().get(cellData.getValue().getOfferItemId()).getName();
+            return new SimpleObjectProperty<>(itemName);
+        });
     }
 
     private void setShoppingCartTableColumnsProperties() {
@@ -517,13 +778,29 @@ public class PurchaseController {
         resetSelectedStoreCards();
         setSelectedStoreCardBorder(storeCardMainRoot);
         updateCurrentStaticStoreAndResetOrderProperties(storeId);
+        clearDiscountCardsFromHBoxIfNeeded(storeId);
+        updateWasCartBuyButtonClickedIfNeeded(storeId);
         this.currentStaticStoreId = storeId;
+
+    }
+
+    private void updateWasCartBuyButtonClickedIfNeeded(int storeId) {
+        if(currentStaticStoreId != storeId){
+            this.wasBuyCartButtonClicked.set(false);
+        }
+    }
+
+    private void clearDiscountCardsFromHBoxIfNeeded(int storeId) {
+        if(this.currentStaticStoreId != storeId){
+            this.discountCardControllersList.clear();
+            this.discountsCardsHBox.getChildren().clear();
+            resetDiscountRelevantComponents();
+        }
     }
 
     private void updateCurrentStaticStoreAndResetOrderProperties(int storeId) {
         if(currentStaticStoreId != storeId) {
             resetOrderProperties();
-            currentStaticStoreId = storeId;
         }
     }
 
@@ -541,7 +818,6 @@ public class PurchaseController {
         if(this.currentStaticStoreId != storeId){
             this.shoppingCartTableView.getItems().clear();
             this.currentOrder.clearOrderDetails();
-            this.discountsAvailable.clear();
         }
     }
 
@@ -561,12 +837,8 @@ public class PurchaseController {
         this.currentOrder.addItem(newStoreItem);
     }
 
-    private void updateCartTableView(StoreItem newStoreItem) {
+    private void addItemToCartTableView(StoreItem newStoreItem) {
         this.shoppingCartTableView.getItems().add(newStoreItem);
-    }
-
-    private void updateDiscountsTableViewIfNeeded(StoreItem newStoreItem, Store storeToBuyFrom) {
-
     }
 
     private boolean isValidTextFieldValue(String purchaseCategory, String textFieldValue, StringBuilder outMessage) {

@@ -29,16 +29,19 @@ public class Store {
 
     private Map<Integer, List<Discount>> generateNewDiscountsMap(SDMStore inputStore) {
         Map<Integer, List<Discount>> discountsMap = new HashMap<>();
+        Discount newDiscountToAdd;
         for (SDMSell sdmSell : inputStore.getSDMPrices().getSDMSell()) {
             if(inputStore.getSDMDiscounts() != null){
                 for (SDMDiscount discount : inputStore.getSDMDiscounts().getSDMDiscount()) {
                     if(discount.getIfYouBuy().getItemId() == sdmSell.getItemId()) {
+                        newDiscountToAdd= new Discount(discount);
+                        newDiscountToAdd.setStoreIdOfDiscount(inputStore.getId());
                         if(discountsMap.containsKey(sdmSell.getItemId())) {
-                            discountsMap.get(sdmSell.getItemId()).add(new Discount(discount));
+                            discountsMap.get(sdmSell.getItemId()).add(newDiscountToAdd);
                         }
                         else {
                             ArrayList<Discount> discountsList = new ArrayList<>();
-                            discountsList.add(new Discount(discount));
+                            discountsList.add(newDiscountToAdd);
                             discountsMap.put(sdmSell.getItemId(), discountsList);
                         }
                     }

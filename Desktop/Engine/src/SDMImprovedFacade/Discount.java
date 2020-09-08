@@ -9,6 +9,7 @@ public class Discount {
     private IfBuy buyThis;
     private String itemToBuyName;
     private ThenGet getThat;
+    private int storeIdOfDiscount;
 
     public Discount(SDMDiscount discount) {
         this.name = discount.getName();
@@ -22,6 +23,14 @@ public class Discount {
 
     public String getName() {
         return name;
+    }
+
+    public int getStoreIdOfDiscount() {
+        return storeIdOfDiscount;
+    }
+
+    public void setStoreIdOfDiscount(int storeIdOfDiscount) {
+        this.storeIdOfDiscount = storeIdOfDiscount;
     }
 
     public IfBuy getBuyThis() {
@@ -76,18 +85,27 @@ public class Discount {
         }
 
         public class Offer {
-            private final int itemId;
+            private String itemName;
+            private final int offerItemId;
             private final double quantity;
             private final int forAdditional;
 
             public Offer(SDMOffer offer) {
-                this.itemId = offer.getItemId();
+                this.offerItemId = offer.getItemId();
                 this.quantity = offer.getQuantity();
                 this.forAdditional = offer.getForAdditional();
             }
 
-            public int getItemId() {
-                return itemId;
+            public int getStoreIdOfOffer() {
+                return getStoreIdOfDiscount();
+            }
+
+            public int getOfferItemId() {
+                return offerItemId;
+            }
+
+            public IfBuy getBuyThisItem(){
+                return getBuyThis();
             }
 
             public double getQuantity() {
@@ -98,7 +116,18 @@ public class Discount {
                 return forAdditional;
             }
 
+            public String getItemName() {
+                return itemName;
+            }
 
+            public void setItemName(String itemName) {
+                this.itemName = itemName;
+            }
+
+            @Override
+            public String toString() {
+                return String.format("%d | %s", offerItemId, itemName );
+            }
         }
     }
 }
