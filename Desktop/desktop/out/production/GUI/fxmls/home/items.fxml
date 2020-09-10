@@ -14,12 +14,12 @@
    <children>
       <TableView fx:id="systemItemsTableView" layoutX="141.0" layoutY="159.0" prefHeight="494.0" prefWidth="667.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="128.0" AnchorPane.topAnchor="158.0">
         <columns>
-          <TableColumn fx:id="systemItemsIdColumn" minWidth="110.0" prefWidth="75.0" text="ID" />
-          <TableColumn fx:id="systemItemsNameColumn" minWidth="110.0" prefWidth="75.0" text="Name" />
-            <TableColumn fx:id="systemItemsCategoryColumn" minWidth="110.0" prefWidth="75.0" text="Category" />
-            <TableColumn fx:id="systemItemsAmountStoresSeliingColumn" minWidth="110.0" prefWidth="102.0" text="# Stores Selling" />
-            <TableColumn fx:id="systemItemsAveragePriceColumn" minWidth="110.0" prefWidth="102.0" text="Average Price" />
-            <TableColumn fx:id="systemItemsQuantitySoldColumn" minWidth="110.0" prefWidth="102.0" text="Quantity Sold" />
+          <TableColumn fx:id="systemItemsIdColumn" minWidth="110.0" prefWidth="75.0" style="-fx-alignment: Center;" text="ID" />
+          <TableColumn fx:id="systemItemsNameColumn" minWidth="110.0" prefWidth="75.0" style="-fx-alignment: Center;" text="Name" />
+            <TableColumn fx:id="systemItemsCategoryColumn" minWidth="110.0" prefWidth="75.0" style="-fx-alignment: Center;" text="Category" />
+            <TableColumn fx:id="systemItemsAmountStoresSeliingColumn" minWidth="110.0" prefWidth="102.0" style="-fx-alignment: Center;" text="# Stores Selling" />
+            <TableColumn fx:id="systemItemsAveragePriceColumn" minWidth="110.0" prefWidth="102.0" style="-fx-alignment: Center;" text="Average Price" />
+            <TableColumn fx:id="systemItemsQuantitySoldColumn" minWidth="110.0" prefWidth="102.0" style="-fx-alignment: Center;" text="Quantity Sold" />
         </columns>
       </TableView>
       <HBox layoutX="139.0" layoutY="42.0" prefHeight="100.0" prefWidth="658.0" spacing="20.0">

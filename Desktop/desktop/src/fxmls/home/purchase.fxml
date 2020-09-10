@@ -66,7 +66,7 @@
       </HBox>
       <HBox layoutX="291.0" layoutY="106.0" prefHeight="25.0" prefWidth="540.0" spacing="20.0" AnchorPane.leftAnchor="287.5">
          <children>
-            <ComboBox fx:id="customerComboBox" prefHeight="25.0" prefWidth="120.0" promptText="Customer" />
+            <ComboBox fx:id="customerComboBox" onAction="#onActionCustomerSelectComboBox" prefHeight="25.0" prefWidth="120.0" promptText="Customer" />
             <Button fx:id="staticPurchaseButton" mnemonicParsing="false" onAction="#onActionStaticPurchaseButton" prefHeight="25.0" prefWidth="120.0" text="Static Purchase" />
             <Button fx:id="dynamicPurchaseButton" mnemonicParsing="false" onAction="#onActionDynamicPurchaseButton" prefHeight="25.0" prefWidth="120.0" text="Dynamic Purchase" />
             <DatePicker fx:id="deliveryDatePicker" prefHeight="25.0" prefWidth="120.0" promptText="Delivery Date" />
@@ -74,25 +74,25 @@
       </HBox>
       <TableView fx:id="purchaseItemsAvailableTableView" disable="true" layoutX="197.0" layoutY="172.0" prefHeight="200.0" prefWidth="380.0" AnchorPane.leftAnchor="195.0">
         <columns>
-            <TableColumn fx:id="purchaseItemTableViewItemIdColumn" maxWidth="95.0" minWidth="0.0" prefWidth="34.0" text="ID" />
-          <TableColumn fx:id="purchaseItemTableViewItemNameColumn" maxWidth="163.0" minWidth="0.0" prefWidth="100.0" text="Item Name" />
-          <TableColumn fx:id="purchaseItemTableViewPricePerUnitColumn" maxWidth="201.0" minWidth="0.0" prefWidth="59.0" text="PPU" />
-            <TableColumn fx:id="purchaseItemTableViewCategoryColumn" maxWidth="198.0" minWidth="0.0" prefWidth="66.0" text="Category" />
-            <TableColumn fx:id="purchaseItemTableViewIsAvailableColumn" maxWidth="218.0" minWidth="0.0" prefWidth="90.0" text="Is Available" />
+            <TableColumn fx:id="purchaseItemTableViewItemIdColumn" maxWidth="95.0" minWidth="0.0" prefWidth="34.0" style="-fx-alignment: CENTER;" text="ID" />
+          <TableColumn fx:id="purchaseItemTableViewItemNameColumn" maxWidth="163.0" minWidth="0.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Item Name" />
+          <TableColumn fx:id="purchaseItemTableViewPricePerUnitColumn" maxWidth="201.0" minWidth="0.0" prefWidth="59.0" style="-fx-alignment: CENTER;" text="PPU" />
+            <TableColumn fx:id="purchaseItemTableViewCategoryColumn" maxWidth="198.0" minWidth="0.0" prefWidth="66.0" style="-fx-alignment: CENTER;" text="Category" />
+            <TableColumn fx:id="purchaseItemTableViewIsAvailableColumn" maxWidth="218.0" minWidth="0.0" prefWidth="90.0" style="-fx-alignment: CENTER;" text="Is Available" />
         </columns>
       </TableView>
       <HBox layoutX="194.0" layoutY="387.0" prefHeight="25.0" prefWidth="380.0" spacing="5.0" AnchorPane.leftAnchor="193.0">
          <children>
             <ComboBox fx:id="chooseItemToBuyComboBox" disable="true" prefWidth="150.0" promptText="Item Name" />
-            <TextField id="amount-text-field" fx:id="itemAmountToBuyTextField" disable="true" prefHeight="25.0" prefWidth="137.0" promptText="Amount" styleClass="text-field" stylesheets="@style.css" />
+            <TextField fx:id="itemAmountToBuyTextField" disable="true" prefHeight="25.0" prefWidth="137.0" promptText="Amount" styleClass="text-field" stylesheets="@style.css" />
             <Button fx:id="addItemToCartButton" disable="true" mnemonicParsing="false" onAction="#onActionAddToCartButton" prefHeight="25.0" prefWidth="80.0" text="Add To Cart" />
          </children>
       </HBox>
       <TableView fx:id="shoppingCartTableView" disable="true" layoutX="600.0" layoutY="172.0" prefHeight="200.0" prefWidth="307.0">
          <columns>
-            <TableColumn fx:id="shoppingCartTableViewItemNameColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" text="Item Name" />
-            <TableColumn fx:id="shoppingCartTableViewAmountColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" text="Amount" />
-            <TableColumn fx:id="shoppingCartTableViewTotalPriceColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" text="Total Price" />
+            <TableColumn fx:id="shoppingCartTableViewItemNameColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" style="-fx-alignment: CENTER;" text="Item Name" />
+            <TableColumn fx:id="shoppingCartTableViewAmountColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" style="-fx-alignment: CENTER;" text="Amount" />
+            <TableColumn fx:id="shoppingCartTableViewTotalPriceColumn" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" style="-fx-alignment: CENTER;" text="Total Price" />
          </columns>
       </TableView>
       <Label layoutX="601.0" layoutY="151.0" text="Shopping Cart">
@@ -122,9 +122,9 @@
       </Label>
       <TableView fx:id="discountOffersTableView" disable="true" layoutX="197.0" layoutY="559.0" prefHeight="96.0" prefWidth="316.0" AnchorPane.leftAnchor="197.0">
          <columns>
-            <TableColumn fx:id="discountOffersTableViewItemNameColumn" maxWidth="105.5" minWidth="105.5" prefWidth="105.5" text="Item Name" />
-            <TableColumn fx:id="discountOffersTableViewQuantityColumn" maxWidth="105.5" minWidth="85.0" prefWidth="85.0" text="Quantity" />
-            <TableColumn fx:id="discountOffersTableViewForAdditionalColumn" maxWidth="106.0" minWidth="83.0" prefWidth="101.0" text="For Additional" />
+            <TableColumn fx:id="discountOffersTableViewItemNameColumn" maxWidth="105.5" minWidth="105.5" prefWidth="105.5" style="-fx-alignment: CENTER;" text="Item Name" />
+            <TableColumn fx:id="discountOffersTableViewQuantityColumn" maxWidth="105.5" minWidth="85.0" prefWidth="85.0" style="-fx-alignment: CENTER;" text="Quantity" />
+            <TableColumn fx:id="discountOffersTableViewForAdditionalColumn" maxWidth="106.0" minWidth="83.0" prefWidth="101.0" style="-fx-alignment: CENTER;" text="For Additional" />
          </columns>
       </TableView>
       <HBox fx:id="discountOffersHBox" layoutX="199.0" layoutY="662.0" spacing="5.0">
@@ -140,26 +140,25 @@
       </HBox>
       <Separator layoutX="586.0" layoutY="151.0" orientation="VERTICAL" prefHeight="263.0" prefWidth="0.0" />
       <Separator layoutX="195.0" layoutY="421.0" prefHeight="5.0" prefWidth="725.0" />
-      <TableView fx:id="storeFinalOrderDetailsTableView" disable="true" layoutX="196.0" layoutY="578.0" prefHeight="84.0" prefWidth="725.0" visible="false">
+      <TableView fx:id="storeFinalOrderDetailsTableView" disable="true" layoutX="198.0" layoutY="550.0" prefHeight="110.0" prefWidth="725.0" visible="false" AnchorPane.leftAnchor="195.0">
         <columns>
-          <TableColumn fx:id="storeFinalOrderDetailsTableViewItemIdColumn" minWidth="68.0" prefWidth="73.0" text="Item ID" />
-          <TableColumn fx:id="storeFinalOrderDetailsTableViewNameColumn" minWidth="100.0" prefWidth="118.0" text="Name" />
-            <TableColumn fx:id="storeFinalOrderDetailsTableViewCategoryColumn" minWidth="76.0" prefWidth="76.0" text="Category" />
-            <TableColumn fx:id="storeFinalOrderDetailsTableViewQuantityColumn" minWidth="74.0" prefWidth="77.0" text="Quantity" />
-            <TableColumn fx:id="storeFinalOrderDetailsTableViewPricePerUnitColumn" minWidth="87.0" prefWidth="98.0" text="Price Per Unit" />
-            <TableColumn fx:id="storeFinalOrderDetailsTableViewTotalPriceColumn" minWidth="79.0" prefWidth="92.0" text="Total Price" />
-            <TableColumn fx:id="storeFinalOrderDetailsTableViewIsPartOfDiscountColumn" minWidth="100.0" prefWidth="190.0" text="Is Part Of Discount" />
+          <TableColumn fx:id="storeFinalOrderDetailsTableViewItemIdColumn" minWidth="68.0" prefWidth="73.0" style="-fx-alignment: CENTER;" text="Item ID" />
+          <TableColumn fx:id="storeFinalOrderDetailsTableViewNameColumn" minWidth="100.0" prefWidth="118.0" style="-fx-alignment: CENTER;" text="Name" />
+            <TableColumn fx:id="storeFinalOrderDetailsTableViewCategoryColumn" minWidth="76.0" prefWidth="76.0" style="-fx-alignment: CENTER;" text="Category" />
+            <TableColumn fx:id="storeFinalOrderDetailsTableViewQuantityColumn" minWidth="74.0" prefWidth="77.0" style="-fx-alignment: CENTER;" text="Quantity" />
+            <TableColumn fx:id="storeFinalOrderDetailsTableViewPricePerUnitColumn" minWidth="87.0" prefWidth="98.0" style="-fx-alignment: CENTER;" text="Price Per Unit" />
+            <TableColumn fx:id="storeFinalOrderDetailsTableViewTotalPriceColumn" minWidth="79.0" prefWidth="92.0" style="-fx-alignment: CENTER;" text="Total Price" />
+            <TableColumn fx:id="storeFinalOrderDetailsTableViewIsPartOfDiscountColumn" minWidth="100.0" prefWidth="190.0" style="-fx-alignment: CENTER;" text="Is Part Of Discount" />
         </columns>
       </TableView>
-      <Separator fx:id="finalOrderDisplaySeparator" disable="true" layoutX="194.0" layoutY="559.0" prefHeight="5.0" prefWidth="298.0" visible="false" />
-      <ComboBox fx:id="selectStoreToViewItsOrderDetailsComboBox" disable="true" layoutX="492.0" layoutY="546.0" prefHeight="25.0" prefWidth="426.0" promptText="Select Store To View It's Order Details" visible="false" />
+      <ComboBox fx:id="selectStoreToViewItsOrderDetailsComboBox" disable="true" layoutX="490.0" layoutY="520.0" onAction="#onActionFinalSummaryComboBoxStoreSelected" prefHeight="25.0" prefWidth="426.0" promptText="Select Store To View It's Order Details" visible="false" AnchorPane.leftAnchor="195.0" />
       <HBox fx:id="acceptRejectOrderHBox" disable="true" layoutX="481.0" layoutY="668.0" spacing="10.0" visible="false" AnchorPane.leftAnchor="467.5">
          <children>
-            <Button fx:id="acceptOrderButton" mnemonicParsing="false" style="-fx-background-color: #3EA372;" text="Accept Order" />
-            <Button fx:id="rejectOrderButton" mnemonicParsing="false" style="-fx-background-color: Red;" text="Reject Order" />
+            <Button fx:id="acceptOrderButton" mnemonicParsing="false" onAction="#onActionAcceptOrderButton" style="-fx-background-color: #3EA372;" text="Accept Order" />
+            <Button fx:id="rejectOrderButton" mnemonicParsing="false" onAction="#onActionRejectOrderButton" style="-fx-background-color: Red;" text="Reject Order" />
          </children>
       </HBox>
-      <HBox fx:id="storeFinalInformationHBox" alignment="CENTER_LEFT" disable="true" layoutX="518.0" layoutY="435.0" prefHeight="105.0" prefWidth="380.0" spacing="20.0" visible="false">
+      <HBox fx:id="storeFinalInformationHBox" alignment="CENTER_LEFT" disable="true" layoutX="369.0" layoutY="426.0" prefHeight="84.0" prefWidth="380.0" spacing="20.0" visible="false" AnchorPane.leftAnchor="195.0">
          <children>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                <children>
@@ -183,12 +182,12 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Label id="salesAvailableLabel" fx:id="storeFinalInformationHBoxTotalDeliveryCostLabel" style="-fx-text-fill: #fa5f7e;" text="0" textFill="#fa5f7e">
+                  <Label id="salesAvailableLabel" fx:id="storeFinalInformationHBoxStoreDeliveryCostLabel" style="-fx-text-fill: #fa5f7e;" text="0" textFill="#fa5f7e">
                      <font>
                         <Font name="System Bold" size="26.0" />
                      </font>
                   </Label>
-                  <Label text="Total Delivery Cost" textFill="#e7e5e5" />
+                  <Label text="Delivery Cost" textFill="#e7e5e5" />
                </children>
             </VBox>
          </children>
@@ -199,5 +198,30 @@
          </font>
       </Label>
       <Button fx:id="displayOrderSummaryButton" layoutX="518.0" layoutY="446.0" mnemonicParsing="false" onAction="#onActionDisplayOrderSummaryButton" prefHeight="92.0" prefWidth="370.0" text="Display Order Summary" />
+      <HBox id="total-summary-hbox" fx:id="finalSummaryTotalOrderAndDeliveryCostHBox" layoutX="700.0" layoutY="426.0" prefHeight="84.0" prefWidth="214.0" spacing="10.0" stylesheets="@style.css" visible="false" AnchorPane.leftAnchor="700.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="92.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="storeFinalInformationHBoxTotalOrderCostLabel" style="-fx-text-fill: #2a73ff;" text="0" textFill="#2a73ff">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Total Order Cost" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="92.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="storeFinalInformationHBoxTotalDeliveryCostLabel" style="-fx-text-fill: #2a73ff;" text="0" textFill="#2a73ff">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Total Delivery Cost" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Button fx:id="resetOrderButton" layoutX="199.0" layoutY="106.0" mnemonicParsing="false" onAction="#onActionResetOrderButton" text="Reset Order" AnchorPane.leftAnchor="197.0" />
    </children>
 </AnchorPane>

@@ -32,7 +32,7 @@ public class Order {
         this.totalOrderCost = deliveryCost + costOfItemsInOrder;
         this.orderDestination = userLocation;
         this.amountOfStoresRelatedToOrder = 1;
-        this.amountItemsInOrder = itemsInOrder.size();
+        this.amountItemsInOrder = getTotalNumberOfItemsInOrder();
     }
 
     public Order(String dateOrderWasMade, Location userLocation, int orderId,
@@ -47,7 +47,7 @@ public class Order {
         this.totalOrderCost = deliveryCost + costOfItemsInOrder;
         this.orderDestination = userLocation;
         this.amountOfStoresRelatedToOrder = amountOfStoresParticipating;
-        this.amountItemsInOrder = itemsInOrder.size();
+        this.amountItemsInOrder = getTotalNumberOfItemsInOrder();
     }
 
     public Order() {
@@ -91,13 +91,13 @@ public class Order {
     }
 
     public double getCostOfItemsInOrder() {
-        return costOfItemsInOrder;
+        return Double.parseDouble(String.format("%.2f",costOfItemsInOrder));
     }
 
-    public double getTotalOrderCost() { return totalOrderCost; }
+    public double getTotalOrderCost() { return Double.parseDouble(String.format("%.2f",totalOrderCost)); }
     
     public double getDeliveryCost() {
-        return deliveryCost;
+        return Double.parseDouble(String.format("%.2f",deliveryCost));
     }
 
     public Location getOrderDestination() {
@@ -155,6 +155,10 @@ public class Order {
 
     public void setAmountOfStoresRelated(int amountOfStoresRelated) {
         this.amountOfStoresRelatedToOrder = amountOfStoresRelated;
+    }
+
+    public int getAmountItemsInOrder() {
+        return amountItemsInOrder;
     }
 
     public int getTotalNumberOfItemsInOrder(){

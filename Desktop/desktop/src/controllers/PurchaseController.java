@@ -1,6 +1,7 @@
 package controllers;
 
 import SDMImprovedFacade.*;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -18,13 +19,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PurchaseController {
-
     private AppController mainController;
     private int currentStaticStoreId = -1;
     private boolean isDynamicPurchaseButtonToggled;
@@ -36,13 +36,14 @@ public class PurchaseController {
     private final List<DiscountCardController> discountCardControllersList = new ArrayList<>();
 
     //Properties
-    private SimpleDoubleProperty cartPriceProperty = new SimpleDoubleProperty();
-    private SimpleDoubleProperty deliveryCostProperty = new SimpleDoubleProperty();
-    private SimpleIntegerProperty itemTypesProperty = new SimpleIntegerProperty();
-    private SimpleIntegerProperty totalItemsProperty = new SimpleIntegerProperty();
+    private final SimpleDoubleProperty cartPriceProperty = new SimpleDoubleProperty();
+    private final SimpleDoubleProperty totalDeliveryCostProperty = new SimpleDoubleProperty();
+    private final SimpleIntegerProperty itemTypesProperty = new SimpleIntegerProperty();
+    private final SimpleIntegerProperty totalItemsProperty = new SimpleIntegerProperty();
     private SimpleBooleanProperty wasOneOfPurchaseButtonsClicked;
-    private SimpleBooleanProperty wasBuyCartButtonClicked = new SimpleBooleanProperty();
-    private SimpleBooleanProperty isShowFinalSummaryStage = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty wasBuyCartButtonClicked = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty isShowFinalSummaryStage = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty wasCustomerSelected = new SimpleBooleanProperty(false);
 
     @FXML
     private AnchorPane mainRoot;
@@ -58,6 +59,9 @@ public class PurchaseController {
 
     @FXML
     private Label totalItemTypesLabel;
+
+    @FXML
+    private Label storeFinalInformationHBoxStoreDeliveryCostLabel;
 
     @FXML
     private Label totalItemsLabel;
@@ -156,34 +160,31 @@ public class PurchaseController {
     private Button applyDiscountButton;
 
     @FXML
-    private TableView<?> storeFinalOrderDetailsTableView;
+    private TableView<StoreItem> storeFinalOrderDetailsTableView;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewItemIdColumn;
+    private TableColumn<StoreItem, Integer> storeFinalOrderDetailsTableViewItemIdColumn;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewNameColumn;
+    private TableColumn<StoreItem, String> storeFinalOrderDetailsTableViewNameColumn;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewCategoryColumn;
+    private TableColumn<StoreItem, String> storeFinalOrderDetailsTableViewCategoryColumn;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewQuantityColumn;
+    private TableColumn<StoreItem, Double> storeFinalOrderDetailsTableViewQuantityColumn;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewPricePerUnitColumn;
+    private TableColumn<StoreItem, Double> storeFinalOrderDetailsTableViewPricePerUnitColumn;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewTotalPriceColumn;
+    private TableColumn<StoreItem, Double> storeFinalOrderDetailsTableViewTotalPriceColumn;
 
     @FXML
-    private TableColumn<?, ?> storeFinalOrderDetailsTableViewIsPartOfDiscountColumn;
+    private TableColumn<StoreItem, Boolean> storeFinalOrderDetailsTableViewIsPartOfDiscountColumn;
 
     @FXML
-    private Separator finalOrderDisplaySeparator;
-
-    @FXML
-    private ComboBox<?> selectStoreToViewItsOrderDetailsComboBox;
+    private ComboBox<Store> selectStoreToViewItsOrderDetailsComboBox;
 
     @FXML
     private HBox acceptRejectOrderHBox;
@@ -207,6 +208,15 @@ public class PurchaseController {
     private Label storeFinalInformationHBoxTotalDeliveryCostLabel;
 
     @FXML
+    private Label storeFinalInformationHBoxTotalOrderCostLabel;
+
+    @FXML
+    private HBox finalSummaryTotalOrderAndDeliveryCostHBox;
+
+    @FXML
+    private Button resetOrderButton;
+
+    @FXML
     private void initialize(){
         this.wasOneOfPurchaseButtonsClicked = new SimpleBooleanProperty(true);
         setPurchaseItemsAvailableTableColumnsProperties();
@@ -215,15 +225,40 @@ public class PurchaseController {
         setStoreFinalOrderDetailsTableColumnsProperties();
         bindRelevantObjectsToWasOneOfPurchaseButtonsClicked();
         bindRelevantObjectToWasBuyCartButtonClicked();
+        bindRelevantObjecetsToIsShowFinalSummaryStage();
+        bindRelevantLabelsOfFinalOrderSummaryToDeliveryAndOrderCostProperties();
         setBuyCartEventHandler();
+        
+    }
 
+    private void bindRelevantLabelsOfFinalOrderSummaryToDeliveryAndOrderCostProperties() {
+        this.storeFinalInformationHBoxTotalDeliveryCostLabel.textProperty().bind(this.totalDeliveryCostProperty.asString("%.2f"));
+        this.storeFinalInformationHBoxTotalOrderCostLabel.textProperty().bind(
+                Bindings.add(this.totalDeliveryCostProperty, this.cartPriceProperty).asString("%.2f"));
+    }
+
+    private void bindRelevantObjecetsToIsShowFinalSummaryStage() {
+
+        //visible property
+        this.finalSummaryTotalOrderAndDeliveryCostHBox.visibleProperty().bind(Bindings.and(wasCustomerSelected,isShowFinalSummaryStage));
+        this.acceptRejectOrderHBox.visibleProperty().bind(Bindings.and(wasCustomerSelected,isShowFinalSummaryStage));
+        this.storeFinalOrderDetailsTableView.visibleProperty().bind(Bindings.and(wasCustomerSelected,isShowFinalSummaryStage));
+        this.storeFinalInformationHBox.visibleProperty().bind(Bindings.and(wasCustomerSelected,isShowFinalSummaryStage));
+        this.selectStoreToViewItsOrderDetailsComboBox.visibleProperty().bind(Bindings.and(wasCustomerSelected,isShowFinalSummaryStage));
+        //disable property
+        this.selectStoreToViewItsOrderDetailsComboBox.disableProperty().bind(Bindings.and(wasCustomerSelected.not(),isShowFinalSummaryStage.not()));
+        this.storeFinalInformationHBox.disableProperty().bind(Bindings.and(wasCustomerSelected.not(),isShowFinalSummaryStage.not()));
+        this.acceptRejectOrderHBox.disableProperty().bind(Bindings.and(wasCustomerSelected.not(),isShowFinalSummaryStage.not()));
+        this.storeFinalOrderDetailsTableView.disableProperty().bind(Bindings.and(wasCustomerSelected.not(),isShowFinalSummaryStage.not()));
     }
 
     private void bindRelevantObjectToWasBuyCartButtonClicked() {
         //disabled property
         isShowFinalSummaryStage.set(false);
-        this.buyCartButton.disableProperty().bind(this.wasBuyCartButtonClicked);
-        this.addItemToCartButton.disableProperty().bind(this.wasBuyCartButtonClicked);
+
+        this.buyCartButton.disableProperty().bind(Bindings.or(this.wasBuyCartButtonClicked,isShowFinalSummaryStage));
+        this.addItemToCartButton.disableProperty().bind(Bindings.or(this.wasBuyCartButtonClicked,isShowFinalSummaryStage));
+
         this.applyDiscountButton.disableProperty().bind(this.wasBuyCartButtonClicked.not());
         //Discount section
         this.discountOffersHBox.disableProperty().bind(this.wasBuyCartButtonClicked.not());
@@ -251,7 +286,6 @@ public class PurchaseController {
     }
 
     private void buyCartMethod() {
-        Map<Integer, List<StoreItem>> purchaseItemsMap; // Integer -> storeId, List<StoreItem> -> StoreItems to buy from the store.
         if(!shoppingCartTableView.getItems().isEmpty()){
             if(this.isDynamicPurchaseButtonToggled) { this.dynamicOrder = initializeDynamicOrderAndAddDiscountCards(); }
             else {
@@ -264,17 +298,80 @@ public class PurchaseController {
                 //There are available discounts to apply
                 //initializeItemAmountBucketMap(dynamic/static); already happened
             }
-            else { showAndInitializeFinalBuySummary(); }
+            else {
+                this.isShowFinalSummaryStage.set(true);
+                if(wasCustomerSelected.get()) { showAndInitializeFinalBuySummary(); }
+                else { displayCustomerNotChosenError(); }
+            }
         }
         else { displayEmptyCartError(); }
     }
 
     private void showAndInitializeFinalBuySummary() {
-        makeInvisibleAndDisableDiscountsSection();
+        if(customerComboBox.getSelectionModel().getSelectedItem() != null)
+        {
+            loadDataIntoRelevantTotalSummaryComponents();
+            makeInvisibleAndDisableDiscountsSection();
+        }
+        else { displayCustomerNotChosenError(); }
+    }
+
+    private void loadDataIntoRelevantTotalSummaryComponents() {
+        resetAllComponents();
+        loadDataIntoFinalSummaryComboBox();
+        updateTotalDeliveryCostProperty();
+    }
+
+    private void updateTotalDeliveryCostProperty() {
+        double totalDeliveryCost = 0;
+        if(!isDynamicPurchaseButtonToggled){
+            //static
+            Store store = this.mainController.getSDMLogic().getStores().get(this.currentStaticStoreId);
+            totalDeliveryCost = store.getDeliveryPpk() * store.calculateDistance(customerComboBox.getSelectionModel().getSelectedItem().getLocation());
+        }
+        else {
+            //dynamic
+            for (Integer storeId : this.dynamicOrder.keySet()) {
+                Store store = this.mainController.getSDMLogic().getStores().get(storeId);
+                totalDeliveryCost += store.getDeliveryPpk() * store.calculateDistance(customerComboBox.getSelectionModel().getSelectedItem().getLocation());
+            }
+        }
+
+        this.totalDeliveryCostProperty.set(totalDeliveryCost);
+    }
+
+    private void loadDataIntoFinalSummaryComboBox() {
+        ObservableList<Store> storesObservableList = FXCollections.observableArrayList();
+        Collection<Store> currentStores = new ArrayList<>();
+        storesObservableList.addAll();
+        if(!isDynamicPurchaseButtonToggled) {
+            //static
+            currentStores.add(this.mainController.getSDMLogic().getStores().get(currentStaticStoreId));
+        }
+        else {
+            //dynamic
+            this.dynamicOrder.forEach((storeId, items) -> currentStores.add(this.mainController.getSDMLogic().getStores().get(storeId)));
+        }
+        storesObservableList.addAll(currentStores);
+        this.selectStoreToViewItsOrderDetailsComboBox.setItems(storesObservableList);
+    }
+
+    private void resetAllComponents() {
+        resetFinalSummaryLabels();
+        this.selectStoreToViewItsOrderDetailsComboBox.getItems().clear();
+        this.storeFinalOrderDetailsTableView.getItems().clear();
+
+    }
+
+    private void resetFinalSummaryLabels() {
+        this.storeFinalInformationHBoxDistanceFromCustomerLabel.setText("");
+        this.storeFinalInformationHBoxPpkLabel.setText("");
+        this.storeFinalInformationHBoxStoreDeliveryCostLabel.setText("");
     }
 
     private void makeInvisibleAndDisableDiscountsSection() {
         this.wasBuyCartButtonClicked.set(false);
+        isShowFinalSummaryStage.set(true);
     }
 
     private void addStaticOrderDiscountsCards() {
@@ -393,9 +490,7 @@ public class PurchaseController {
     }
 
     private void resetSelectedDiscountCards() {
-        this.discountCardControllersList.forEach(discountCardController -> {
-            discountCardController.getMainRoot().setStyle("-fx-border-color: none; -fx-background-color: #EEEEFB;");
-        });
+        this.discountCardControllersList.forEach(discountCardController -> discountCardController.getMainRoot().setStyle("-fx-border-color: none; -fx-background-color: #EEEEFB;"));
     }
 
     private void createAndAddDiscountCards(List<Discount> discountToAdd, int discountStoreId) throws IOException {
@@ -530,7 +625,9 @@ public class PurchaseController {
 
         this.discountOffersTableView.getItems().clear();
         if(discountCardControllersList.isEmpty()){
-            showAndInitializeFinalBuySummary();
+            this.isShowFinalSummaryStage.set(true);
+            if(wasCustomerSelected.get()){ showAndInitializeFinalBuySummary(); }
+            else { displayCustomerNotChosenError(); }
         }
     }
 
@@ -553,9 +650,7 @@ public class PurchaseController {
 
     private int calculateAmountOfItemsTypesInDynamicOrder() {
         HashSet<Integer> itemTypesHashSet = new HashSet<>();
-        dynamicOrder.forEach((storeId,itemsToBuyList) -> {
-            itemsToBuyList.forEach(item -> itemTypesHashSet.add(item.getId()));
-        });
+        dynamicOrder.forEach((storeId,itemsToBuyList) -> itemsToBuyList.forEach(item -> itemTypesHashSet.add(item.getId())));
 
         return itemTypesHashSet.size();
     }
@@ -573,6 +668,8 @@ public class PurchaseController {
     }
 
     private void addAppliedOfferToOrderAndUpdateCart(Discount.ThenGet.Offer selectedOffer, StoreItem newStoreItemFromOffer) {
+        currentOrder.addItem(newStoreItemFromOffer);
+
         if(this.isDynamicPurchaseButtonToggled){
             //push to dynamic
             if(dynamicOrder.containsKey(selectedOffer.getStoreIdOfOffer())){
@@ -587,7 +684,6 @@ public class PurchaseController {
         }
         else {
             //push to static
-            currentOrder.addItem(newStoreItemFromOffer);
             this.addRelevantDiscountCardsToHBox(tempStaticOrder);
         }
 
@@ -595,23 +691,27 @@ public class PurchaseController {
     }
 
     @FXML
-    void onActionDisplayOrderSummaryButton(ActionEvent event) {
+    void onActionDisplayOrderSummaryButton() {
+        this.isShowFinalSummaryStage.set(true);
         showAndInitializeFinalBuySummary();
     }
 
     private void onChangedBuyResetProperties() {
         resetDiscountRelevantComponents();
-        resetOrderProperties();//
-        this.discountsCardsHBox.getChildren().clear();//
-        this.shoppingCartTableView.getItems().clear();//
-        this.currentOrder.clearOrderDetails();//
-        this.wasBuyCartButtonClicked.set(false);//
+        resetOrderProperties();
+        this.discountsCardsHBox.getChildren().clear();
+        this.shoppingCartTableView.getItems().clear();
+        this.currentOrder.clearOrderDetails();
+        this.wasBuyCartButtonClicked.set(false);
         this.chooseItemToBuyComboBox.getItems().clear();
         this.discountCardControllersList.clear();
+        isShowFinalSummaryStage.set(false);
+        this.customerComboBox.disableProperty().set(false);
+        this.deliveryDatePicker.setValue(null);
     }
 
     public void bindRelevantLabelsToOrderProperties() {
-        this.totalCartPriceLabel.textProperty().bind(cartPriceProperty.asString());
+        this.totalCartPriceLabel.textProperty().bind(cartPriceProperty.asString("%.2f"));
         this.totalItemsLabel.textProperty().bind(totalItemsProperty.asString());
         this.totalItemTypesLabel.textProperty().bind(itemTypesProperty.asString());
     }
@@ -651,7 +751,7 @@ public class PurchaseController {
         newStoreItem.setPricePerUnit(storeToBuyFrom.getItemsBeingSold().get(newStoreItem.getId()).getPricePerUnit());
         addItemToCartTableView(newStoreItem);
         addItemToOrder(newStoreItem);
-        updateProperties(newStoreItem, storeToBuyFrom);
+        updateProperties(newStoreItem);
         addStoreParticipatingInOrder(storeToBuyFrom);
     }
 
@@ -698,7 +798,6 @@ public class PurchaseController {
 
     public void insertCustomersToComboBox() {
         ObservableList<Customer> customerObservableList = FXCollections.observableArrayList();
-        Collection<Customer> a = this.mainController.getSDMLogic().getCustomers().values();
         customerObservableList.addAll(this.mainController.getSDMLogic().getCustomers().values());
         this.customerComboBox.setItems(customerObservableList);
     }
@@ -717,12 +816,18 @@ public class PurchaseController {
     }
 
     private void setStoreFinalOrderDetailsTableColumnsProperties() {
-
+        this.storeFinalOrderDetailsTableViewItemIdColumn.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        this.storeFinalOrderDetailsTableViewNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        this.storeFinalOrderDetailsTableViewCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("purchaseCategory"));
+        this.storeFinalOrderDetailsTableViewQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("totalItemsSold"));
+        this.storeFinalOrderDetailsTableViewPricePerUnitColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerUnit"));
+        this.storeFinalOrderDetailsTableViewTotalPriceColumn.setCellValueFactory(cellData ->  new SimpleObjectProperty<>(cellData.getValue().getTotalPrice()));
+        this.storeFinalOrderDetailsTableViewIsPartOfDiscountColumn.setCellValueFactory(new PropertyValueFactory<>("wasPartOfDiscount"));
     }
 
     private void setDiscountOffersTableColumnsProperties() {
-        this.discountOffersTableViewQuantityColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Double>("quantity"));
-        this.discountOffersTableViewForAdditionalColumn.setCellValueFactory(new PropertyValueFactory<Discount.ThenGet.Offer, Double>("forAdditional"));
+        this.discountOffersTableViewQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        this.discountOffersTableViewForAdditionalColumn.setCellValueFactory(new PropertyValueFactory<>("forAdditional"));
         this.discountOffersTableViewItemNameColumn.setCellValueFactory(cellData -> {
             String itemName = this.mainController.getSDMLogic().getItems().get(cellData.getValue().getOfferItemId()).getName();
             return new SimpleObjectProperty<>(itemName);
@@ -730,9 +835,9 @@ public class PurchaseController {
     }
 
     private void setShoppingCartTableColumnsProperties() {
-        this.shoppingCartTableViewItemNameColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, String>("name"));
-        this.shoppingCartTableViewAmountColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, Double>("totalItemsSold"));
-        this.shoppingCartTableViewTotalPriceColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<Double>(cellData.getValue().getTotalPrice()));
+        this.shoppingCartTableViewItemNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        this.shoppingCartTableViewAmountColumn.setCellValueFactory(new PropertyValueFactory<>("totalItemsSold"));
+        this.shoppingCartTableViewTotalPriceColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getTotalPrice()));
     }
 
     public void setMainController(AppController mainController) {
@@ -741,9 +846,9 @@ public class PurchaseController {
 
     private void setPurchaseItemsAvailableTableColumnsProperties() {
         this.purchaseItemTableViewItemIdColumn.setCellValueFactory(new PropertyValueFactory<>("Id"));
-        this.purchaseItemTableViewItemNameColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, String>("name"));
-        this.purchaseItemTableViewPricePerUnitColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, Double>("pricePerUnit"));
-        this.purchaseItemTableViewCategoryColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, String>("purchaseCategory"));
+        this.purchaseItemTableViewItemNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        this.purchaseItemTableViewPricePerUnitColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerUnit"));
+        this.purchaseItemTableViewCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("purchaseCategory"));
         this.purchaseItemTableViewIsAvailableColumn.setCellValueFactory(cellData -> {
             if(isDynamicPurchaseButtonToggled) { return new SimpleObjectProperty<>("True"); }
             else if (cellData.getValue().getPricePerUnit() == 0.0) { return new SimpleObjectProperty<>("False"); }
@@ -781,7 +886,9 @@ public class PurchaseController {
         clearDiscountCardsFromHBoxIfNeeded(storeId);
         updateWasCartBuyButtonClickedIfNeeded(storeId);
         this.currentStaticStoreId = storeId;
-
+        isShowFinalSummaryStage.set(false);
+        this.customerComboBox.disableProperty().set(false);
+        this.deliveryDatePicker.setValue(null);
     }
 
     private void updateWasCartBuyButtonClickedIfNeeded(int storeId) {
@@ -809,9 +916,8 @@ public class PurchaseController {
     }
 
     private void resetSelectedStoreCards() {
-        this.mainController.getStoreCardControllerMapForPurchase().values().forEach(storeCardController -> {
-            storeCardController.getMainRoot().setStyle("-fx-border-color: none; -fx-background-color: #EEEEFB;");
-        });
+        this.mainController.getStoreCardControllerMapForPurchase().values().forEach(storeCardController ->
+                storeCardController.getMainRoot().setStyle("-fx-border-color: none; -fx-background-color: #EEEEFB;"));
     }
 
     private void updateShoppingCartWhenCardClicked(int storeId) {
@@ -821,7 +927,7 @@ public class PurchaseController {
         }
     }
 
-    private void updateProperties(StoreItem newStoreItem, Store storeToBuyFrom) {
+    private void updateProperties(StoreItem newStoreItem) {
         this.cartPriceProperty.set(this.cartPriceProperty.get() + newStoreItem.getTotalPrice());
         this.totalItemsProperty.set(this.currentOrder.getTotalNumberOfItemsInOrder());
         this.itemTypesProperty.set(this.currentOrder.getNumberOfItemsTypesInOrder());
@@ -880,8 +986,7 @@ public class PurchaseController {
 
     private void updatePurchaseItemAvailableTableView(Store store) {
         try {
-            Map<Integer, StoreItem> itemsToAdd = new HashMap<>();
-            itemsToAdd.putAll(store.getItemsBeingSold());
+            Map<Integer, StoreItem> itemsToAdd = new HashMap<>(store.getItemsBeingSold());
 
             for (StoreItem sItem : mainController.getSDMLogic().getItems().values()) {
                 if(itemsToAdd.containsKey(sItem.getId())) {
@@ -909,5 +1014,156 @@ public class PurchaseController {
         catch (Exception e) {
             return false;
         }
+    }
+
+    @FXML
+    void onActionFinalSummaryComboBoxStoreSelected() {
+        Store selectedStore = this.selectStoreToViewItsOrderDetailsComboBox.getSelectionModel().getSelectedItem();
+        ObservableList<StoreItem> observableStoreItemsList = FXCollections.observableArrayList();
+        if(selectedStore != null){
+            updateFinalSummaryLabels(selectedStore);
+
+            if(!isDynamicPurchaseButtonToggled) {
+                this.storeFinalOrderDetailsTableView.getItems().clear();
+                observableStoreItemsList.addAll(currentOrder.getItemsInOrder());
+            }
+            else{ observableStoreItemsList.addAll(this.dynamicOrder.get(selectedStore.getId())); }
+
+            this.storeFinalOrderDetailsTableView.setItems(observableStoreItemsList);
+        }
+    }
+
+    private void displayCustomerNotChosenError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Customer Selection Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Please select a customer in order to advance to the final summary section");
+        alert.showAndWait();
+    }
+
+    private void updateFinalSummaryLabels(Store selectedStore) {
+
+        double distanceFromCustomer = selectedStore.calculateDistance(this.customerComboBox.getSelectionModel().getSelectedItem().getLocation());
+        double deliveryCost = selectedStore.getDeliveryPpk() * distanceFromCustomer;
+        this.storeFinalInformationHBoxDistanceFromCustomerLabel.setText(String.format("%.2f", distanceFromCustomer));
+        this.storeFinalInformationHBoxStoreDeliveryCostLabel.setText(String.format("%.2f", deliveryCost));
+        this.storeFinalInformationHBoxPpkLabel.setText(Integer.toString(selectedStore.getDeliveryPpk()));
+    }
+
+    @FXML
+    void onActionResetOrderButton(ActionEvent event) {
+        resetAllOrder();
+    }
+
+    private void resetAllOrder() {
+        this.discountOffersTableView.getItems().clear();
+        resetSelectedStoreCards();
+        resetDiscountRelevantComponents();
+        resetOrderProperties();
+
+        this.currentStaticStoreId = -1;
+        this.currentOrder.clearOrderDetails();
+        if(this.dynamicOrder != null && !this.dynamicOrder.isEmpty()) { this.dynamicOrder.clear(); this.dynamicOrder = null; }
+        this.discountsCardsHBox.getChildren().clear();
+        this.shoppingCartTableView.getItems().clear();
+        this.chooseItemToBuyComboBox.getItems().clear();
+        this.itemsAmountBucketMap.clear();
+        this.chooseOfferComboBox.getItems().clear();
+        this.deliveryDatePicker.setValue(null);
+
+        this.discountCardControllersList.clear();
+        this.selectStoreToViewItsOrderDetailsComboBox.getItems().clear();
+        this.storeFinalOrderDetailsTableView.getItems().clear();
+        this.purchaseItemsAvailableTableView.getItems().clear();
+
+        this.wasBuyCartButtonClicked.set(false);
+        this.isShowFinalSummaryStage.set(false);
+        this.customerComboBox.getItems().clear();
+        this.wasCustomerSelected.set(false);
+        this.customerComboBox.disableProperty().set(false);
+        insertCustomersToComboBox();
+        this.wasOneOfPurchaseButtonsClicked.set(false);
+    }
+
+    @FXML
+    void onActionCustomerSelectComboBox() {
+        if(this.customerComboBox.getSelectionModel().getSelectedItem() != null) {
+            wasCustomerSelected.set(true);
+            this.customerComboBox.disableProperty().set(true);
+        }
+
+        if(this.isShowFinalSummaryStage.get() && wasCustomerSelected.get()) {
+            showAndInitializeFinalBuySummary();
+        }
+    }
+
+    @FXML
+    void onActionRejectOrderButton() {
+        resetAllOrder();
+    }
+
+
+    @FXML
+    void onActionAcceptOrderButton() {
+        if(deliveryDatePicker.getValue() != null) {
+            int lastOrderId = this.mainController.getSDMLogic().getLastOrderID();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            String dateOfOrder = deliveryDatePicker.getValue().format(dateTimeFormatter);
+            Customer customer = customerComboBox.getSelectionModel().getSelectedItem();
+
+            if(!isDynamicPurchaseButtonToggled) {
+                Store storeToOrderFrom = this.mainController.getSDMLogic().getStores().get(currentStaticStoreId);
+                this.mainController.getSDMLogic().generateOrderForStore(
+                        storeToOrderFrom, dateOfOrder,
+                        lastOrderId, currentOrder.getItemsInOrder(), customer.getLocation());
+                this.mainController.getSDMLogic().updateStoreAndSystemItemAmountInformationAccordingToNewOrder(
+                        currentOrder.getItemsInOrder(), storeToOrderFrom);
+                //Add order to Customer
+                this.mainController.getSDMLogic().addStaticOrderToCustomer(
+                        currentStaticStoreId, lastOrderId, customer);
+                //The amount of orders label is being updated from a bind inside of SDMLogic to orderId
+            }
+            else {
+                double totalDeliveryCost = 0;
+                for (Integer storeIdToOrderFrom: dynamicOrder.keySet()) {
+                    Store store = this.mainController.getSDMLogic().getStores().get(storeIdToOrderFrom);
+                    totalDeliveryCost += store.getDeliveryPpk() * store.calculateDistance(customer.getLocation());
+                }
+
+                this.mainController.getSDMLogic().generateDynamicOrderAndRecord(currentOrder.getItemsInOrder(), totalDeliveryCost, dateOfOrder,
+                        customer.getLocation(), this.dynamicOrder.keySet().size(), lastOrderId); //Record is only adding dynamic to system dynamic orders.
+                this.mainController.getSDMLogic().addDynamicOrderToCustomer(lastOrderId, customer);
+                this.dynamicOrder.forEach((storeId, listOfItemsToOrder) -> {
+                    Store storeToUpdate = this.mainController.getSDMLogic().getStores().get(storeId);
+                    storeToUpdate.generateOrder(dateOfOrder, lastOrderId, listOfItemsToOrder, customer.getLocation() );
+                    this.mainController.getSDMLogic().updateStoreAndSystemItemAmountInformationAccordingToNewOrder(listOfItemsToOrder, storeToUpdate);
+                });
+            }
+
+            showOrderWasSuccessfullyMadeAlert();
+            resetAllOrder();
+        } else {
+            displayDateNotChosenError();
+        }
+    }
+
+    private void showOrderWasSuccessfullyMadeAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Order Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("The order was successfully made");
+        alert.showAndWait();
+    }
+
+    private void displayDateNotChosenError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Date Selection Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Please select a date in order to finish the order");
+        alert.showAndWait();
+    }
+
+    public void activateReset() {
+        resetAllOrder();
     }
 }

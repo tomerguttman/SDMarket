@@ -74,4 +74,13 @@
     -fx-background-radius: 10 10 10 10;
 }
 
+#total-summary-hbox {
+    -fx-border-radius: 10 10 10 10;
+    -fx-border-color: black;
+}
+
+.text-field {
+    -fx-border-radius: 10 10 10 10;
+    -fx-background-radius: 10 10 10 10;
+}
 

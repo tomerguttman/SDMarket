@@ -148,4 +148,8 @@ public class SuperDuperMarket {
     public SimpleStringProperty getAmountItemsProperty() {
         return amountItemsProperty;
     }
+
+    public void updateTotalNumberOfOrders() {
+        amountOrdersProperty.set(Integer.toString(Integer.parseInt(amountOrdersProperty.get()) + 1));
+    }
 }

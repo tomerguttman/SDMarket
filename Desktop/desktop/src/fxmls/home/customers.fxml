@@ -27,12 +27,12 @@
       </ScrollPane>
       <TableView fx:id="customerOrdersTableView" layoutX="262.0" layoutY="203.0" prefHeight="344.0" prefWidth="595.0" AnchorPane.leftAnchor="260.0" AnchorPane.rightAnchor="80.0">
          <columns>
-            <TableColumn fx:id="ordersTableViewIdColumn" minWidth="100.0" prefWidth="100.0" text="ID" />
-            <TableColumn fx:id="ordersTableViewDateColumn" minWidth="100.0" prefWidth="100.0" text="Date" />
-            <TableColumn fx:id="ordersTableViewTotalItemsColumn" minWidth="100.0" prefWidth="100.0" text="Total Items" />
-            <TableColumn fx:id="ordersTableViewTotalItemsPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Items Price" />
-            <TableColumn fx:id="ordersTableViewDeliveryCostColumn" minWidth="100.0" prefWidth="100.0" text="Delivery Cost" />
-            <TableColumn fx:id="ordersTableViewTotalPriceColumn" minWidth="100.0" prefWidth="100.0" text="Total Price" />
+            <TableColumn fx:id="ordersTableViewIdColumn" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="ID" />
+            <TableColumn fx:id="ordersTableViewDateColumn" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Date" />
+            <TableColumn fx:id="ordersTableViewTotalItemsColumn" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Total Items" />
+            <TableColumn fx:id="ordersTableViewTotalItemsPriceColumn" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Total Items Price" />
+            <TableColumn fx:id="ordersTableViewDeliveryCostColumn" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Delivery Cost" />
+            <TableColumn fx:id="ordersTableViewTotalPriceColumn" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Total Price" />
          </columns>
       </TableView>
       <HBox alignment="CENTER_LEFT" layoutX="211.0" layoutY="44.0" prefHeight="92.0" prefWidth="625.0" spacing="50.0" AnchorPane.leftAnchor="245.0" AnchorPane.rightAnchor="65.0" AnchorPane.topAnchor="75.0">

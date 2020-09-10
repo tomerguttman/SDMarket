@@ -16,8 +16,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-public class AppController {
 
+public class AppController {
     private final SuperMarketLogic SDMLogic;
     private final SimpleBooleanProperty isXMLLoaded;
     private Stage mainStage;
@@ -28,6 +28,7 @@ public class AppController {
     private final ItemsController itemsController;
     private final CustomersController customersController;
     private final PurchaseController purchaseController;
+    private final UpdateInformationController updateInformationController;
     private final Map<Integer, StoreCardController> storeCardControllersMap = new HashMap<>();
     private final Map<Integer, CustomerCardController> customerCardControllersMap = new HashMap<>();
     private final Map<Integer, StoreCardController> storeCardControllerMapForPurchase = new HashMap<>();
@@ -64,6 +65,17 @@ public class AppController {
         itemsController = initializeItemsController();
         customersController = initializeCustomersController();
         purchaseController = initializePurchaseController();
+        updateInformationController = initializeUpdateInformationController();
+    }
+
+    private UpdateInformationController initializeUpdateInformationController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/updateInformation.fxml");
+        loader.setLocation(mainFXML);
+        loader.load(); //need to be done before loader.getController() !
+        UpdateInformationController tempUpdateInformationController = loader.getController();
+        tempUpdateInformationController.setMainController(this);
+        return tempUpdateInformationController;
     }
 
     private PurchaseController initializePurchaseController() throws IOException {
@@ -165,10 +177,7 @@ public class AppController {
                 anchorPaneMainWindow.getChildren().clear();
                 AnchorPane anchorPane = customersController.getMainRoot();
                 anchorPaneMainWindow.getChildren().add(anchorPane);
-                AnchorPane.setTopAnchor(anchorPane, 0.0);
-                AnchorPane.setRightAnchor(anchorPane, 0.0);
-                AnchorPane.setBottomAnchor(anchorPane, 0.0);
-                AnchorPane.setLeftAnchor(anchorPane, 0.0);
+                setAnchorPaneInPlace(anchorPane);
 
                 for(Customer customer : getSDMLogic().getCustomers().values()) {
                     loader = new FXMLLoader();
@@ -194,10 +203,7 @@ public class AppController {
             anchorPaneMainWindow.getChildren().clear();
             AnchorPane itemsControllerMainRoot = itemsController.getRoot();
             anchorPaneMainWindow.getChildren().add(itemsControllerMainRoot);
-            AnchorPane.setTopAnchor(itemsControllerMainRoot, 0.0);
-            AnchorPane.setRightAnchor(itemsControllerMainRoot, 0.0);
-            AnchorPane.setBottomAnchor(itemsControllerMainRoot, 0.0);
-            AnchorPane.setLeftAnchor(itemsControllerMainRoot, 0.0);
+            setAnchorPaneInPlace(itemsControllerMainRoot);
             itemsController.updateSystemItemsScene(new ArrayList<>(this.getSDMLogic().getItems().values()));
         }
     }
@@ -218,10 +224,7 @@ public class AppController {
                 anchorPaneMainWindow.getChildren().clear();
                 AnchorPane anchorPane = purchaseController.getMainRoot();
                 anchorPaneMainWindow.getChildren().add(anchorPane);
-                AnchorPane.setTopAnchor(anchorPane, 0.0);
-                AnchorPane.setRightAnchor(anchorPane, 0.0);
-                AnchorPane.setBottomAnchor(anchorPane, 0.0);
-                AnchorPane.setLeftAnchor(anchorPane, 0.0);
+                setAnchorPaneInPlace(anchorPane);
 
                 for(Store store : getSDMLogic().getStores().values()) {
                     loader = new FXMLLoader();
@@ -234,6 +237,7 @@ public class AppController {
                 }
 
                 purchaseController.addStoreCards(storeCardControllerMapForPurchase);
+                purchaseController.activateReset();
                 purchaseController.insertCustomersToComboBox();
             }
         }
@@ -255,10 +259,7 @@ public class AppController {
                 anchorPaneMainWindow.getChildren().clear();
                 AnchorPane anchorPane = storesController.getMainRoot();
                 anchorPaneMainWindow.getChildren().add(anchorPane);
-                AnchorPane.setTopAnchor(anchorPane, 0.0);
-                AnchorPane.setRightAnchor(anchorPane, 0.0);
-                AnchorPane.setBottomAnchor(anchorPane, 0.0);
-                AnchorPane.setLeftAnchor(anchorPane, 0.0);
+                setAnchorPaneInPlace(anchorPane);
 
                 for(Store store : getSDMLogic().getStores().values()) {
                     loader = new FXMLLoader();
@@ -271,6 +272,7 @@ public class AppController {
                 }
 
                 storesController.addStoreCards(storeCardControllersMap);
+                storesController.resetAllComponents();
             }
         }
         catch(IOException e){
@@ -280,7 +282,27 @@ public class AppController {
 
     @FXML
     void onActionUpdateInformation(ActionEvent event) {
+        try {
+            if (!anchorPaneMainWindow.getChildren().contains(updateInformationController.getMainRoot())) {
+                anchorPaneMainWindow.getChildren().clear();
+                AnchorPane anchorPane = updateInformationController.getMainRoot();
+                anchorPaneMainWindow.getChildren().add(anchorPane);
+                setAnchorPaneInPlace(anchorPane);
+                updateInformationController.initializeChooseOperationComboBox();
+                updateInformationController.initializeChooseStoreComboBox();
+                updateInformationController.initializeChooseItemComboBox();
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void setAnchorPaneInPlace(AnchorPane anchorPane) {
+        AnchorPane.setTopAnchor(anchorPane, 0.0);
+        AnchorPane.setRightAnchor(anchorPane, 0.0);
+        AnchorPane.setBottomAnchor(anchorPane, 0.0);
+        AnchorPane.setLeftAnchor(anchorPane, 0.0);
     }
 
     public void enableMenuButtons() {

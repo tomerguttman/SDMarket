@@ -75,6 +75,9 @@ public class StoresController {
     private TableColumn<Order, Double> ordersTableViewTotalPriceColumn;
 
     @FXML
+    private TableColumn<Order, String> ordersTableViewDestinationColumn;
+
+    @FXML
     private TableView<Discount> discountsTableView;
 
     @FXML
@@ -165,6 +168,12 @@ public class StoresController {
         this.ordersTableViewTotalItemsPriceColumn.setCellValueFactory(new PropertyValueFactory<Order, Double>("costOfItemsInOrder"));
         this.ordersTableViewTotalItemsColumn.setCellValueFactory(new PropertyValueFactory<Order, Integer>("amountItemsInOrder"));
         this.ordersTableViewTotalPriceColumn.setCellValueFactory(new PropertyValueFactory<Order, Double>("totalOrderCost"));
+        this.ordersTableViewDestinationColumn.setCellValueFactory(cellData -> {
+            String parsedLocation;
+            parsedLocation = String.format("(%d,%d)",
+                    cellData.getValue().getOrderDestination().getX(), cellData.getValue().getOrderDestination().getY());
+            return new SimpleObjectProperty<>(parsedLocation);
+        });
     }
 
     private void setItemsTableColumnsProperties() {
@@ -175,9 +184,7 @@ public class StoresController {
         this.itemsTableViewPriceColumn.setCellValueFactory(new PropertyValueFactory<StoreItem, Double>("pricePerUnit"));
     }
 
-    public void setMainController(AppController mainController) {
-        this.mainController = mainController;
-    }
+    public void setMainController(AppController mainController) { this.mainController = mainController; }
 
     public AnchorPane getMainRoot() {
         return mainRoot;
@@ -257,12 +264,24 @@ public class StoresController {
         try {
             this.itemsLabel.setText(Integer.toString(store.getItemsBeingSold().size()));
             this.ppkLabel.setText(Integer.toString(store.getDeliveryPpk()));
-            //this.salesLabel.setText(Integer.toString(store.getSales().size()));
-            this.totalRevenueLabel.setText(Double.toString(store.getTotalOrdersRevenue()));
+            this.salesLabel.setText(Integer.toString(store.getTotalAmountOfDiscounts()));
+            this.totalRevenueLabel.setText(String.format("%.2f", store.getTotalOrdersRevenue()));
             this.storesHeaderLabel.setText(String.format("%d : %s", store.getId(), store.getName()));
         }
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void resetAllComponents() {
+        this.thenYouGetTableView.getItems().clear();
+        this.discountsTableView.getItems().clear();
+        this.ordersTableView.getItems().clear();
+        this.itemsTableView.getItems().clear();
+        this.storesHeaderLabel.setText("");
+        this.totalRevenueLabel.setText("0");
+        this.salesLabel.setText("0");
+        this.ppkLabel.setText("0");
+        this.itemsLabel.setText("0");
     }
 }

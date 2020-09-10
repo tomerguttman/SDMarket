@@ -1,6 +1,7 @@
 package SDMImprovedFacade;
 
 import generatedClasses.*;
+import javafx.beans.binding.Bindings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ public class Store {
     private String name;
     private Location storeLocation;
     private Map<Integer, StoreItem> itemsBeingSold;
-    private Map<Integer, List<Discount>> storeDiscounts; // Integer -> IfYouBuyItemId, List<Discount> -> Discount associated with the item.
+    private final Map<Integer, List<Discount>> storeDiscounts; // Integer -> IfYouBuyItemId, List<Discount> -> Discount associated with the item.
     private final List<Order> storeOrdersHistory;
 
 
@@ -104,6 +105,8 @@ public class Store {
         return storeLocation;
     }
 
+
+
     public void setStoreLocation(Location storeLocation) {
         this.storeLocation = storeLocation;
     }
@@ -134,23 +137,16 @@ public class Store {
 
     @Override
     public String toString() {
-        StringBuilder storeInformation = new StringBuilder();
-        storeInformation.append("\n<><><><><>   Store - ").append(Id).append("  <><><><><>\n");
-        storeInformation.append("Store ID: ").append(Id).append("\n").append("Store Name: ").append(name).append("\n");
-        storeInformation.append("Store PPK: ").append(deliveryPpk).append("\n");
-        storeInformation.append("Total Orders Revenue: ").append(String.format("%.2f", totalOrdersRevenue)).append("\n\n");
-        storeInformation.append("Store Item List: ").append(itemsBeingSold.size()).append(" items\n");
-        storeInformation.append("\n-----  Store Items  -----\n\n");
-        itemsBeingSold.values().forEach(item -> storeInformation.append(item.toString()));
-        storeInformation.append("\n-----  Store Orders  -----\n\n");
+        return String.format("%d | %s", this.Id, this.name);
+    }
 
-        if(!storeOrdersHistory.isEmpty()) {
-            storeOrdersHistory.forEach(order -> storeInformation.append((order.toString())));
-        }
-        else{
-            storeInformation.append("\tThere are no orders that were made from this store.\n\n");
+    public int getTotalAmountOfDiscounts() {
+        int sumOfDiscounts = 0;
+
+        for (Integer itemId: storeDiscounts.keySet()) {
+            sumOfDiscounts += storeDiscounts.get(itemId).size();
         }
 
-        return storeInformation.toString();
+        return sumOfDiscounts;
     }
 }

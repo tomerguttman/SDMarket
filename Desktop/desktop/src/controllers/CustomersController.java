@@ -110,8 +110,8 @@ public class CustomersController {
 
     private void updateCustomerHeader(Customer customer) {
         try {
-            this.averageCartPriceLabel.setText(Double.toString(customer.getAverageOrdersPriceWithoutDelivery()));
-            this.averagePriceOfDeliveryLabel.setText(Double.toString(customer.getAverageOrdersDeliveryPrice()));
+            this.averageCartPriceLabel.setText(String.format("%.2f", customer.getAverageOrdersPriceWithoutDelivery()));
+            this.averagePriceOfDeliveryLabel.setText(String.format("%.2f", customer.getAverageOrdersDeliveryPrice()));
             this.locationLabel.setText(String.format("(%d,%d)", customer.getLocation().getX(), customer.getLocation().getY()));
             this.numberOfOrdersLabel.setText(Integer.toString(customer.getTotalNumberOfOrders()));
             this.customerHeaderLabel.setText(String.format("%d : %s", customer.getId(), customer.getName()));

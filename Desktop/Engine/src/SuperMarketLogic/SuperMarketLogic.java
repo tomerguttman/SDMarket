@@ -13,7 +13,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class SuperMarketLogic {
     private SuperDuperMarket SDMImproved;
@@ -400,7 +399,6 @@ public class SuperMarketLogic {
 
     public void updateStoreAndSystemItemAmountInformationAccordingToNewOrder(List<StoreItem> orderItems, Store storeToOrderFrom) {
         orderItems.forEach(itemInOrder -> {
-
             double currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
             storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
 
@@ -423,8 +421,10 @@ public class SuperMarketLogic {
 
     public void addItemToStore(StoreItem itemToAdd, Store storeOfChoice) {
         this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().put(itemToAdd.getId(), itemToAdd);
+
         this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).
                 getItemsBeingSold().get(itemToAdd.getId()).setPricePerUnit(itemToAdd.getAveragePriceOfTheItem());
+
         this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 
@@ -444,6 +444,7 @@ public class SuperMarketLogic {
 
     public void generateOrderForStore(Store storeToOrderFrom, String userDateInput, int lastOrderID, List<StoreItem> orderItems, Location userLocationInput) {
         storeToOrderFrom.generateOrder(userDateInput, lastOrderID, orderItems, userLocationInput);
+        this.SDMImproved.updateTotalNumberOfOrders();
     }
 
     public double calculateDistanceFromUser(Store storeToOrderFrom, Location userLocationInput) {
@@ -569,6 +570,7 @@ public class SuperMarketLogic {
         Order dynamicOrder = new Order(userDateInput, userLocationInput, orderIDForAllOrdersIncluded,
                 totalDeliveryCost, amountOfStoresParticipating, itemsToOrder);
         this.SDMImproved.addDynamicOrder(dynamicOrder);
+        this.SDMImproved.updateTotalNumberOfOrders();
     }
 
     public String getStringOfAllDynamicSystemOrders() {
@@ -749,5 +751,16 @@ public class SuperMarketLogic {
         }
 
         return storeToBuyFrom;
+    }
+
+    public void addStaticOrderToCustomer(int currentStaticStoreId, int lastOrderId, Customer customer) {
+        Order lastOrder = this.SDMImproved.getSystemStores().get(currentStaticStoreId).getLastOrder();
+        if(lastOrderId == lastOrder.getOrderId()) {
+            customer.addOrder(lastOrder);
+        }
+    }
+
+    public void addDynamicOrderToCustomer(int lastOrderId, Customer customer) {
+        customer.addOrder(this.SDMImproved.getSystemDynamicOrders().get(lastOrderId));
     }
 }

@@ -10,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-
 import javax.xml.bind.JAXBException;
 import java.io.File;
 
@@ -44,7 +43,6 @@ public class LoadXMLController {
 
     @FXML
     private Label amountItemsLabel;
-
 
     @FXML
     void onActionChooseXMLFile(ActionEvent event) throws JAXBException {

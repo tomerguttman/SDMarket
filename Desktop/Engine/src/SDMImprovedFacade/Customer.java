@@ -74,9 +74,6 @@ public class Customer {
         this.totalNumberOfOrders = customerOrders.size(); //do not move!
         this.averageOrdersPriceWithoutDelivery = sumOfOrdersPriceWithoutDelivery / totalNumberOfOrders;
         this.averageOrdersDeliveryPrice = sumOfOrdersDeliveryPrice / totalNumberOfOrders;
-
-
-
     }
 
     @Override
