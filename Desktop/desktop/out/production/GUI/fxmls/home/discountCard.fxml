@@ -31,7 +31,7 @@
             </ImageView>
          </children>
       </Pane>
-      <Label fx:id="discountCardDiscountNameLabel" alignment="CENTER" layoutY="45.0" prefHeight="21.0" prefWidth="140.0" text="DISCOUNT NAME" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <Label fx:id="discountCardDiscountNameLabel" alignment="CENTER" layoutY="40.0" prefHeight="21.0" prefWidth="140.0" text="DISCOUNT NAME" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <font>
             <Font size="15.0" />
          </font>
@@ -41,6 +41,7 @@
             <Font size="15.0" />
          </font>
       </Label>
+      <Label fx:id="discountCardStoreNameLabel" alignment="CENTER" layoutY="55.0" prefHeight="21.0" prefWidth="140.0" text="store name" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
    <opaqueInsets>
       <Insets left="10.0" />

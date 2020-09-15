@@ -89,11 +89,11 @@
                         <Insets left="50.0" />
                      </padding>
                   </Button>
-                  <Button fx:id="buttonSettings" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionSettings" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Settings">
+                  <Button fx:id="buttonOrderHistory" alignment="BASELINE_LEFT" graphicTextGap="22.0" layoutX="31.0" layoutY="378.0" mnemonicParsing="false" onAction="#onActionOrderHistory" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Order History">
                      <graphic>
-                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="22.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" smooth="false">
                            <image>
-                              <Image url="@../images/adjust.png" />
+                              <Image url="@../images/history.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -106,6 +106,18 @@
                         <ImageView fitHeight="26.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../images/update.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets left="50.0" />
+                     </padding>
+                  </Button>
+                  <Button fx:id="buttonSettings" alignment="BASELINE_LEFT" graphicTextGap="22.0" mnemonicParsing="false" onAction="#onActionSettings" prefHeight="42.0" prefWidth="259.0" stylesheets="@style.css" text="Settings">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/adjust.png" />
                            </image>
                         </ImageView>
                      </graphic>

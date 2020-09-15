@@ -28,7 +28,7 @@ public class PurchaseController {
     private AppController mainController;
     private int currentStaticStoreId = -1;
     private boolean isDynamicPurchaseButtonToggled;
-    private final Order currentOrder = new Order();
+    private Order currentOrder = new Order();
     private final Map<Integer, Store> storesParticipatingInOrder = new HashMap<>();
     private Map<Integer, Double> itemsAmountBucketMap = new HashMap<>();
     private Map<Integer, List<StoreItem>> dynamicOrder;
@@ -364,9 +364,9 @@ public class PurchaseController {
     }
 
     private void resetFinalSummaryLabels() {
-        this.storeFinalInformationHBoxDistanceFromCustomerLabel.setText("");
-        this.storeFinalInformationHBoxPpkLabel.setText("");
-        this.storeFinalInformationHBoxStoreDeliveryCostLabel.setText("");
+        this.storeFinalInformationHBoxDistanceFromCustomerLabel.setText("0");
+        this.storeFinalInformationHBoxPpkLabel.setText("0");
+        this.storeFinalInformationHBoxStoreDeliveryCostLabel.setText("0");
     }
 
     private void makeInvisibleAndDisableDiscountsSection() {
@@ -501,6 +501,7 @@ public class PurchaseController {
                     discountCardController.setDiscountCardItemToBuyId(discount.getBuyThis().getItemId());
                     discountCardController.setDiscountCardItemToBuyName(String.format(" | %s",discount.getItemToBuyName()));
                     discountCardController.setStoreId(discountStoreId);
+                    discountCardController.setStoreName(this.mainController.getSDMLogic().getStores().get(discountStoreId).getName());
                     this.discountCardControllersList.add(discountCardController);
                 }
             }
@@ -1125,6 +1126,7 @@ public class PurchaseController {
             }
             else {
                 double totalDeliveryCost = 0;
+
                 for (Integer storeIdToOrderFrom: dynamicOrder.keySet()) {
                     Store store = this.mainController.getSDMLogic().getStores().get(storeIdToOrderFrom);
                     totalDeliveryCost += store.getDeliveryPpk() * store.calculateDistance(customer.getLocation());
@@ -1141,6 +1143,7 @@ public class PurchaseController {
             }
 
             showOrderWasSuccessfullyMadeAlert();
+            this.currentOrder = new Order();
             resetAllOrder();
         } else {
             displayDateNotChosenError();

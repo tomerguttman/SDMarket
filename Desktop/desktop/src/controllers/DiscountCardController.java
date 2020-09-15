@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 
 public class DiscountCardController {
     Discount discount;
+
     @FXML
     private AnchorPane mainRoot;
 
@@ -21,6 +22,9 @@ public class DiscountCardController {
 
     @FXML
     private Label discountCardItemToBuyName;
+
+    @FXML
+    private Label discountCardStoreNameLabel;
 
     public AnchorPane getMainRoot() {
         return mainRoot;
@@ -48,5 +52,9 @@ public class DiscountCardController {
 
     public String getDiscountName() {
         return this.discountCardDiscountNameLabel.getText();
+    }
+
+    public void setStoreName(String name) {
+        this.discountCardStoreNameLabel.setText(name);
     }
 }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="935.0" style="-fx-border-color: #FFFFFF;" styleClass="anchor-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.OrdersHistoryController">
+   <children>
+      <Separator layoutX="49.0" layoutY="298.0" prefHeight="28.0" prefWidth="840.0" />
+      <TableView fx:id="ordersHistoryStaticOrdersTableView" layoutX="44.0" layoutY="178.0" onMouseClicked="#onMouseClickedOrdersTableView" prefHeight="120.0" prefWidth="790.0" AnchorPane.leftAnchor="72.5">
+         <columns>
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewIdColumn" prefWidth="57.0" style="-fx-alignment: Center;" text="ID" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewDateColumn" prefWidth="108.0" style="-fx-alignment: Center;" text="Date" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewStoreIdColumn" prefWidth="67.0" style="-fx-alignment: Center;" text="Store ID" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewStoreNameColumn" prefWidth="119.0" style="-fx-alignment: Center;" text="Store Name" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewTotalTypesColumn" minWidth="0.0" prefWidth="90.0" style="-fx-alignment: Center;" text="Total Types" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewTotalItemsColumn" minWidth="3.0" prefWidth="73.0" style="-fx-alignment: Center;" text="Total Items" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewItemsCostColumn" prefWidth="83.0" style="-fx-alignment: Center;" text="Items Cost" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewDeliveryCostColumn" minWidth="0.0" prefWidth="86.0" style="-fx-alignment: Center;" text="Delivery Cost" />
+            <TableColumn fx:id="ordersHistoryStaticOrdersTableViewTotalCostColumn" prefWidth="82.0" style="-fx-alignment: Center;" text="Total Cost" />
+         </columns>
+      </TableView>
+      <Label layoutX="74.0" layoutY="13.0" text="Dynamic Orders" AnchorPane.leftAnchor="74.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="74.0" layoutY="157.0" text="Static Orders" AnchorPane.leftAnchor="74.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <TableView fx:id="ordersHistoryDynamicOrdersTableView" layoutX="44.0" layoutY="34.0" onMouseClicked="#onMouseClickedOrdersTableView" prefHeight="120.0" prefWidth="790.0" AnchorPane.leftAnchor="72.5">
+         <columns>
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewIdColumn" prefWidth="41.0" style="-fx-alignment: Center;" text="ID" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewDateColumn" prefWidth="90.0" style="-fx-alignment: Center;" text="Date" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewStoresParticipatingColumn" prefWidth="121.0" style="-fx-alignment: Center;" text="Stores Participating" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewStoreNameColumn" prefWidth="105.0" style="-fx-alignment: Center;" text="Store Name" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewTotalTypesColumn" minWidth="0.0" prefWidth="84.0" style="-fx-alignment: Center;" text="Total Types" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewTotalItemsColumn" minWidth="3.0" prefWidth="73.0" style="-fx-alignment: Center;" text="Total Items" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewItemsCostColumn" prefWidth="83.0" style="-fx-alignment: Center;" text="Items Cost" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewDeliveryCostColumn" minWidth="0.0" prefWidth="86.0" style="-fx-alignment: Center;" text="Delivery Cost" />
+            <TableColumn fx:id="ordersHistoryDynamicOrdersTableViewTotalCostColumn" prefWidth="82.0" style="-fx-alignment: Center;" text="Total Cost" />
+         </columns>
+      </TableView>
+      <TableView fx:id="ordersHistoryItemsOfOrderTableView" layoutX="76.5" layoutY="400.0" prefHeight="158.0" prefWidth="790.0" AnchorPane.leftAnchor="72.5">
+         <columns>
+            <TableColumn fx:id="ordersHistoryItemsOfOrderTableViewItemIdColumn" prefWidth="109.0" style="-fx-alignment: Center;" text="Item ID" />
+            <TableColumn fx:id="ordersHistoryItemsOfOrderTableViewNameColumn" prefWidth="117.0" style="-fx-alignment: Center;" text="Name" />
+            <TableColumn fx:id="ordersHistoryItemsOfOrderTableViewAmountColumn" prefWidth="145.0" style="-fx-alignment: Center;" text="Amount" />
+            <TableColumn fx:id="ordersHistoryItemsOfOrderTableViewPricePerUnitColumn" prefWidth="205.0" style="-fx-alignment: Center;" text="Price Per Unit" />
+            <TableColumn fx:id="ordersHistoryItemsOfOrderTableViewTotalPriceColumn" minWidth="0.0" prefWidth="185.0" style="-fx-alignment: Center;" text="Total Price" />
+         </columns>
+      </TableView>
+      <Label layoutX="74.0" layoutY="379.0" text="Items Of Order">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <HBox id="total-summary-hbox" layoutX="362.0" layoutY="323.0" prefHeight="60.0" prefWidth="214.0" spacing="10.0" stylesheets="@style.css">
+         <children>
+            <VBox alignment="CENTER" prefHeight="58.0" prefWidth="147.0">
+               <children>
+                  <Label fx:id="ordersHistoryOrderTypeLabel" style="-fx-text-fill: #2a73ff;" text="-" textFill="#2a73ff">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Order Type" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="92.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="ordersHistoryOrderIdLabel" style="-fx-text-fill: #2a73ff;" text="-" textFill="#2a73ff">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Label>
+                  <Label text="Order ID" textFill="#e7e5e5" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

@@ -16,6 +16,7 @@ public class Order {
     final String dateOrderWasMade;
     final String storeName;
     final Location orderDestination;
+
     private int amountOfStoresRelatedToOrder;
     private int amountItemsInOrder ;
     final List<StoreItem> itemsInOrder;
@@ -143,6 +144,10 @@ public class Order {
         this.costOfItemsInOrder = 0.0;
         this.amountOfStoresRelatedToOrder = 0;
         this.amountItemsInOrder = 0;
+    }
+
+    public int getAmountOfStoresRelatedToOrder() {
+        return amountOfStoresRelatedToOrder;
     }
 
     private boolean checkIfFirstItemInOrder() {

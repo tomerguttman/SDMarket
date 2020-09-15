@@ -29,6 +29,7 @@ public class AppController {
     private final CustomersController customersController;
     private final PurchaseController purchaseController;
     private final UpdateInformationController updateInformationController;
+    private final OrdersHistoryController ordersHistoryController;
     private final Map<Integer, StoreCardController> storeCardControllersMap = new HashMap<>();
     private final Map<Integer, CustomerCardController> customerCardControllersMap = new HashMap<>();
     private final Map<Integer, StoreCardController> storeCardControllerMapForPurchase = new HashMap<>();
@@ -49,6 +50,9 @@ public class AppController {
     private Button buttonItems;
 
     @FXML
+    private Button buttonOrderHistory;
+
+    @FXML
     private Button buttonSettings;
 
     @FXML
@@ -56,6 +60,8 @@ public class AppController {
 
     @FXML
     private AnchorPane anchorPaneMainWindow;
+
+
 
     public AppController() throws IOException {
         isXMLLoaded = new SimpleBooleanProperty(false);
@@ -66,6 +72,17 @@ public class AppController {
         customersController = initializeCustomersController();
         purchaseController = initializePurchaseController();
         updateInformationController = initializeUpdateInformationController();
+        ordersHistoryController = initializeOrderHistoryController();
+    }
+
+    private OrdersHistoryController initializeOrderHistoryController() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("/fxmls/home/ordersHistory.fxml");
+        loader.setLocation(mainFXML);
+        loader.load(); //need to be done before loader.getController() !
+        OrdersHistoryController tempOrdersHistoryController = loader.getController();
+        tempOrdersHistoryController.setMainController(this);
+        return tempOrdersHistoryController;
     }
 
     private UpdateInformationController initializeUpdateInformationController() throws IOException {
@@ -167,6 +184,7 @@ public class AppController {
         buttonSettings.disableProperty().bind(isXMLLoaded.not());
         buttonStores.disableProperty().bind(isXMLLoaded.not());
         buttonUpdateInformation.disableProperty().bind(isXMLLoaded.not());
+        buttonOrderHistory.disableProperty().bind(isXMLLoaded.not());
     }
 
     @FXML
@@ -291,6 +309,22 @@ public class AppController {
                 updateInformationController.initializeChooseOperationComboBox();
                 updateInformationController.initializeChooseStoreComboBox();
                 updateInformationController.initializeChooseItemComboBox();
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void onActionOrderHistory(ActionEvent event) {
+        try {
+            if (!anchorPaneMainWindow.getChildren().contains(ordersHistoryController.getMainRoot())) {
+                anchorPaneMainWindow.getChildren().clear();
+                AnchorPane anchorPane = ordersHistoryController.getMainRoot();
+                anchorPaneMainWindow.getChildren().add(anchorPane);
+                setAnchorPaneInPlace(anchorPane);
+                ordersHistoryController.loadOrdersToTableViews();
             }
         }
         catch(Exception e) {
