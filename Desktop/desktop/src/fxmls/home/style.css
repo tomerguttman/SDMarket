@@ -84,3 +84,20 @@
     -fx-background-radius: 10 10 10 10;
 }
 
+.accept-button:hover {
+    -fx-background-color : #4ABF50;
+}
+
+.accept-button:pressed {
+    -fx-background-color : #4ABF50;
+}
+
+.reject-button:hover {
+    -fx-background-color : #E42535;
+}
+
+.reject-button:pressed {
+    -fx-background-color : #E42535;
+}
+
+

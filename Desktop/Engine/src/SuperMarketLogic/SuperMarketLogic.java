@@ -332,8 +332,8 @@ public class SuperMarketLogic {
         try {
             for (SDMStore store : storesToValidate.getSDMStore()) {
 
-                if (!(store.getLocation().getX() <= 50 && store.getLocation().getX() >= 1 &&
-                        store.getLocation().getY() >= 1 && store.getLocation().getY() <= 50)) {
+                if (!(store.getLocation().getX() <= X_TOP_RANGE && store.getLocation().getX() >= X_LOW_RANGE &&
+                        store.getLocation().getY() >= Y_LOW_RANGE && store.getLocation().getY() <= Y_TOP_RANGE)) {
                     return false;
                 }
             }
@@ -439,7 +439,7 @@ public class SuperMarketLogic {
     }
 
     public boolean validateLocationBorders(int x, int y) {
-        return (1 <= x && x <= 50) && (1 <= y && y <= 50);
+        return (X_LOW_RANGE <= x && x <= X_TOP_RANGE) && (Y_LOW_RANGE <= y && y <= Y_TOP_RANGE);
     }
 
     public void generateOrderForStore(Store storeToOrderFrom, String userDateInput, int lastOrderID, List<StoreItem> orderItems, Location userLocationInput) {

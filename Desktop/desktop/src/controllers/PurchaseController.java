@@ -1,17 +1,18 @@
 package controllers;
 
 import SDMImprovedFacade.*;
+import javafx.animation.*;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -19,7 +20,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.HLineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.Polyline;
+import javafx.util.Duration;
+
 import java.io.IOException;
+import java.security.Key;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,6 +36,7 @@ public class PurchaseController {
     private AppController mainController;
     private int currentStaticStoreId = -1;
     private boolean isDynamicPurchaseButtonToggled;
+    boolean isAnimationEnabled = true;
     private Order currentOrder = new Order();
     private final Map<Integer, Store> storesParticipatingInOrder = new HashMap<>();
     private Map<Integer, Double> itemsAmountBucketMap = new HashMap<>();
@@ -152,6 +161,9 @@ public class PurchaseController {
 
     @FXML
     private Label discountOperatorLabel;
+
+    @FXML
+    private Label itemToAddAnimationLabel;
 
     @FXML
     private ComboBox<Discount.ThenGet.Offer> chooseOfferComboBox;
@@ -605,10 +617,12 @@ public class PurchaseController {
     @FXML
     void onActionApplyDiscountButton() {
         String offerOperator = this.discountOperatorLabel.getText();
+
         if( offerOperator.equals("ONE-OF")){
             Discount.ThenGet.Offer selectedOffer = this.chooseOfferComboBox.getSelectionModel().getSelectedItem();
             //Offer can be applied due to our logic flow. (All discount cards appear iff they can be applied)
             if(selectedOffer != null){
+                updateItemsAmountBucketMapAccordingToDiscount(selectedOffer);
                 createNewItemFromAppliedOfferAndUpdateTableViewAndOrderAndAddToRelevantOrder(selectedOffer);
                 updatePropertiesFromOffer(selectedOffer);
             }
@@ -617,6 +631,9 @@ public class PurchaseController {
             }
         }
         else {
+            List<Discount.ThenGet.Offer> offerList = this.discountOffersTableView.getItems();
+            updateItemsAmountBucketMapAccordingToDiscount(offerList.get(0)); //we need to subtract only ones!
+
             for (Discount.ThenGet.Offer offer : this.discountOffersTableView.getItems()) {
                 //Offer can be applied due to our logic flow. (All discount cards appear iff they can be applied)
                 createNewItemFromAppliedOfferAndUpdateTableViewAndOrderAndAddToRelevantOrder(offer);
@@ -630,6 +647,12 @@ public class PurchaseController {
             if(wasCustomerSelected.get()){ showAndInitializeFinalBuySummary(); }
             else { displayCustomerNotChosenError(); }
         }
+    }
+
+    private void updateItemsAmountBucketMapAccordingToDiscount(Discount.ThenGet.Offer offer) {
+        Discount.IfBuy ifBuyItem = offer.getBuyThisItem();
+        this.itemsAmountBucketMap.put(offer.getBuyThisItem().getItemId(),
+                this.itemsAmountBucketMap.get(ifBuyItem.getItemId()) - ifBuyItem.getQuantity());
     }
 
     private void updatePropertiesFromOffer(Discount.ThenGet.Offer selectedOffer) {
@@ -658,9 +681,6 @@ public class PurchaseController {
 
     private void createNewItemFromAppliedOfferAndUpdateTableViewAndOrderAndAddToRelevantOrder(Discount.ThenGet.Offer offer) {
         if(offer != null){
-            Discount.IfBuy ifBuyItem = offer.getBuyThisItem();
-            this.itemsAmountBucketMap.put(offer.getBuyThisItem().getItemId(),
-                    this.itemsAmountBucketMap.get(ifBuyItem.getItemId()) - ifBuyItem.getQuantity());
             StoreItem newStoreItemFromOffer = new StoreItem(offer.getOfferItemId(), offer.getQuantity(),
                     offer.getForAdditional() / offer.getQuantity(), offer.getItemName(),
                     this.mainController.getSDMLogic().getItems().get(offer.getOfferItemId()).getPurchaseCategory(), true);
@@ -688,7 +708,8 @@ public class PurchaseController {
             this.addRelevantDiscountCardsToHBox(tempStaticOrder);
         }
 
-        addItemToCartTableView(newStoreItemFromOffer);
+       if (isAnimationEnabled) { performAnimation(455.0, 675.0, this.itemToAddAnimationLabel, newStoreItemFromOffer, new Double[] {0.0, 0.0, 270.0, -350.0});}
+       else { addItemToCartTableView(newStoreItemFromOffer); }
     }
 
     @FXML
@@ -750,10 +771,61 @@ public class PurchaseController {
 
     private void performAllOnActionAddToCartButtonMethods(StoreItem newStoreItem, Store storeToBuyFrom) {
         newStoreItem.setPricePerUnit(storeToBuyFrom.getItemsBeingSold().get(newStoreItem.getId()).getPricePerUnit());
-        addItemToCartTableView(newStoreItem);
+        double xEnd = 200, yEnd = 200;
+        if(isAnimationEnabled) { performAnimation(425.0, 400.0,this.itemToAddAnimationLabel, newStoreItem, new Double[] {0.0, 0.0, 200.0, 100.0, 300.0, -100.0}); }
+        else { addItemToCartTableView(newStoreItem); }
         addItemToOrder(newStoreItem);
         updateProperties(newStoreItem);
         addStoreParticipatingInOrder(storeToBuyFrom);
+    }
+
+    private void performAnimation(double xStart, double yStart, Label itemToAddAnimationLabel, StoreItem newStoreItem, Double[] polylineArray) {
+        StringBuilder sb = new StringBuilder();
+        double sHeight = itemToAddAnimationLabel.getHeight();
+        itemToAddAnimationLabel.setLayoutX(xStart);
+        itemToAddAnimationLabel.setLayoutY(yStart);
+        itemToAddAnimationLabel.setWrapText(false);
+        String offerOperator = this.discountOperatorLabel.getText();
+
+        if(wasBuyCartButtonClicked.get()) {
+            if(!offerOperator.equals("ONE-OF")) {
+                List<Discount.ThenGet.Offer> tableViewOffers = this.discountOffersTableView.getItems();
+                itemToAddAnimationLabel.setPrefHeight(sHeight * tableViewOffers.size());
+                for (Discount.ThenGet.Offer offer : tableViewOffers ) {
+                    sb.append(String.format("%d | %s - %.2f\n", offer.getOfferItemId(), offer.getItemName(), offer.getQuantity()));
+                }
+            }
+            else {
+                Discount.ThenGet.Offer offer = this.chooseOfferComboBox.getSelectionModel().getSelectedItem();
+                sb.append(String.format("%d | %s - %.2f", offer.getOfferItemId(), offer.getItemName(), offer.getQuantity()));
+            }
+        }
+        else {
+            sb.append(String.format("%d | %s - %.2f", newStoreItem.getId(), newStoreItem.getName(), newStoreItem.getTotalItemsSold()));
+        }
+
+
+        itemToAddAnimationLabel.setText(sb.toString());
+        Polyline polyline = new Polyline();
+        polyline.getPoints().addAll(polylineArray);
+        PathTransition transition = new PathTransition();
+        transition.setNode(itemToAddAnimationLabel);
+        transition.setDuration(Duration.seconds(3));
+        transition.setPath(polyline);
+        itemToAddAnimationLabel.setVisible(true);
+        transition.play();
+        transition.statusProperty().addListener(new ChangeListener<Animation.Status>() {
+            @Override
+            public void changed(ObservableValue<? extends Animation.Status> observable, Animation.Status oldValue, Animation.Status newValue) {
+                if(newValue == Animation.Status.STOPPED) {
+                    itemToAddAnimationLabel.setVisible(false);
+                    addItemToCartTableView(newStoreItem);
+                    itemToAddAnimationLabel.setPrefHeight(sHeight);
+                }
+            }
+        });
+
+
     }
 
     private Store getStoreToBuyFrom(StoreItem newStoreItem) {

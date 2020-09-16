@@ -90,5 +90,6 @@
          </children>
       </HBox>
       <Separator layoutX="280.0" layoutY="213.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <AnchorPane fx:id="loadXMLMapAnchorPane" layoutX="2.0" layoutY="350.0" prefHeight="348.0" prefWidth="935.0" AnchorPane.leftAnchor="1.0" />
    </children>
 </AnchorPane>

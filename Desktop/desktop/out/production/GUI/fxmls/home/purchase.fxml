@@ -154,8 +154,8 @@
       <ComboBox fx:id="selectStoreToViewItsOrderDetailsComboBox" disable="true" layoutX="490.0" layoutY="520.0" onAction="#onActionFinalSummaryComboBoxStoreSelected" prefHeight="25.0" prefWidth="426.0" promptText="Select Store To View It's Order Details" visible="false" AnchorPane.leftAnchor="195.0" />
       <HBox fx:id="acceptRejectOrderHBox" disable="true" layoutX="481.0" layoutY="668.0" spacing="10.0" visible="false" AnchorPane.leftAnchor="467.5">
          <children>
-            <Button fx:id="acceptOrderButton" mnemonicParsing="false" onAction="#onActionAcceptOrderButton" style="-fx-background-color: #3EA372;" text="Accept Order" />
-            <Button fx:id="rejectOrderButton" mnemonicParsing="false" onAction="#onActionRejectOrderButton" style="-fx-background-color: Red;" text="Reject Order" />
+            <Button fx:id="acceptOrderButton" mnemonicParsing="false" onAction="#onActionAcceptOrderButton" style="-fx-background-color: #68CA6D;" styleClass="accept-button" stylesheets="@style.css" text="Accept Order" />
+            <Button fx:id="rejectOrderButton" mnemonicParsing="false" onAction="#onActionRejectOrderButton" style="-fx-background-color: #E84855;" styleClass="reject-button" stylesheets="@style.css" text="Reject Order" />
          </children>
       </HBox>
       <HBox fx:id="storeFinalInformationHBox" alignment="CENTER_LEFT" disable="true" layoutX="369.0" layoutY="426.0" prefHeight="84.0" prefWidth="380.0" spacing="20.0" visible="false" AnchorPane.leftAnchor="195.0">
@@ -223,5 +223,6 @@
          </children>
       </HBox>
       <Button fx:id="resetOrderButton" layoutX="199.0" layoutY="106.0" mnemonicParsing="false" onAction="#onActionResetOrderButton" text="Reset Order" AnchorPane.leftAnchor="197.0" />
+      <Label fx:id="itemToAddAnimationLabel" layoutX="425.0" layoutY="400.0" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: #80CFA9; -fx-alignment: center; -fx-border-radius: 10 10 10 10; -fx-background-radius: 10 10 10 10;" textAlignment="CENTER" visible="false" />
    </children>
 </AnchorPane>

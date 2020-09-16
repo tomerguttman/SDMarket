@@ -30,6 +30,9 @@ public class LoadXMLController {
     private ProgressBar loadXMLProgressBar;
 
     @FXML
+    private AnchorPane loadXMLMapAnchorPane;
+
+    @FXML
     private Label pathToFileLabel;
 
     @FXML

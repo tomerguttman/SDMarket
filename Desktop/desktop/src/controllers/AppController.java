@@ -251,6 +251,8 @@ public class AppController {
                     StoreCardController storeCardController = loader.getController();
                     storeCardController.setStoreNameCardLabelText(store.getName());
                     storeCardController.setStoreIdCardLabelText(Integer.toString(store.getId()));
+                    storeCardController.setLocationLabelText(String.format("(%d,%d)",
+                            store.getStoreLocation().getX(), store.getStoreLocation().getY()));
                     storeCardControllerMapForPurchase.put(store.getId(), storeCardController);
                 }
 
@@ -286,6 +288,8 @@ public class AppController {
                     StoreCardController storeCardController = loader.getController();
                     storeCardController.setStoreIdCardLabelText(Integer.toString(store.getId()));
                     storeCardController.setStoreNameCardLabelText(store.getName());
+                    storeCardController.setLocationLabelText(String.format("(%d,%d)",
+                            store.getStoreLocation().getX(), store.getStoreLocation().getY()));
                     storeCardControllersMap.put(store.getId(), storeCardController);
                 }
 

@@ -15,6 +15,9 @@ public class StoreCardController {
     @FXML
     private Label storeNameCardLabel;
 
+    @FXML
+    private Label storeCardLocationLabel;
+
     public void setStoreIdCardLabelText(String storeId){
         storeIdCardLabel.setText(storeId);
     }
@@ -25,5 +28,9 @@ public class StoreCardController {
 
     public AnchorPane getMainRoot() {
         return mainRoot;
+    }
+
+    public void setLocationLabelText(String locationString) {
+        this.storeCardLocationLabel.setText(locationString);
     }
 }

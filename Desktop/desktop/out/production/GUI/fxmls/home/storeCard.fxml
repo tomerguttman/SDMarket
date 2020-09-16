@@ -38,6 +38,11 @@
             <Font size="15.0" />
          </font>
       </Label>
+      <Label fx:id="storeCardLocationLabel" alignment="CENTER" layoutY="68.0" prefHeight="21.0" prefWidth="140.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
    </children>
    <opaqueInsets>
       <Insets left="10.0" />
