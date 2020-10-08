@@ -1,0 +1,51 @@
+.text-color {
+  color: #789283;
+}
+
+.social-icons i {
+  font-size: 24px;
+  display: inline-block;
+  color: #789283;
+  margin: 0 10px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #789283;
+  border-radius: 50%;
+  line-height: 38px;
+  margin-top: 20px;
+}
+
+.social-icons i:hover {
+  color: #9FADAA;
+  border-color: #9FADAA;
+}
+
+.tooltip > .tooltip-inner {
+  background-color: #789283;
+}
+
+.tooltip .arrow:before {
+  border-top-color: #789283;
+}
+
+.mh-50vh {
+  min-height: 50vh;
+}
+
+.mh-100vh {
+  min-height: 100vh;
+}
+
+.spectral {
+  font-family: 'Spectral';
+}
+
+.font20 {
+  font-size: 20px;
+}
+
+.shadow {
+  -webkit-box-shadow: 0px 0px 45px 0px rgba(0,0,0,0.4);
+  -moz-box-shadow: 0px 0px 45px 0px rgba(0,0,0,0.4);
+}
+
