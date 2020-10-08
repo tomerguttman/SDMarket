@@ -5,7 +5,7 @@
 # SDMarket 🏪🛒
 Java based super market system
 
-<br>Technology stack include:<br /> `Java` `HTML` `Bootstrap` `CSS` `Java FX` `XML` `JSON` `Tomcat` `Servelts`
+<br>Technology stack include:<br /> `Java` `Javascript` `HTML` `Bootstrap` `CSS` `Java FX` `XML` `JSON` `Tomcat` `Servelts`
 
 
 # Intro
