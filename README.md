@@ -17,13 +17,14 @@ SDMarket allows you to set up stores that sell various items and will allow the 
 
 ## Main Features
 
-- [x] Add stores, customers, sales
+- [x] Add stores, customers and discounts
 - [x] Add items to the system or to a specific store
 - [x] Save orders history to a json file
+- [x] Map component which display all the stores and customers in the system
 - [x] Perform static/dynamic orders
 - [x] Multiple skins can be selected 
-- [x] Load data from and XML file
-- [x] JavaFX GUI
+- [x] Load data from an XML file
+- [x] Full web-application
 
 ## Contributing
 
