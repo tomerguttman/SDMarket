@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.css">
+    <script src="assets/js/context-path-helper.js"></script>
 </head>
 
 <body id="page-top">
@@ -158,7 +159,7 @@
                                 <div class="row align-items-center no-gutters">
                                     <div class="col mr-2">
                                         <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>Earnings</span></div>
-                                        <div class="text-dark font-weight-bold h5 mb-0"><span>$0</span></div>
+                                        <div class="text-dark font-weight-bold h5 mb-0"><span id="earningsSpan">$0</span></div>
                                     </div>
                                     <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
                                 </div>
@@ -171,7 +172,7 @@
                                 <div class="row align-items-center no-gutters">
                                     <div class="col mr-2">
                                         <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>stores owned</span></div>
-                                        <div class="text-dark font-weight-bold h5 mb-0"><span>0</span></div>
+                                        <div class="text-dark font-weight-bold h5 mb-0"><span id="storesOwnedSpan">0</span></div>
                                     </div>
                                     <div class="col-auto"><i class="fas fa-store fa-2x text-gray-300"></i></div>
                                 </div>
@@ -183,10 +184,10 @@
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col mr-2">
-                                        <div class="text-uppercase text-info font-weight-bold text-xs mb-1"><span>orders made from owned storeS</span></div>
+                                        <div class="text-uppercase text-info font-weight-bold text-xs mb-1"><span>orders made from owned stores</span></div>
                                         <div class="row no-gutters align-items-center">
                                             <div class="col-auto">
-                                                <div class="text-dark font-weight-bold h5 mb-0 mr-3"><span>0</span></div>
+                                                <div class="text-dark font-weight-bold h5 mb-0 mr-3"><span id="ordersMadeFromOwnedStoresSpan">0</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -200,8 +201,8 @@
                             <div class="card-body">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col mr-2">
-                                        <div class="text-uppercase text-warning font-weight-bold text-xs mb-1"><span>average raTING</span></div>
-                                        <div class="text-dark font-weight-bold h5 mb-0"><span>0</span></div>
+                                        <div class="text-uppercase text-warning font-weight-bold text-xs mb-1"><span>average rating</span></div>
+                                        <div class="text-dark font-weight-bold h5 mb-0"><span id="averageRatingSpan">0</span></div>
                                     </div>
                                     <div class="col-auto"><i class="far fa-star fa-2x text-gray-300"></i></div>
                                 </div>
@@ -217,7 +218,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table">
+                                    <table id="zonesOverviewTable" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Zone</th>
@@ -230,16 +231,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td><button class="btn btn-primary btn-sm" id="ownerGoToZoneButton" type="button">Go To Zone</button></td>
-                                            </tr>
-                                            <tr></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -265,7 +256,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table">
+                                    <table id="transactionsOverviewTable" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Type</th>
@@ -276,14 +267,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -297,7 +280,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table">
+                                    <table id="activeUsersTable" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Name</th>
@@ -305,11 +288,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>-</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -331,6 +309,8 @@
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/dashboard-owner.js"></script>
+
 </body>
 
 </html>

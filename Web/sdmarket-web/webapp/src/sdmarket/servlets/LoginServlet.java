@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class LoginServlet extends HttpServlet {
-
+    private final String EMPTY_STRING = "";
     private final String DASHBOARD_OWNER_URL = "dashboard-owner.html";
     private final String DASHBOARD_CUSTOMER_URL = "dashboard-customer.html";
     private final String LOGIN_URL = "login.html";
@@ -36,7 +36,7 @@ public class LoginServlet extends HttpServlet {
             //User is not logged in yet
             String usernameFromParameter = request.getParameter(Constants.USERNAME);
             String userTypeFromParameter = request.getParameter(Constants.USER_TYPE);
-            if (usernameFromParameter == null) {
+            if (usernameFromParameter == null || usernameFromParameter.equals(EMPTY_STRING)) {
                 response.sendRedirect(LOGIN_URL);
             }
             else {

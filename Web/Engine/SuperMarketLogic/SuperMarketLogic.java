@@ -687,6 +687,6 @@ public class SuperMarketLogic {
     }
 
     public Map<String, Zone> getSystemZones() {
-        return this.SDMImproved.getSystemZones();
+        return this.SDMImproved != null ? this.SDMImproved.getSystemZones() : null;
     }
 }

@@ -19,7 +19,6 @@ public class RechargeBalanceServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
         String json = "";
-
         response.setContentType("application/json");
         SDMarketManager sdMarketManager = ServletUtils.getSDMarketManager(getServletContext());
         String currentUserName = SessionUtils.getUsername(request);

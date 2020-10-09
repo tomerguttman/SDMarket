@@ -11,6 +11,7 @@
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/pages/login</url-pattern>
     </servlet-mapping>
+
     <servlet>
         <servlet-name>RechargeBalanceServlet</servlet-name>
         <servlet-class>sdmarket.servlets.RechargeBalanceServlet</servlet-class>
@@ -19,4 +20,24 @@
         <servlet-name>RechargeBalanceServlet</servlet-name>
         <url-pattern>/pages/recharge-balance</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadDashboardServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadDashboardServlet</servlet-name>
+        <url-pattern>/pages/load-dashboard</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OrdersZoneServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.OrdersZoneServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OrdersZoneServlet</servlet-name>
+        <url-pattern>/pages/order</url-pattern>
+    </servlet-mapping>
+
+
 </web-app>

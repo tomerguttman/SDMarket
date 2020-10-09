@@ -14,6 +14,11 @@ public class Zone {
     private final HashMap<Integer, Order> ordersMadeInZone = new HashMap<>();
     private final HashMap<Integer, StoreItem> itemsAvailableInZone = new HashMap<>();
 
+    public Zone(String zoneName, String ownerName) {
+        this.zoneName = zoneName;
+        this.ownerName = ownerName;
+    }
+
     public String getZoneName() {
         return zoneName;
     }
