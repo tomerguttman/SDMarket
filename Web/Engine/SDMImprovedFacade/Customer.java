@@ -4,6 +4,7 @@ import generatedClasses.Location;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Customer extends User {
 
@@ -49,5 +50,27 @@ public class Customer extends User {
         this.totalNumberOfOrders = customerOrders.size(); //do not move!
         this.averageOrdersPriceWithoutDelivery = sumOfOrdersPriceWithoutDelivery / totalNumberOfOrders;
         this.averageOrdersDeliveryPrice = sumOfOrdersDeliveryPrice / totalNumberOfOrders;
+    }
+
+    public int getMostLovedItem() {
+        Map<Integer,Double> itemsBucketMap = new HashMap<>();
+        for (Order order : this.userOrdersMap.values()) {
+            for (StoreItem sItem : order.getItemsInOrder()) {
+                if(itemsBucketMap.containsKey(sItem.getId())) {
+                    itemsBucketMap.put(sItem.getId(), itemsBucketMap.get(sItem.getId()) + sItem.getTotalItemsSold());
+                }
+                else { itemsBucketMap.put(sItem.getId(), sItem.getTotalItemsSold()); }
+            }
+        }
+        int lovedItemId = -1;
+        double maxAmount = -1;
+        for (Integer itemId : itemsBucketMap.keySet()) {
+            if(maxAmount < itemsBucketMap.get(itemId)) {
+                maxAmount = itemsBucketMap.get(itemId);
+                lovedItemId = itemId;
+            }
+        }
+
+        return lovedItemId;
     }
 }

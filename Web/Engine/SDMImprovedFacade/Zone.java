@@ -1,6 +1,14 @@
 package SDMImprovedFacade;
 
+import generatedClasses.SDMItem;
+import generatedClasses.SDMSell;
+import generatedClasses.SDMStore;
+import generatedClasses.SuperDuperMarketDescriptor;
+
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Zone {
     private String zoneName;
@@ -17,6 +25,82 @@ public class Zone {
     public Zone(String zoneName, String ownerName) {
         this.zoneName = zoneName;
         this.ownerName = ownerName;
+    }
+
+    public Zone(SuperDuperMarketDescriptor inputSDM, String ownerName) {
+        this.zoneName = inputSDM.getSDMZone().getName();
+        this.ownerName = ownerName;
+        this.storesInZone.putAll(createStoresInZoneMap(inputSDM));
+        updateItemsBeingSoldForEachStore(inputSDM);
+        this.itemsAvailableInZone.putAll(createItemsInZoneMap(inputSDM));
+        initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+        this.amountOfStoresInZone = storesInZone.size();
+        this.amountOfItemTypesInZone = itemsAvailableInZone.size();
+        this.amountOfOrdersInZone = 0;
+        this.averageOrdersCostWithoutDelivery = 0;
+    }
+
+    private Map<Integer, StoreItem> createItemsInZoneMap(SuperDuperMarketDescriptor inputSDM) {
+        Map<Integer, SDMItem> SDMItemsMap = inputSDM.getSDMItems().getSDMItem().stream().collect(Collectors.toMap(SDMItem::getId, item -> item));
+        Map<Integer, StoreItem> itemsInZoneMap = new HashMap<>();
+
+        for (SDMItem item : SDMItemsMap.values()) {
+            itemsInZoneMap.put(item.getId(), new StoreItem(item));
+        }
+
+        return itemsInZoneMap;
+    }
+
+    public void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
+        double sum;
+        int amountOfStoresSellingAnItem;
+
+        for (StoreItem systemItem : itemsAvailableInZone.values()) {
+            amountOfStoresSellingAnItem = 0;
+            sum = 0;
+
+            for (Store store : storesInZone.values()) {
+                if (store.getItemsBeingSold().containsKey(systemItem.getId())) {
+                    amountOfStoresSellingAnItem += 1;
+                    sum += store.getItemsBeingSold().get(systemItem.getId()).getPricePerUnit();
+                }
+
+            }
+
+            if(amountOfStoresSellingAnItem != 0) {
+                systemItem.setAveragePriceOfTheItem(sum / (double) amountOfStoresSellingAnItem);
+            }
+
+            systemItem.setAmountOfStoresSellingThisItem(amountOfStoresSellingAnItem);
+
+        }
+    }
+
+    private void updateItemsBeingSoldForEachStore(SuperDuperMarketDescriptor inputSDM) {
+        Map<Integer, SDMItem> SDMItemsMap = inputSDM.getSDMItems().getSDMItem().stream().collect(Collectors.toMap(SDMItem::getId, item -> item));
+        Map<Integer, StoreItem> storeItemsForSaleImproved;
+
+        for (SDMStore currentStore : inputSDM.getSDMStores().getSDMStore()) {
+            storeItemsForSaleImproved = new HashMap<>();
+            Store improvedStore = storesInZone.get(currentStore.getId());
+
+            for (SDMSell currentItem : currentStore.getSDMPrices().getSDMSell()) {
+                storeItemsForSaleImproved.put(currentItem.getItemId(), new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem));
+            }
+
+            improvedStore.setItemBeingSold(storeItemsForSaleImproved);
+        }
+    }
+
+    private Map<Integer, Store> createStoresInZoneMap(SuperDuperMarketDescriptor inputSDM) {
+        Map<Integer, SDMStore> SDMStoreMap = inputSDM.getSDMStores().getSDMStore().stream().collect(Collectors.toMap(SDMStore::getId, store -> store));
+        Map<Integer, Store> storesInZoneMap = new HashMap<>();
+
+        for (SDMStore store : SDMStoreMap.values()) {
+            storesInZoneMap.put(store.getId(), new Store(store));
+        }
+
+        return storesInZoneMap;
     }
 
     public String getZoneName() {

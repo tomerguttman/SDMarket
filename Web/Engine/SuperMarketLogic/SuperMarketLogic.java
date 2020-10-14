@@ -4,8 +4,7 @@ import SDMImprovedFacade.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import generatedClasses.*;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -15,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SuperMarketLogic {
-    private SuperDuperMarket SDMImproved;
+    private SuperDuperMarket SDMarket = new SuperDuperMarket();
     private final int X_TOP_RANGE = 50;
     private final int X_LOW_RANGE = 1;
     private final int Y_TOP_RANGE = 50;
@@ -34,8 +33,8 @@ public class SuperMarketLogic {
             if (filePath.length() >= 4 && filePath.substring(filePath.length() - 3).toLowerCase().equals("xml")) {
                 File file = new File(filePath);
                 if (file.exists()) {
-                    SDMImproved = loadXML(file, outputMessage);
-                    if (SDMImproved == null) {
+                    SDMarket = loadXML(file, outputMessage);
+                    if (SDMarket == null) {
                         successFlag = false;
                     }
                 } else {
@@ -65,7 +64,20 @@ public class SuperMarketLogic {
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             temp = (SuperDuperMarketDescriptor) jaxbUnmarshaller.unmarshal(file);
 
-            return validateSDMDataLoaded(temp, outputMessage) ? new SuperDuperMarket(temp) : SDMImproved;
+            return validateSDMDataLoaded(temp, outputMessage) ? new SuperDuperMarket() : SDMarket;
+        } catch (JAXBException e) {
+            throw new JAXBException(e.getMessage());
+        }
+    }
+
+    private Zone loadZoneXML(InputStream file, StringBuilder outputMessage, String ownerName) throws JAXBException {
+        try {
+            SuperDuperMarketDescriptor SDMDescriptor;
+            JAXBContext jaxbContext = JAXBContext.newInstance(SuperDuperMarketDescriptor.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            SDMDescriptor = (SuperDuperMarketDescriptor) jaxbUnmarshaller.unmarshal(file);
+
+            return validateZoneData(SDMDescriptor, outputMessage) ? new Zone(SDMDescriptor, ownerName) : null;
         } catch (JAXBException e) {
             throw new JAXBException(e.getMessage());
         }
@@ -80,6 +92,27 @@ public class SuperMarketLogic {
             throw new NullPointerException("<One of the members in the system was Null>");
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("<There was an error instantiating a data structure>");
+        }
+    }
+
+    private boolean validateZoneData(SuperDuperMarketDescriptor SDMtoValidate, StringBuilder outputMessage) {
+        try {
+            return isSDMItemsDataValid(SDMtoValidate, outputMessage) && isSDMStoresDataValid(SDMtoValidate, outputMessage) &&
+                    isSDMDiscountsDataValid(SDMtoValidate, outputMessage) && isSDMZoneNameUnique(SDMtoValidate, outputMessage);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("<One of the members in the Zone file was Null>");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("<There was an error instantiating a data structure>");
+        }
+    }
+
+    private boolean isSDMZoneNameUnique(SuperDuperMarketDescriptor sdMtoValidate, StringBuilder outputMessage) {
+        if(SDMarket.getSystemZones().containsKey(sdMtoValidate.getSDMZone().getName())){
+            outputMessage.append("The XML file uploaded contains a zone with a name that is not unique");
+            return false;
+        }
+        else{
+            return true;
         }
     }
 
@@ -288,11 +321,11 @@ public class SuperMarketLogic {
     }
 
     public Map<Integer, Store> getStores() {
-        return SDMImproved.getSystemStores();
+        return SDMarket.getSystemStores();
     }
 
     public Map<Integer, StoreItem> getItems() {
-        return SDMImproved.getSystemItems();
+        return SDMarket.getSystemItems();
     }
 
     public boolean checkUserLocationAgainstAllStoresLocations(int x, int y) {
@@ -301,7 +334,7 @@ public class SuperMarketLogic {
         userLocation.setX(x);
         userLocation.setY(y);
         //iterate over the values and stop when one of the stores location equals to the user order location - return false because one of them matches.
-        for (Store store : this.SDMImproved.getSystemStores().values()) {
+        for (Store store : this.SDMarket.getSystemStores().values()) {
             if (store.getStoreLocation().getY() == y && store.getStoreLocation().getX() == x) {
                 locationIsValidFlag.set(false);
                 break;
@@ -316,39 +349,36 @@ public class SuperMarketLogic {
             double currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
             storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
 
-            currentItemAmount = this.SDMImproved.getSystemItems().get(itemInOrder.getId()).getTotalItemsSold();
-            this.SDMImproved.getSystemItems().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
+            currentItemAmount = this.SDMarket.getSystemItems().get(itemInOrder.getId()).getTotalItemsSold();
+            this.SDMarket.getSystemItems().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
         });
     }
 
     public int getLastOrderID() {
-        return this.SDMImproved.getOrderID();
+        return this.SDMarket.getOrderID();
     }
 
     public void updatePriceOfAnItem(int storeOfChoiceId, int itemId, double newPrice) {
         this.getStores().get(storeOfChoiceId).getItemsBeingSold().get(itemId).setPricePerUnit(newPrice);
-        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+        this.SDMarket.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 
     public void updateAllStoresItemsAveragePricesAndAmountOfStoresSellingAnItem() {
-        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+        this.SDMarket.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 
     public void addItemToStore(StoreItem itemToAdd, Store storeOfChoice) {
-        SimpleStringProperty amountItemsStringProperty = this.getAmountItemsStringProperty();
-        this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().put(itemToAdd.getId(), itemToAdd);
+        this.SDMarket.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().put(itemToAdd.getId(), itemToAdd);
 
-        this.SDMImproved.getSystemItems().put(itemToAdd.getId(), itemToAdd);
-        this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).
+        this.SDMarket.getSystemItems().put(itemToAdd.getId(), itemToAdd);
+        this.SDMarket.getSystemStores().get(storeOfChoice.getId()).
                 getItemsBeingSold().get(itemToAdd.getId()).setPricePerUnit(itemToAdd.getPricePerUnit());
-        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
-
-        amountItemsStringProperty.set(Integer.toString(Integer.parseInt(amountItemsStringProperty.get()) + 1));
+        this.SDMarket.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 
     public void removeItemFromStore(StoreItem itemToRemove, Store storeOfChoice) {
-        this.SDMImproved.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().remove(itemToRemove.getId());
-        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+        this.SDMarket.getSystemStores().get(storeOfChoice.getId()).getItemsBeingSold().remove(itemToRemove.getId());
+        this.SDMarket.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 
     public boolean isValidStoreChoice(String userStoreIDInput) {
@@ -360,9 +390,8 @@ public class SuperMarketLogic {
         return (X_LOW_RANGE <= x && x <= X_TOP_RANGE) && (Y_LOW_RANGE <= y && y <= Y_TOP_RANGE);
     }
 
-    public void generateOrderForStore(Store storeToOrderFrom, String userDateInput, int lastOrderID, List<StoreItem> orderItems, Location userLocationInput) {
-        storeToOrderFrom.generateOrder(userDateInput, lastOrderID, orderItems, userLocationInput);
-        this.SDMImproved.updateTotalNumberOfOrders();
+    public void generateOrderForStore(String customerName, Store storeToOrderFrom, String userDateInput, int lastOrderID, List<StoreItem> orderItems, Location userLocationInput) {
+        storeToOrderFrom.generateOrder(customerName, userDateInput, lastOrderID, orderItems, userLocationInput);
     }
 
     public double calculateDistanceFromUser(Store storeToOrderFrom, Location userLocationInput) {
@@ -475,24 +504,23 @@ public class SuperMarketLogic {
     }
 
     public Map<Integer, Order> getDynamicOrders() {
-        return this.SDMImproved.getSystemDynamicOrders();
+        return this.SDMarket.getSystemDynamicOrders();
     }
 
-    public double updateStoreRevenue(List<StoreItem> listOfItems, Store storeOfChoice,
+    public double updateStoreRevenue(String customerName, List<StoreItem> listOfItems, Store storeOfChoice,
                                      Location userLocationInput, String userDateInput, int orderIDForAllOrdersIncluded) {
-        storeOfChoice.generateOrder(userDateInput, orderIDForAllOrdersIncluded, listOfItems, userLocationInput);
+        storeOfChoice.generateOrder(customerName, userDateInput, orderIDForAllOrdersIncluded, listOfItems, userLocationInput);
         return storeOfChoice.calculateDistance(userLocationInput) * storeOfChoice.getDeliveryPpk();
     }
 
-    public void generateDynamicOrderAndRecord(List<StoreItem> itemsToOrder, Double totalDeliveryCost, String userDateInput, Location userLocationInput, int amountOfStoresParticipating, int orderIDForAllOrdersIncluded) {
+    public void generateDynamicOrderAndRecord(String customerName, List<StoreItem> itemsToOrder, Double totalDeliveryCost, String userDateInput, Location userLocationInput, int amountOfStoresParticipating, int orderIDForAllOrdersIncluded) {
         Order dynamicOrder = new Order(userDateInput, userLocationInput, orderIDForAllOrdersIncluded,
-                totalDeliveryCost, amountOfStoresParticipating, itemsToOrder);
-        this.SDMImproved.addDynamicOrder(dynamicOrder);
-        this.SDMImproved.updateTotalNumberOfOrders();
+                totalDeliveryCost, customerName, amountOfStoresParticipating, itemsToOrder);
+        this.SDMarket.addDynamicOrder(dynamicOrder);
     }
 
     public String getStringOfAllDynamicSystemOrders() {
-        Map<Integer, Order> dynamicOrders = this.SDMImproved.getSystemDynamicOrders();
+        Map<Integer, Order> dynamicOrders = this.SDMarket.getSystemDynamicOrders();
         StringBuilder dynamicOrderHistory = new StringBuilder();
 
         if (!dynamicOrders.isEmpty()) {
@@ -556,7 +584,7 @@ public class SuperMarketLogic {
     }
 
     private void resetSystemItemAmountSoldStats() {
-        this.SDMImproved.getSystemItems().values().forEach(systemItem -> systemItem.setTotalItemsSold(0));
+        this.SDMarket.getSystemItems().values().forEach(systemItem -> systemItem.setTotalItemsSold(0));
     }
 
     private void addStaticOrdersToStoresAndUpdateSystemInfo(Map<Integer, Store> systemStores, List<Order> staticOrders) {
@@ -608,7 +636,7 @@ public class SuperMarketLogic {
         AtomicInteger maxOrderID = new AtomicInteger();
         maxOrderID.set(-1);
 
-        for (Store store : this.SDMImproved.getSystemStores().values()) {
+        for (Store store : this.SDMarket.getSystemStores().values()) {
             store.getStoreOrdersHistory().forEach(order -> {
                 if (order.getOrderId() > maxOrderID.get()) {
                     maxOrderID.set(order.getOrderId());
@@ -616,23 +644,7 @@ public class SuperMarketLogic {
             });
         }
 
-        this.SDMImproved.setOrderID(maxOrderID.get() + 1);
-    }
-
-    public SimpleStringProperty getAmountItemsStringProperty() {
-        return this.SDMImproved.getAmountItemsProperty();
-    }
-
-    public ObservableValue<? extends String> getAmountOrdersStringProperty() {
-        return this.SDMImproved.getAmountOrdersProperty();
-    }
-
-    public SimpleStringProperty getAmountStoresStringProperty() {
-        return SDMImproved.getAmountStoresProperty();
-    }
-
-    public ObservableValue<? extends String> getAmountCustomers() {
-        return SDMImproved.getAmountCustomersProperty();
+        this.SDMarket.setOrderID(maxOrderID.get() + 1);
     }
 
     public Double getCheapestPriceForItem(int itemId) {
@@ -668,25 +680,32 @@ public class SuperMarketLogic {
     }
 
     public void addStaticOrderToCustomer(int currentStaticStoreId, int lastOrderId, Customer customer) {
-        Order lastOrder = this.SDMImproved.getSystemStores().get(currentStaticStoreId).getLastOrder();
+        Order lastOrder = this.SDMarket.getSystemStores().get(currentStaticStoreId).getLastOrder();
         if(lastOrderId == lastOrder.getOrderId()) {
             customer.addOrder(lastOrder);
         }
     }
 
     public void addDynamicOrderToCustomer(int lastOrderId, Customer customer) {
-        customer.addOrder(this.SDMImproved.getSystemDynamicOrders().get(lastOrderId));
+        customer.addOrder(this.SDMarket.getSystemDynamicOrders().get(lastOrderId));
     }
 
     public void addStoreToSystem(Store newlyAddedStore) {
-        SimpleStringProperty amountStoreStringProperty = this.getAmountStoresStringProperty();
-        this.SDMImproved.getSystemStores().put(newlyAddedStore.getId(), newlyAddedStore);
-        this.SDMImproved.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
-
-        amountStoreStringProperty.set(Integer.toString(Integer.parseInt(amountStoreStringProperty.get()) + 1));
+        this.SDMarket.getSystemStores().put(newlyAddedStore.getId(), newlyAddedStore);
+        this.SDMarket.initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 
     public Map<String, Zone> getSystemZones() {
-        return this.SDMImproved != null ? this.SDMImproved.getSystemZones() : null;
+        return this.SDMarket != null ? this.SDMarket.getSystemZones() : null;
+    }
+
+    public Zone validateZoneXML(InputStream inputStream, String ownerName, StringBuilder sBuilder) throws JAXBException {
+        Zone zoneToAdd = loadZoneXML(inputStream, sBuilder, ownerName);
+
+        if(zoneToAdd != null){
+            SDMarket.addNewZoneToSystem(zoneToAdd);
+        }
+
+        return zoneToAdd;
     }
 }

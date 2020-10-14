@@ -77,26 +77,4 @@ public class User {
 
         return (userOrdersMap.size() != 0) ? (sumOrders / userOrdersMap.size()) : 0;
     }
-
-    public int getMostLovedItem() {
-        Map<Integer,Double> itemsBucketMap = new HashMap<>();
-        for (Order order : this.userOrdersMap.values()) {
-            for (StoreItem sItem : order.getItemsInOrder()) {
-                if(itemsBucketMap.containsKey(sItem.getId())) {
-                    itemsBucketMap.put(sItem.getId(), itemsBucketMap.get(sItem.getId()) + sItem.getTotalItemsSold());
-                }
-                else { itemsBucketMap.put(sItem.getId(), sItem.getTotalItemsSold()); }
-            }
-        }
-        int lovedItemId = -1;
-        double maxAmount = -1;
-        for (Integer itemId : itemsBucketMap.keySet()) {
-            if(maxAmount < itemsBucketMap.get(itemId)) {
-                maxAmount = itemsBucketMap.get(itemId);
-                lovedItemId = itemId;
-            }
-        }
-
-        return lovedItemId;
-    }
 }

@@ -1,36 +1,59 @@
 package SDMImprovedFacade;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ShopOwner extends User {
 
     HashMap<String, Zone> zonesOwned;
-    HashMap<Integer, Store> storesOwned;
-    List<Feedback> feedbackList;
+    HashMap<String, Store> storesOwned; //String -> store name
+    Map<String, List<Feedback>> feedbackMapPerZone;
 
     public ShopOwner(int userID, String username, String userType) {
         super(username, userType, userID);
         zonesOwned = new HashMap<>();
         storesOwned = new HashMap<>();
-        feedbackList = new ArrayList<>();
+        feedbackMapPerZone = new HashMap<>();
     }
 
     public HashMap<String, Zone> getZoneOwned() {
         return zonesOwned;
     }
 
-    public HashMap<Integer, Store> getStoresOwned() {
+    public HashMap<String, Store> getStoresOwned() {
         return storesOwned;
     }
 
     public double getAverageRating() {
-        double sumRating = 0;
-        for (Feedback feedback : feedbackList) {
-            sumRating += feedback.getRating();
+        double sumRating = 0, amountOfFeedbacks = 0;
+
+        for (List<Feedback> feedbackOfZone : feedbackMapPerZone.values()) {
+            for(Feedback feedback : feedbackOfZone){
+                sumRating += feedback.getRating();
+                amountOfFeedbacks += 1;
+            }
         }
 
-        return (feedbackList.size() != 0) ? (sumRating / feedbackList.size()) : 0 ;
+        //sumRating must be at least 1 !
+        return (amountOfFeedbacks != 0) ? (sumRating / amountOfFeedbacks) : 0 ;
+    }
+
+    public void addZoneToShopOwner(Zone zoneToAdd) {
+        this.zonesOwned.put(zoneToAdd.getZoneName().replaceAll("\\s+",""), zoneToAdd);
+        zoneToAdd.getStoresInZone().forEach((storeId, store) ->{
+            this.storesOwned.put(store.getName(), store);
+        });
+    }
+
+    public List<Feedback> getZoneFeedbacks(String currentZoneName) {
+        return feedbackMapPerZone.getOrDefault(currentZoneName, null);
+    }
+
+    public List<Store> getZoneStores(String currentZoneName) {
+        return zonesOwned.containsKey(currentZoneName) ? new ArrayList<>(zonesOwned.get(currentZoneName).getStoresInZone().values()) : null;
+    }
+
+    public List<StoreItem> getZoneItems(String currentZoneName) {
+        return zonesOwned.containsKey(currentZoneName) ? new ArrayList<>(zonesOwned.get(currentZoneName).getItemsAvailableInZone().values()) : null;
     }
 }

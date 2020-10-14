@@ -2,6 +2,7 @@ package manager;
 
 import SDMImprovedFacade.*;
 import SuperMarketLogic.SuperMarketLogic;
+import com.google.gson.Gson;
 
 
 import java.util.*;
@@ -51,5 +52,26 @@ public class SDMarketManager {
 
     public Map<Integer, StoreItem> getSystemItems() {
         return this.SDMLogic.getItems();
+    }
+
+    public List<Zone> getSystemZonesAsList() {
+        List<Zone> listOfZones = new ArrayList<>();
+        for (Zone zone : SDMLogic.getSystemZones().values()) {
+            listOfZones.add(zone);
+        }
+
+        return listOfZones;
+    }
+
+    public String getOrderHistoryJsonForCustomer(String username) {
+        Customer currentCustomer = (Customer)systemUsersMap.get(username);
+        List<Order> customerOrderHistory =  currentCustomer.getCustomerOrders();
+        return new Gson().toJson(customerOrderHistory);
+    }
+
+    public String getOrderHistoryJsonForShopOwner(String username, String storeName) {
+        ShopOwner currentShopOwner = (ShopOwner)systemUsersMap.get(username);
+        List<Order> pickedStoreOrdersList =  currentShopOwner.getStoresOwned().get(storeName).getStoreOrdersHistory();
+        return new Gson().toJson(pickedStoreOrdersList);
     }
 }

@@ -1,9 +1,37 @@
-var RECHARGE_BALANCE_URL = buildUrlWithContextPath("recharge-balance");
-var REFRESH_DASHBOARD_URL = buildUrlWithContextPath("load-dashboard");
+var UPLOAD_XML_URL = buildUrlWithContextPath("uploadXML");
+var REFRESH_DASHBOARD_URL = buildUrlWithContextPath("load-dashboard")
+
 
 $(document).ready(function(){
     setInterval(refreshDashboardInformation, 2000);
 })
+
+$("#uploadXMLButton").click(() => {
+    if(document.getElementById("chooseXMLButton").textContent !== "Choose XML File"){
+        var inputFile = new FormData();
+        inputFile.append('file', $('#inputFile')[0].files[0]);
+        $.ajax({
+            url : UPLOAD_XML_URL,
+            data : inputFile,
+            processData: false,
+            contentType: false,
+            type: "POST",
+            success: function(data) {
+                alert(data.message);
+                $("#inputFile")[0].value = "";
+                document.getElementById("chooseXMLButton").textContent = "Choose XML File";
+            },
+            error: function (data) {
+                alert(data.message);
+                $("#inputFile")[0].value = "";
+                document.getElementById("chooseXMLButton").textContent = "Choose XML File";
+            }
+        });
+    }
+    else{
+        alert("Please choose a file first");
+    }
+});
 
 function addTransactionToTransactionsOverview(transactionType, datePicked, amountToRecharge, balanceBefore, balanceAfter) {
     var newTransactionRow = $("<tr>\n" +
@@ -19,7 +47,7 @@ function addTransactionToTransactionsOverview(transactionType, datePicked, amoun
 function refreshDashboardInformation() {
     $.ajax({
         type: 'GET',
-        contentType: "application/json",
+        contentType: "application/json charset=utf-8",
         url: REFRESH_DASHBOARD_URL,
         success:function(data){
             //'data' is the value returned.
@@ -61,15 +89,15 @@ function updateDashboardActiveUsersTable(otherUsers) {
 }
 
 function loadNewDataToDashboard(data) {
-    updateDashboardLabels(data.totalEarnings, data.storesOwned, data.ordersMadeFromOwnedStores, data.averageRating);
+    updateDashboardLabels(data.totalEarnings, data.amountOfStoresOwned, data.ordersMadeFromOwnedStores, data.averageRating);
     updateDashboardZonesTable(data.systemZones);
     updateDashboardTransactionsTable(data.userTransactions);
     updateDashboardActiveUsersTable(data.otherUsers);
 }
 
 function createZoneButton(zoneName) {
-    const customHref = "/pages/order?zone=" + zoneName;
-    return '<button class="btn btn-primary btn-sm" type="submit" name="zoneName" value=' + zoneName + '>' +
+    const noSpaceZoneName = zoneName.replace(/ /g,"");
+    return '<button class="btn btn-primary btn-sm" type="submit" name="zoneName" value=' + noSpaceZoneName + '>' +
         "Go To Zone" +
         "</button>";
 }
@@ -96,4 +124,6 @@ function createActiveUserTableRow(user) {
         "<td>" + user.userType + "</td>\n" +
         "</tr>\n");
 }
+
+
 

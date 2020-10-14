@@ -15,30 +15,14 @@ public class SuperDuperMarket {
     private final Map<Integer, StoreItem> systemItems;
     private Map<Integer, Order> systemDynamicOrders;
     private Map<String, Zone> systemZones;
-
-    //Properties
-    private SimpleStringProperty amountCustomersProperty;
-    private SimpleStringProperty amountOrdersProperty;
-    private SimpleStringProperty amountItemsProperty;
-    private SimpleStringProperty amountStoresProperty;
-
     private int orderID = 1;
     private int userID = 1;
 
-    public SuperDuperMarket(SuperDuperMarketDescriptor inputSDM){
-        systemStores = inputSDM.getSDMStores().getSDMStore().stream().collect(Collectors.toMap(SDMStore::getId, Store::new));
-        systemItems = inputSDM.getSDMItems().getSDMItem().stream().collect(Collectors.toMap(SDMItem::getId, StoreItem::new));
-        //systemCustomers = inputSDM.getSDMCustomers().getSDMCustomer().stream().collect(Collectors.toMap(SDMCustomer::getId, Customer::new));
+    public SuperDuperMarket() {
+        systemStores = new HashMap<>();
+        systemItems = new HashMap<>();
         systemDynamicOrders = new HashMap<>();
-        initializeStoresItems(inputSDM);
-        updateStoreDiscountsOffersItemName(systemStores);
-        updateStoreDiscountsItemToBuyName(systemStores);
-        initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
-
-        amountStoresProperty = new SimpleStringProperty(Integer.toString(this.getSystemStores().values().size()));
-        amountItemsProperty = new SimpleStringProperty(Integer.toString(this.getSystemItems().values().size()));
-        amountOrdersProperty = new SimpleStringProperty(Integer.toString(orderID - 1));
-       // amountCustomersProperty = new SimpleStringProperty(Integer.toString(this.getSystemCustomers().values().size()));
+        systemZones = new HashMap<>();
     }
 
     private void updateStoreDiscountsOffersItemName(Map<Integer, Store> systemStores) {
@@ -64,23 +48,24 @@ public class SuperDuperMarket {
     }
 
     public void initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem() {
-        Collection<Store> storesInSystem = systemStores.values();
         double sum;
         int amountOfStoresSellingAnItem;
 
-        for (StoreItem systemItem : systemItems.values() ) {
+        for (StoreItem systemItem : systemItems.values()) {
             amountOfStoresSellingAnItem = 0;
             sum = 0;
 
-            for (Store store: systemStores.values()) {
-                if(store.getItemsBeingSold().containsKey(systemItem.getId())) {
+            for (Store store : systemStores.values()) {
+                if (store.getItemsBeingSold().containsKey(systemItem.getId())) {
                     amountOfStoresSellingAnItem += 1;
                     sum += store.getItemsBeingSold().get(systemItem.getId()).getPricePerUnit();
                 }
-
             }
 
-            systemItem.setAveragePriceOfTheItem(sum / (double)amountOfStoresSellingAnItem);
+            if(amountOfStoresSellingAnItem != 0 ) {
+                systemItem.setAveragePriceOfTheItem(sum / (double) amountOfStoresSellingAnItem);
+            }
+
             systemItem.setAmountOfStoresSellingThisItem(amountOfStoresSellingAnItem);
         }
     }
@@ -94,7 +79,7 @@ public class SuperDuperMarket {
             Store improvedStore = systemStores.get(currentStore.getId());
 
             for (SDMSell currentItem : currentStore.getSDMPrices().getSDMSell()) {
-                storeItemsForSaleImproved.put(currentItem.getItemId(),new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem));
+                storeItemsForSaleImproved.put(currentItem.getItemId(), new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem));
             }
 
             improvedStore.setItemBeingSold(storeItemsForSaleImproved);
@@ -117,7 +102,9 @@ public class SuperDuperMarket {
         return orderID++;
     }
 
-    public int getUserID() { return userID++; }
+    public int getUserID() {
+        return userID++;
+    }
 
     public void setUserID(int userID) {
         this.userID = userID;
@@ -128,38 +115,22 @@ public class SuperDuperMarket {
     }
 
     public void addDynamicOrder(Order dynamicOrder) {
-        if (this.systemDynamicOrders == null){
+        if (this.systemDynamicOrders == null) {
             this.systemDynamicOrders = new HashMap<>();
         }
 
         this.systemDynamicOrders.put(dynamicOrder.getOrderId(), dynamicOrder);
     }
 
-    //public Map<Integer, Customer> getSystemCustomers() {
-       // return systemCustomers;
-    //}
-
-    public SimpleStringProperty getAmountStoresProperty() {
-        return amountStoresProperty;
-    }
-
-    public SimpleStringProperty getAmountCustomersProperty() {
-        return amountCustomersProperty;
-    }
-
-    public SimpleStringProperty getAmountOrdersProperty() {
-        return amountOrdersProperty;
-    }
-
-    public SimpleStringProperty getAmountItemsProperty() {
-        return amountItemsProperty;
-    }
-
     public Map<String, Zone> getSystemZones() {
         return systemZones;
     }
 
-    public void updateTotalNumberOfOrders() {
-        amountOrdersProperty.set(Integer.toString(Integer.parseInt(amountOrdersProperty.get()) + 1));
+    public void addNewZoneToSystem(Zone zoneToAdd) {
+        this.systemZones.put(zoneToAdd.getZoneName().replaceAll("\\s+",""), zoneToAdd);
+        this.systemItems.putAll(zoneToAdd.getItemsAvailableInZone());
+        this.systemStores.putAll(zoneToAdd.getStoresInZone());
+        initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
     }
 }
+

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.css">
+    <script src="assets/js/context-path-helper.js"></script>
 </head>
 
 <body id="page-top">
@@ -144,7 +145,7 @@
             <div class="container" style="margin: 0px;">
                 <div class="row" style="width: 485px;">
                     <div class="col col-12 col-sm-5 col-md-6 col-lg-6" style="padding: 0px;padding-left: 0px;">
-                        <div style="padding-left: 12px;"><a class="btn btn-info btn-lg" role="button" data-toggle="modal" href="#createStoreModal" style="padding-top: 6px;margin-top: 6px;">Create Store</a>
+                        <div style="padding-left: 12px;"><a id="openCreateStoreModalButton" class="btn btn-info btn-lg" role="button" data-toggle="modal" href="#createStoreModal" style="padding-top: 6px;margin-top: 6px;">Create Store</a>
                             <div class="modal fade" role="dialog" tabindex="-1" id="createStoreModal">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
@@ -152,53 +153,50 @@
                                             <h4>Create Store</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
                                         <div class="modal-body">
                                             <div>
-                                                <form id="createStoreForm" style="margin-top: 0px;">
-                                                    <div class="form-row" style="margin-top: 6px;">
-                                                        <div class="col"><label class="col-form-label">Zone</label></div>
-                                                        <div class="col"><select class="form-control" style="width: 308px;" name="createStoreZoneSelected"><option value="Yaffo" selected="">Yaffo</option></select></div>
-                                                    </div>
-                                                    <div class="form-row" style="margin-top: 6px;">
-                                                        <div class="col"><label class="col-form-label">Store Name</label></div>
-                                                        <div class="col"><input class="form-control" type="text" style="width: 308px;" name="storeName"></div>
-                                                    </div>
-                                                    <div class="form-row" style="margin-top: 6px;">
-                                                        <div class="col"><label class="col-form-label">Price Per Kilometer</label></div>
-                                                        <div class="col"><input class="form-control" type="number" min="0" required="" style="width: 308px;" name="ppk"></div>
-                                                    </div>
-                                                    <div class="form-row" style="margin-top: 6px;">
-                                                        <div class="col"><label class="col-form-label">Location</label></div>
-                                                        <div class="col"><input class="form-control" type="number" min="1" max="50" placeholder="X Coordinate" required="" name="x"></div>
-                                                        <div class="col"><input class="form-control" type="number" min="1" max="50" placeholder="Y Coordinate" required="" name="y"></div>
-                                                    </div>
-                                                    <div class="form-row" style="margin-top: 6px;">
-                                                        <div class="col">
-                                                            <div class="table-responsive">
-                                                                <table class="table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>ID</th>
-                                                                            <th>Name</th>
-                                                                            <th>Price</th>
-                                                                            <th>Include</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td><input class="form-control" type="number" required="" style="width: 104px;" min="1"></td>
-                                                                            <td><input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="Yes" data-off="No"></td>
-                                                                        </tr>
-                                                                        <tr></tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Store Name</label></div>
+                                                    <div class="col"><input class="form-control" type="text" style="width: 308px;" name="storeName"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Price Per Kilometer</label></div>
+                                                    <div class="col"><input class="form-control" type="number" min="0" required="" style="width: 308px;" name="ppk"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Location</label></div>
+                                                    <div class="col"><input class="form-control" type="number" min="1" max="50" placeholder="X Coordinate" required="" name="x"></div>
+                                                    <div class="col"><input class="form-control" type="number" min="1" max="50" placeholder="Y Coordinate" required="" name="y"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>ID</th>
+                                                                    <th>Name</th>
+                                                                    <th>Price</th>
+                                                                    <th>Include</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <tr>
+                                                                    <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td><input class="form-control" type="number" required="" style="width: 104px;" min="1"></td>
+                                                                    <td>
+                                                                        <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="Yes" data-off="No">
+                                                                    </td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
                                                         </div>
                                                     </div>
-                                                </form>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="modal-footer"><button class="btn btn-danger" data-dismiss="modal" type="button">Cancel</button><button class="btn btn-primary" type="button" form="createStoreForm">Create</button></div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-danger" data-dismiss="modal" type="button">Cancel</button>
+                                            <button id="createStoreButton" class="btn btn-primary" type="button" >Create</button></div>
                                     </div>
                                 </div>
                             </div>
@@ -220,13 +218,15 @@
                             <div>
                                 <div class="form-row">
                                     <div class="col-auto col-2 col-sm-2 col-md-2 col-lg-2"><label class="col-form-label">Store Picker</label></div>
-                                    <div class="col-2 col-sm-3"><select class="form-control" id="ordersHistoryStoreSelectBox"><option value="Hakol Be Shekel">Hakol Be Shekel</option></select></div>
+                                    <div class="col-2 col-sm-3">
+                                        <select class="form-control" id="ordersHistoryStoreSelectBox"></select>
+                                    </div>
                                     <div class="col col-sm-3"><button class="btn btn-secondary" id="ordersHistoryPickStoreButton" type="button">Pick Store</button></div>
                                 </div>
                                 <div class="form-row">
                                     <div class="col">
                                         <div class="table-responsive">
-                                            <table class="table">
+                                            <table id="ordersHistoryTable" class="table">
                                                 <thead>
                                                     <tr>
                                                         <th>Order ID</th>
@@ -249,46 +249,8 @@
                                                         <td>-</td>
                                                         <td>-</td>
                                                         <td>
-                                                            <div><a class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal" href="#myModal">Order Details</a>
-                                                                <div class="modal fade" role="dialog" tabindex="-1" id="myModal">
-                                                                    <div class="modal-dialog modal-lg" role="document">
-                                                                        <div class="modal-content">
-                                                                            <div class="modal-header">
-                                                                                <h4>Order Details</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
-                                                                            <div class="modal-body">
-                                                                                <div>
-                                                                                    <div class="table-responsive">
-                                                                                        <table class="table">
-                                                                                            <thead>
-                                                                                                <tr>
-                                                                                                    <th>ID</th>
-                                                                                                    <th>Name</th>
-                                                                                                    <th>Category</th>
-                                                                                                    <th>Amount</th>
-                                                                                                    <th>Price Per Unit</th>
-                                                                                                    <th>Total Price</th>
-                                                                                                    <th>Part Of Discount</th>
-                                                                                                </tr>
-                                                                                            </thead>
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <td>-</td>
-                                                                                                    <td>-</td>
-                                                                                                    <td>-</td>
-                                                                                                    <td>-</td>
-                                                                                                    <td>-</td>
-                                                                                                    <td>-</td>
-                                                                                                    <td>-</td>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="modal-footer"><button class="btn btn-light" data-dismiss="modal" type="button">Close</button></div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+                                                            <div>
+                                                                <a class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal" href="#orderDetailsModal">Order Details</a>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -309,8 +271,8 @@
                         <p class="text-primary m-0 font-weight-bold">Feedback</p>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table mt-2" id="dataTable-2" role="grid" aria-describedby="dataTable_info">
-                            <table class="table my-0" id="dataTable">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                            <table class="table my-0" id="feedbackTable">
                                 <thead>
                                     <tr>
                                         <th>Customer Name</th>
@@ -344,7 +306,50 @@
                     </div>
                 </div>
             </div>
-        </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="orderDetailsModal">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4>Order Details</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <div class="table-responsive">
+                                        <table id="orderDetailsModalTable" class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Category</th>
+                                                <th>Amount</th>
+                                                <th>Price Per Unit</th>
+                                                <th>Total Price</th>
+                                                <th>Part Of Discount</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" data-dismiss="modal" type="button">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         <footer class="bg-white sticky-footer">
             <div class="container my-auto">
                 <div class="text-center my-auto copyright"><span>Copyright: Tomer Guttman &amp; Ohad Slutzky © SDMarket 2020</span></div>
@@ -357,6 +362,7 @@
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/script.min.js"></script>
+    <script src="./assets/js/table-owner.js"></script>
 </body>
 
 </html>

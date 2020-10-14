@@ -39,5 +39,40 @@
         <url-pattern>/pages/order</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>UploadZoneXMLServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.UploadZoneXMLServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UploadZoneXMLServlet</servlet-name>
+        <url-pattern>/pages/uploadXML</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OrderHistoryForStoreServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.OrderHistoryForStoreServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OrderHistoryForStoreServlet</servlet-name>
+        <url-pattern>/pages/getSelectedStoreOrdersHistory</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadOwnerTableServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadOwnerTableServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadOwnerTableServlet</servlet-name>
+        <url-pattern>/pages/getTableOwnerInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CreateStoreServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.CreateStoreServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateStoreServlet</servlet-name>
+        <url-pattern>/pages/createStore</url-pattern>
+    </servlet-mapping>
 
 </web-app>

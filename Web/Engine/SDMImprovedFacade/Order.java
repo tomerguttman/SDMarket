@@ -13,20 +13,21 @@ public class Order {
     double deliveryCost;
     double costOfItemsInOrder;
     double totalOrderCost;
+    final String customerName;
     final String dateOrderWasMade;
     final String storeName;
     final Location orderDestination;
-
     private int amountOfStoresRelatedToOrder;
     private int amountItemsInOrder ;
     final List<StoreItem> itemsInOrder;
 
     public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost,
-                 String storeName, List<StoreItem> itemsInOrder, Location userLocation) {
+                 String customerName, String storeName, List<StoreItem> itemsInOrder, Location userLocation) {
         this.dateOrderWasMade = dateOrderWasMade;
         this.orderId = orderId;
         this.storeId = storeId;
         this.deliveryCost = deliveryCost;
+        this.customerName = customerName;
         this.storeName = storeName;
         this.itemsInOrder = itemsInOrder;
         this.costOfItemsInOrder = calculateTotalCostOfItemsInOrder();
@@ -37,9 +38,10 @@ public class Order {
     }
 
     public Order(String dateOrderWasMade, Location userLocation, int orderId,
-                 Double deliveryCost, int amountOfStoresParticipating, List<StoreItem> itemsInOrder) {
+                 Double deliveryCost, String customerName, int amountOfStoresParticipating, List<StoreItem> itemsInOrder) {
         this.dateOrderWasMade = dateOrderWasMade;
         this.orderId = orderId;
+        this.customerName = customerName;
         this.storeId = -1;
         this.deliveryCost = deliveryCost;
         this.storeName = String.format("Dynamic Order %d",orderId);
@@ -52,6 +54,7 @@ public class Order {
     }
 
     public Order() {
+        this.customerName = null;
         this.dateOrderWasMade = "";
         this.orderId = -1;
         this.storeId = -1;

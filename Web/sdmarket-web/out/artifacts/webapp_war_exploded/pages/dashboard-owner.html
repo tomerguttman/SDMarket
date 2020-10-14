@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
@@ -17,7 +16,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.css">
     <script src="assets/js/context-path-helper.js"></script>
 </head>
-
 <body id="page-top">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: #1cc88a;">
@@ -147,8 +145,13 @@
                     <h3 class="text-dark mb-0">Dashboard</h3>
                     <div>
                         <div class="row">
-                            <div class="col-auto"><button class="btn btn-link" type="button" style="border: 1px solid #0075ff ;">Choose XML File</button><input type="file" class="file-input"></div>
-                            <div class="col-auto"><button class="btn btn-primary">Upload</button></div>
+                            <div class="col-auto">
+                                <button id="chooseXMLButton" class="btn btn-link" type="button" style="border: 1px solid #0075ff ;">Choose XML File</button>
+                                <input id="inputFile" name="inputFile" type="file" class="file-input">
+                            </div>
+                            <div class="col-auto">
+                                <button id="uploadXMLButton" type="button" class="btn btn-primary">Upload</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -310,7 +313,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/script.min.js"></script>
     <script src="assets/js/dashboard-owner.js"></script>
-
 </body>
-
 </html>
