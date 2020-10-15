@@ -9,4 +9,6 @@ public class Constants {
     public static final String AMOUNT_TO_RECHARGE = "amountToRecharge";
     public static final String DATE_RECHARGE = "dateOfRecharge";
     public static final String CURRENT_ZONE = "currentZone" ;
+    public static final String LOGIN_URL = "login.html";
+
 }

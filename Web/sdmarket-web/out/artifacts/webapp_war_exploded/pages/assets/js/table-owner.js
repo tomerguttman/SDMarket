@@ -6,6 +6,7 @@ var currentZoneStores;
 var currentZoneItems;
 
 $(document).ready(function(){
+    refreshTableOwnerInformation();
     setInterval(refreshTableOwnerInformation, 1000);
 })
 
@@ -58,7 +59,7 @@ function updateRelevantFeedbacksInTable(feedbacks) {
     }
 }
 
-function refreshTableOwnerInformation(data) {
+function refreshTableOwnerInformation() {
     $.ajax({
         url : REFRESH_TABLE_OWNER_URL,
         type: "GET",
@@ -84,7 +85,7 @@ function updateOrdersHistoryTableForStore(ordersHistory) {
 }
 
 function createOrderButton(orderId) {
-    const onclickMethod = "activateOrderModal(" + orderId + ");";
+    const onclickMethod = "activateOrderDetailsModal(" + orderId + ");";
     return '<a id="orderBtn' + orderId + ' ' +
         'class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal"' +
         'onclick=' + onclickMethod + ">" +
@@ -184,7 +185,7 @@ function isStoreItemsValid(storeItemsDetails, storeItemsList) {
     for (var itemRow of storeItemsDetails) {
         if($(itemRow).find("[type='checkbox']").prop('checked')) {
             if($(itemRow).find("[type='number']").val() !== "") {
-                storeItemsList.add({
+                storeItemsList.push({
                     "id" : parseInt($(itemRow).children()[0].textContent),
                     "price" : parseInt($(itemRow).find("[type='number']").val())
                 });
@@ -232,13 +233,13 @@ function resetCreateStoreModal() {
 }
 
 $("#createStoreButton").click(() => {
-    var storeItemsList;
+    var storeItemsList = [];
     const storeName = $("#createStoreModal [name='storeName']").val();
     const ppk = $("#createStoreModal [name='ppk']").val();
     const xCoordinate = $("#createStoreModal [name='x']").val();
     const yCoordinate = $("#createStoreModal [name='y']").val();
     const storeItemsDetails = $("#createStoreModal .itemRow");
-    resetCreateStoreModal();
+
     $('#createStoreModal').modal("hide");
     if (validateInput(storeName, ppk, xCoordinate, yCoordinate, storeItemsDetails, storeItemsList) ) {
         $.ajax({
@@ -248,7 +249,7 @@ $("#createStoreButton").click(() => {
                 "ppk" : ppk,
                 "xCoordinate" : xCoordinate,
                 "yCoordinate" : yCoordinate,
-                "storeItems" : storeItemsList
+                "storeItems" : JSON.stringify(storeItemsList)
             },
             type: "POST",
             success: function(data) {
@@ -259,6 +260,8 @@ $("#createStoreButton").click(() => {
             }
         });
     }
+
+    resetCreateStoreModal();
 });
 
 function createPriceInputElement() {
@@ -280,6 +283,8 @@ function createRowForCreateStoreItemsTable(item) {
 
 $("#openCreateStoreModalButton").click(() => {
     $('#createStoreModal tbody').empty();
+    resetCreateStoreModal();
+
     for(var item of currentZoneItems) {
         $('#createStoreModal tbody').append(createRowForCreateStoreItemsTable(item));
     }

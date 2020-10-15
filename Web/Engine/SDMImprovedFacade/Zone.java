@@ -17,6 +17,7 @@ public class Zone {
     private int amountOfStoresInZone;
     private int amountOfOrdersInZone;
     private double averageOrdersCostWithoutDelivery;
+    private double totalRevenue;
 
     private final HashMap<Integer, Store> storesInZone = new HashMap<>();
     private final HashMap<Integer, Order> ordersMadeInZone = new HashMap<>();
@@ -25,12 +26,13 @@ public class Zone {
     public Zone(String zoneName, String ownerName) {
         this.zoneName = zoneName;
         this.ownerName = ownerName;
+        this.totalRevenue = 0;
     }
 
     public Zone(SuperDuperMarketDescriptor inputSDM, String ownerName) {
         this.zoneName = inputSDM.getSDMZone().getName();
         this.ownerName = ownerName;
-        this.storesInZone.putAll(createStoresInZoneMap(inputSDM));
+        this.storesInZone.putAll(createStoresInZoneMap(inputSDM, ownerName));
         updateItemsBeingSoldForEachStore(inputSDM);
         this.itemsAvailableInZone.putAll(createItemsInZoneMap(inputSDM));
         initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
@@ -38,6 +40,7 @@ public class Zone {
         this.amountOfItemTypesInZone = itemsAvailableInZone.size();
         this.amountOfOrdersInZone = 0;
         this.averageOrdersCostWithoutDelivery = 0;
+        this.totalRevenue = 0;
     }
 
     private Map<Integer, StoreItem> createItemsInZoneMap(SuperDuperMarketDescriptor inputSDM) {
@@ -92,12 +95,12 @@ public class Zone {
         }
     }
 
-    private Map<Integer, Store> createStoresInZoneMap(SuperDuperMarketDescriptor inputSDM) {
+    private Map<Integer, Store> createStoresInZoneMap(SuperDuperMarketDescriptor inputSDM, String ownerName) {
         Map<Integer, SDMStore> SDMStoreMap = inputSDM.getSDMStores().getSDMStore().stream().collect(Collectors.toMap(SDMStore::getId, store -> store));
         Map<Integer, Store> storesInZoneMap = new HashMap<>();
 
         for (SDMStore store : SDMStoreMap.values()) {
-            storesInZoneMap.put(store.getId(), new Store(store));
+            storesInZoneMap.put(store.getId(), new Store(store, ownerName));
         }
 
         return storesInZoneMap;
@@ -151,6 +154,14 @@ public class Zone {
         this.averageOrdersCostWithoutDelivery = averageOrdersCostWithoutDelivery;
     }
 
+    public double getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(double totalRevenue) {
+        this.totalRevenue = totalRevenue;
+    }
+
     public HashMap<Integer, StoreItem> getItemsAvailableInZone() {
         return itemsAvailableInZone;
     }
@@ -161,5 +172,10 @@ public class Zone {
 
     public HashMap<Integer, Order> getOrdersMadeInZone() {
         return ordersMadeInZone;
+    }
+
+    public void addStoreToZone(Store storeToAdd) {
+        this.storesInZone.put(storeToAdd.getId(), storeToAdd);
+        this.amountOfStoresInZone += 1;
     }
 }

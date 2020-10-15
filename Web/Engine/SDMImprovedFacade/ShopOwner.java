@@ -56,4 +56,17 @@ public class ShopOwner extends User {
     public List<StoreItem> getZoneItems(String currentZoneName) {
         return zonesOwned.containsKey(currentZoneName) ? new ArrayList<>(zonesOwned.get(currentZoneName).getItemsAvailableInZone().values()) : null;
     }
+
+    public void addStoreToUser(String currentZoneName, Store newStoreToAdd) {
+        this.zonesOwned.get(currentZoneName).getStoresInZone().put(newStoreToAdd.getId(), newStoreToAdd); // the amount of stores in the zone was already updated ! the shopOwner and the system have the same reference to the zones
+        this.zonesOwned.get(currentZoneName).initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+        this.storesOwned.put(newStoreToAdd.getName(), newStoreToAdd);
+        /*
+        Alerts?
+        Alerts?
+        Alerts?
+        Alerts?
+        Alerts?
+         */
+    }
 }

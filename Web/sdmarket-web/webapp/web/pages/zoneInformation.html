@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Dashboard - Brand</title>
+    <title>Profile - Brand</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Spectral:300,300i,400,400i">
@@ -16,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.css">
     <script src="assets/js/context-path-helper.js"></script>
 </head>
+
 <body id="page-top">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: #1cc88a;">
@@ -26,8 +28,8 @@
                 </a>
                 <hr class="sidebar-divider my-0">
                 <ul class="nav navbar-nav text-light" id="accordionSidebar">
-                    <li class="nav-item"><a class="nav-link active" href="dashboard-owner.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="zoneInformation.html"><i class="fas fa-user"></i><span>Zone Information</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard-owner.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link active" href="zoneInformation.html"><i class="fas fa-user"></i><span>Zone Information</span></a></li>
                     <li class="nav-item"></li>
                     <li class="nav-item"><a class="nav-link" href="login.html"><i class="far fa-user-circle"></i><span>Login</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="register.html"><i class="fas fa-user-circle"></i><span>Register</span></a></li>
@@ -140,157 +142,108 @@
                     </ul>
             </div>
             </nav>
-            <div class="container-fluid" style="border-width: 0px;">
-                <div class="d-sm-flex justify-content-between align-items-center mb-4">
-                    <h3 class="text-dark mb-0">Dashboard</h3>
-                    <div>
-                        <div class="row">
-                            <div class="col-auto">
-                                <button id="chooseXMLButton" class="btn btn-link" type="button" style="border: 1px solid #0075ff ;">Choose XML File</button>
-                                <input id="inputFile" name="inputFile" type="file" class="file-input">
+            <div class="container-fluid">
+                <h3 class="text-dark mb-4">Zone Information</h3>
+                <div class="row mb-3">
+                    <div class="col-lg-4 col-lg-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="text-primary font-weight-bold m-0">Zone</h6>
                             </div>
-                            <div class="col-auto">
-                                <button id="uploadXMLButton" type="button" class="btn btn-primary">Upload</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 col-xl-3 mb-4">
-                        <div class="card shadow border-left-primary py-2">
                             <div class="card-body">
-                                <div class="row align-items-center no-gutters">
-                                    <div class="col mr-2">
-                                        <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>Earnings</span></div>
-                                        <div class="text-dark font-weight-bold h5 mb-0"><span id="earningsSpan">$0</span></div>
-                                    </div>
-                                    <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
-                        <div class="card shadow border-left-success py-2">
-                            <div class="card-body">
-                                <div class="row align-items-center no-gutters">
-                                    <div class="col mr-2">
-                                        <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>stores owned</span></div>
-                                        <div class="text-dark font-weight-bold h5 mb-0"><span id="storesOwnedSpan">0</span></div>
-                                    </div>
-                                    <div class="col-auto"><i class="fas fa-store fa-2x text-gray-300"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
-                        <div class="card shadow border-left-info py-2">
-                            <div class="card-body">
-                                <div class="row align-items-center no-gutters">
-                                    <div class="col mr-2">
-                                        <div class="text-uppercase text-info font-weight-bold text-xs mb-1"><span>orders made from owned stores</span></div>
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col-auto">
-                                                <div class="text-dark font-weight-bold h5 mb-0 mr-3"><span id="ordersMadeFromOwnedStoresSpan">0</span></div>
+                                <div>
+                                    <form>
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <select id="zoneSelectBox" class="form-control">
+                                                </select>
+                                            </div>
+                                            <div class="col">
+                                                <button id="displayZoneDetailsButton" class="btn btn-primary" type="button">Display Details</button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto"><i class="fab fa-dropbox fa-2x text-gray-300"></i></div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3 mb-4">
-                        <div class="card shadow border-left-warning py-2">
+                    <div class="col-lg-4 col-lg-4">
+                        <div class="card mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="text-primary font-weight-bold m-0">Zone Details</h6>
+                            </div>
                             <div class="card-body">
-                                <div class="row align-items-center no-gutters">
-                                    <div class="col mr-2">
-                                        <div class="text-uppercase text-warning font-weight-bold text-xs mb-1"><span>average rating</span></div>
-                                        <div class="text-dark font-weight-bold h5 mb-0"><span id="averageRatingSpan">0</span></div>
-                                    </div>
-                                    <div class="col-auto"><i class="far fa-star fa-2x text-gray-300"></i></div>
+                                <div>
+                                    <form>
+                                        <div class="form-row">
+                                            <div class="col-4"><label class="col-form-label">Zone Owner:</label></div>
+                                            <div class="col">
+                                                <label id="zoneOwnerLabel" class="col-form-label">-</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-4" style="border-width: 0px;"><label class="col-form-label">No. Stores:</label></div>
+                                            <div class="col" style="border-width: 0px;">
+                                                <label  id="numberOfStoresLabel" class="col-form-label">0</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-4" style="border-width: 0px;"><label class="col-form-label">No. Items</label></div>
+                                            <div class="col" style="border-width: 0px;">
+                                                <label  id="numberOfItemsLabel" class="col-form-label">0</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-4" style="border-width: 0px;"><label class="col-form-label">Total Revenue:</label></div>
+                                            <div class="col" style="border-width: 0px;">
+                                                <label  id="totalRevenueLabel" class="col-form-label">$0</label>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-7 col-xl-8">
-                        <div class="card shadow mb-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary font-weight-bold m-0">Zones Overview</h6>
+                    <div class="col">
+                        <div class="card shadow mb-3">
+                            <div class="card-header py-3">
+                                <p class="text-primary m-0 font-weight-bold">Stores In Selected Zone</p>
                             </div>
                             <div class="card-body">
+                                <div></div>
                                 <div class="table-responsive">
-                                    <table id="zonesOverviewTable" class="table">
+                                    <table id="storesInSelectedZoneTable" class="table">
                                         <thead>
                                             <tr>
-                                                <th>Zone</th>
-                                                <th>Owner</th>
-                                                <th>Types Amount</th>
-                                                <th>Stores Amount</th>
-                                                <th>Orders Amount</th>
-                                                <th>Average Cart Price (Without Delivery)</th>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Owner Name</th>
+                                                <th>Location</th>
+                                                <th>No. Orders</th>
+                                                <th>PPK</th>
+                                                <th>Items Revenue</th>
+                                                <th>Delivery Revenue</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-5 col-xl-4">
-                        <div class="card shadow mb-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary font-weight-bold m-0">Current Balance</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="col mr-2">
-                                    <h6 class="mb-0"><strong>$0</strong></h6><span class="text-xs"></span></div>
-                                <div class="text-center small mt-4"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-7 col-xl-8">
-                        <div class="card shadow mb-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary font-weight-bold m-0">Transactions Overview</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="transactionsOverviewTable" class="table">
-                                        <thead>
                                             <tr>
-                                                <th>Type</th>
-                                                <th>Date</th>
-                                                <th>Amount</th>
-                                                <th>Balance Before</th>
-                                                <th>Balance After</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>
+                                                    <div><a class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal" href="#displayStoreItemsModal">Display Items</a>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-7 col-xl-8">
-                        <div class="card shadow mb-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary font-weight-bold m-0">Active Users</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="activeUsersTable" class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Type</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                            <tr></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -298,6 +251,80 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <p class="text-primary m-0 font-weight-bold">Items In Selected Zone</p>
+                            </div>
+                            <div class="card-body">
+                                <div></div>
+                                <div class="table-responsive">
+                                    <table id="itemsInSelectedZoneTable" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Category</th>
+                                                <th>No. Stores Selling</th>
+                                                <th>Avg Price</th>
+                                                <th>No. Sold</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="displayStoreItemsModal">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4>Store Items</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                            <div class="modal-body">
+                                <div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Category</th>
+                                                <th>PPU</th>
+                                                <th>No. Sold</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" data-dismiss="modal" type="button">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <footer class="bg-white sticky-footer">
@@ -312,6 +339,7 @@
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/script.min.js"></script>
-    <script src="assets/js/dashboard-owner.js"></script>
+    <script src="assets/js/zoneInformation.js"></script>
 </body>
+
 </html>

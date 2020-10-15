@@ -75,4 +75,22 @@
         <url-pattern>/pages/createStore</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>LoadSelectedZoneInformationServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadSelectedZoneInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadSelectedZoneInformationServlet</servlet-name>
+        <url-pattern>/pages/getSelectedZoneInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadZoneSelectBoxInformationServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadZoneSelectBoxInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadZoneSelectBoxInformationServlet</servlet-name>
+        <url-pattern>/pages/getZoneInformation</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -1,6 +1,7 @@
 var RECHARGE_BALANCE_URL = buildUrlWithContextPath("recharge-balance");
 var REFRESH_DASHBOARD_URL = buildUrlWithContextPath("load-dashboard");
 $(document).ready(function(){
+    refreshDashboardInformation();
     setInterval(refreshDashboardInformation, 2000);
     $("#buttonRecharge").click(() => {
         try {

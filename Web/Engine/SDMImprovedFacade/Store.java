@@ -1,32 +1,33 @@
 package SDMImprovedFacade;
 
 import generatedClasses.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Store {
     private final int Id;
-    private String zone;
+    private String zoneName;
+    private String ownerName;
     private int deliveryPpk;
     private double totalOrdersRevenue = 0;
     private String name;
     private Location storeLocation;
     private Map<Integer, StoreItem> itemsBeingSold;
-    private final Map<Integer, List<Discount>> storeDiscounts; // Integer -> IfYouBuyItemId, List<Discount> -> Discount associated with the item.
-    private final List<Order> storeOrdersHistory;
+    private  Map<Integer, List<Discount>> storeDiscounts = new HashMap<>(); // Integer -> IfYouBuyItemId, List<Discount> -> Discount associated with the item.
+    private  List<Order> storeOrdersHistory = new ArrayList<>();
+    private double totalItemsRevenue;
+    private double totalDeliveryRevenue;
     private final HashMap<Integer, List<Feedback>> feedbackHashMap = new HashMap<>();
 
-
-
-    public Store(SDMStore inputStore){
+    public Store(SDMStore inputStore, String ownerName){
         this.Id = inputStore.getId();
         this.deliveryPpk = inputStore.getDeliveryPpk();
         this.name = inputStore.getName();
         this.storeLocation = inputStore.getLocation();
         storeOrdersHistory = new ArrayList<>();
         this.storeDiscounts = generateNewDiscountsMap(inputStore);
+        this.ownerName = ownerName;
+        this.totalDeliveryRevenue = 0;
+        this.totalItemsRevenue = 0;
     }
 
     public Store(int id, String name, int storePpk, Location storeLocation) {
@@ -37,6 +38,18 @@ public class Store {
         this.itemsBeingSold = new HashMap<>();
         this.storeDiscounts = new HashMap<>();
         this.storeOrdersHistory = new ArrayList<>();
+    }
+
+    public Store(int storeId, String storeName, String currentZoneName, int ppk, Location storeLocation, Map<Integer, StoreItem> storeItems, String ownerName) {
+        this.Id = storeId;
+        this.name = storeName;
+        this.zoneName = currentZoneName;
+        this.deliveryPpk = ppk;
+        this.storeLocation = storeLocation;
+        this.itemsBeingSold = storeItems;
+        this.ownerName = ownerName;
+        this.totalDeliveryRevenue = 0;
+        this.totalItemsRevenue = 0;
     }
 
     private Map<Integer, List<Discount>> generateNewDiscountsMap(SDMStore inputStore) {
@@ -116,7 +129,13 @@ public class Store {
         return storeLocation;
     }
 
+    public String getZoneName() {
+        return zoneName;
+    }
 
+    public void setZoneName(String zoneName) {
+        this.zoneName = zoneName;
+    }
 
     public void setStoreLocation(Location storeLocation) {
         this.storeLocation = storeLocation;

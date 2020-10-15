@@ -3,6 +3,7 @@ var REFRESH_DASHBOARD_URL = buildUrlWithContextPath("load-dashboard")
 
 
 $(document).ready(function(){
+    refreshDashboardInformation();
     setInterval(refreshDashboardInformation, 2000);
 })
 

@@ -3,6 +3,9 @@ package manager;
 import SDMImprovedFacade.*;
 import SuperMarketLogic.SuperMarketLogic;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import generatedClasses.Location;
 
 
 import java.util.*;
@@ -73,5 +76,49 @@ public class SDMarketManager {
         ShopOwner currentShopOwner = (ShopOwner)systemUsersMap.get(username);
         List<Order> pickedStoreOrdersList =  currentShopOwner.getStoresOwned().get(storeName).getStoreOrdersHistory();
         return new Gson().toJson(pickedStoreOrdersList);
+    }
+
+    public void createNewStoreAndAddToZoneAndUser(ShopOwner currentShopOwner, String currentZoneName
+            , String storeName, int ppk, int xCoordinate, int yCoordinate, Map<Integer, StoreItem> storeItems) {
+        Location storeLocation = new Location();
+        storeLocation.setX(xCoordinate);
+        storeLocation.setY(yCoordinate);
+        Zone currentZone = this.SDMLogic.getSystemZones().get(currentZoneName);
+        Store newStoreToAdd = new Store(currentZone.getAmountOfStoresInZone() + 1, storeName, currentZoneName, ppk, storeLocation, storeItems, currentShopOwner.getName());
+        this.SDMLogic.addStoreToSystem(newStoreToAdd);
+        currentShopOwner.addStoreToUser(currentZoneName, newStoreToAdd);
+        //newStore is already updated with the zone average price. (not the whole system)
+        this.SDMLogic.addStoreToZoneInSystem(currentZoneName, newStoreToAdd);
+
+    }
+
+    public Map<Integer, StoreItem> createItemsBeingSoldFromJson(String storeItems, String currentZoneName) {
+        Map<Integer, StoreItem> outputItemsBeingSoldMap = new HashMap<>();
+        JsonElement itemsBeingSoldJsonElement = new JsonParser().parse(storeItems);
+        for (JsonElement jsonItem : itemsBeingSoldJsonElement.getAsJsonArray()) {
+            StoreItem sItem = createStoreItemFromJson(jsonItem, currentZoneName);
+            outputItemsBeingSoldMap.put(sItem.getId(), sItem);
+        }
+
+        return outputItemsBeingSoldMap;
+    }
+
+    private StoreItem createStoreItemFromJson(JsonElement jsonItem, String currentZoneName) {
+        StoreItem sItem;
+        Zone currentZone = this.SDMLogic.getSystemZones().get(currentZoneName);
+        int id = jsonItem.getAsJsonObject().get("id").getAsInt();
+        int price = jsonItem.getAsJsonObject().get("price").getAsInt();
+        StoreItem systemItem = currentZone.getItemsAvailableInZone().get(id);
+        sItem = new StoreItem(id, systemItem.getName(), systemItem.getPurchaseCategory());
+        sItem.setPricePerUnit(price);
+        sItem.setIsAvailable(true);
+
+        return sItem;
+    }
+
+    public List<String> getZonesNames() {
+        List<String> zonesNames = new ArrayList<>();
+        this.SDMLogic.getSystemZones().values().forEach(zone -> zonesNames.add(zone.getZoneName()));
+        return zonesNames;
     }
 }

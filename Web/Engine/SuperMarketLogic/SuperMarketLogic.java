@@ -708,4 +708,8 @@ public class SuperMarketLogic {
 
         return zoneToAdd;
     }
+
+    public void addStoreToZoneInSystem(String currentZoneName, Store newStoreToAdd) {
+        this.SDMarket.getSystemZones().get(currentZoneName).addStoreToZone(newStoreToAdd);
+    }
 }
