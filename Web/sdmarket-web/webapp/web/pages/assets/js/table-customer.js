@@ -1,13 +1,11 @@
-var SELECTED_STORE_ORDERS_HISTORY_URL = buildUrlWithContextPath("getSelectedStoreOrdersHistory");
-var REFRESH_TABLE_OWNER_URL = buildUrlWithContextPath("getTableOwnerInformation")
-var CREATE_STORE_URL = buildUrlWithContextPath("createStore");
-var currentOrdersHistory;
-var currentZoneStores;
-var currentZoneItems;
+const SELECTED_STORE_ORDERS_HISTORY_URL = buildUrlWithContextPath("getSelectedStoreOrdersHistory");
+const REFRESH_TABLE_OWNER_URL = buildUrlWithContextPath("getTableOwnerInformation")
+const CREATE_STORE_URL = buildUrlWithContextPath("createStore");
+const GET_AVAILABLE_ITEMS_DYNAMIC_URL = buildUrlWithContextPath("getAllAvailableItemsInZone");
 
 $(document).ready(function(){
     refreshTableOwnerInformation();
-    //setInterval(refreshTableOwnerInformation, 1000);
+    setInterval(refreshTableOwnerInformation, 1000);
 })
 
 function createStoreOption(store) {
@@ -30,13 +28,13 @@ function createFeedbackTableRow(feedback, feedbackNumber) {
         "<td>" + feedback.customerName + "</td>\n" +
         "<td>" + feedback.dateOfFeedback + "</td>\n" +
         "<td>" +
-            '<div class="row">' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-            '</div>' +
+        '<div class="row">' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '</div>' +
         "<td>" + feedback.review + "</td>\n" +
         "</tr>\n");
 }
@@ -280,13 +278,62 @@ function createRowForCreateStoreItemsTable(item) {
         "</tr>\n");
 }
 
-$("#openCreateStoreModalButton").click(() => {
-    $('#createStoreModal tbody').empty();
-    resetCreateStoreModal();
+function disableAndDeleteSelectBoxOptions() {
+    $('#storePickerSelectBox option').remove();
+    $('#storePickerSelectBox').prop('disabled', true);
+    $('#pickStoreButton').prop('disabled', true);
+}
 
-    for(var item of currentZoneItems) {
-        $('#createStoreModal tbody').append(createRowForCreateStoreItemsTable(item));
+function clearAllTables() {
+    $('#availableItemsTable tbody').remove();
+    $('#availableDiscountsTable tbody').remove();
+    $('#discountOffersTable tbody').remove();
+    $('#shoppingCartTable tbody').remove();
+}
+
+function loadAvailItemsToTable(data) {
+    //Continue here!
+    // create table row for each of the item.
+}
+
+function ajaxLoadAvailableItems() {
+    $.ajax({
+        url : GET_AVAILABLE_ITEMS_DYNAMIC_URL,
+        type: "GET",
+        success: function(data) {
+            loadAvailItemsToTable(data);
+        },
+        error: function (data) {
+            alert(data.message);
+        }
+    });
+
+}
+
+function resetOrderDetails(purchaseMethod) {
+    $('#datePicker').val("");
+    $('#destinationX').val("");
+    $('#destinationY').val("");
+
+    clearAllTables();
+
+    if(purchaseMethod === 'dynamic') {
+        disableAndDeleteSelectBoxOptions();
+        ajaxLoadAvailableItems();
     }
+    else { loadStorePicker(); }
+
+
+
+
+
+}
+
+$("#purchaseMethodToggle").change(() => {
+    var purchaseMethod = 'static';
+    if($('#purchaseMethodToggle').find("[type='checkbox']").prop('checked')) { purchaseMethod = "dynamic"; }
+    resetOrderDetails(purchaseMethod);
+    initializePurchaseForm(purchaseMethod);
 });
 
 

@@ -120,9 +120,12 @@ function createZonesTableRow(zone) {
 }
 
 function createActiveUserTableRow(user) {
+    var realUserType;
+    realUserType = user.userType === "customer" ? "Customer" : "Shop Owner";
+
     return $("<tr>\n" +
         "<td>" + user.name + "</td>\n" +
-        "<td>" + user.userType + "</td>\n" +
+        "<td>" + realUserType + "</td>\n" +
         "</tr>\n");
 }
 

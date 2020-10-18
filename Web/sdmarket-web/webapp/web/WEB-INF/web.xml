@@ -93,4 +93,13 @@
         <url-pattern>/pages/getZoneInformation</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>RedirectToRelevantDashboardServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.RedirectToRelevantDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RedirectToRelevantDashboardServlet</servlet-name>
+        <url-pattern>/pages/getRelevantDashboardForUser</url-pattern>
+    </servlet-mapping>
+
 </web-app>

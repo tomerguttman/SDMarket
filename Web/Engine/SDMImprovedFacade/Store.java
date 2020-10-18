@@ -141,8 +141,8 @@ public class Store {
         this.storeLocation = storeLocation;
     }
 
-    public void generateOrder(String customerName, String orderDate, int orderId, List<StoreItem> itemsInOrder, Location userCoordinates){
-        Order order = new Order(orderDate, orderId, this.Id, calculateDistance(userCoordinates) * deliveryPpk, customerName, this.name, itemsInOrder, userCoordinates);
+    public void generateOrder(String customerName, String orderDate, int orderId, List<StoreItem> itemsInOrder, Location userCoordinates, String zoneName){
+        Order order = new Order(orderDate, orderId, this.Id, calculateDistance(userCoordinates) * deliveryPpk, customerName, this.name, itemsInOrder, userCoordinates, zoneName);
         storeOrdersHistory.add(order);
         this.totalOrdersRevenue += order.getTotalOrderCost();
     }

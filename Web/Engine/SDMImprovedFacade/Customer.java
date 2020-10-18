@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Customer extends User {
 
@@ -12,8 +13,6 @@ public class Customer extends User {
     private double averageOrdersPriceWithoutDelivery;
     private double averageOrdersDeliveryPrice;
     private List<Order> customerOrders;
-
-    private final HashMap<Integer, Order> userOrdersMap = new HashMap<>();
 
     public Customer(int id, String name, String userType) {
         super(name, userType, id);
@@ -54,7 +53,7 @@ public class Customer extends User {
 
     public int getMostLovedItem() {
         Map<Integer,Double> itemsBucketMap = new HashMap<>();
-        for (Order order : this.userOrdersMap.values()) {
+        for (Order order : this.getUserOrdersMap().values()) {
             for (StoreItem sItem : order.getItemsInOrder()) {
                 if(itemsBucketMap.containsKey(sItem.getId())) {
                     itemsBucketMap.put(sItem.getId(), itemsBucketMap.get(sItem.getId()) + sItem.getTotalItemsSold());
@@ -72,5 +71,9 @@ public class Customer extends User {
         }
 
         return lovedItemId;
+    }
+
+    public List<Order> getCustomerOrdersOfSelectedZone(String zoneName) {
+        return this.customerOrders.stream().filter(order -> order.zoneNameOfOrder.equals(zoneName)).collect(Collectors.toList()); // CHECK IF IT WORKS :")
     }
 }

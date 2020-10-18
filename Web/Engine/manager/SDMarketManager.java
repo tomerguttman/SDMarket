@@ -2,9 +2,7 @@ package manager;
 
 import SDMImprovedFacade.*;
 import SuperMarketLogic.SuperMarketLogic;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import generatedClasses.Location;
 
 
@@ -66,16 +64,22 @@ public class SDMarketManager {
         return listOfZones;
     }
 
-    public String getOrderHistoryJsonForCustomer(String username) {
+    public JsonObject getOrderHistoryJsonForCustomer(String username, String zoneName) {
+        JsonObject jsonObject = new JsonObject();
+
         Customer currentCustomer = (Customer)systemUsersMap.get(username);
-        List<Order> customerOrderHistory =  currentCustomer.getCustomerOrders();
-        return new Gson().toJson(customerOrderHistory);
+        List<Order> customerZoneOrderHistory =  currentCustomer.getCustomerOrdersOfSelectedZone(zoneName);
+        jsonObject.add("ordersHistory" , new Gson().toJsonTree(customerZoneOrderHistory));
+
+        return jsonObject;
     }
 
-    public String getOrderHistoryJsonForShopOwner(String username, String storeName) {
+    public JsonObject getOrderHistoryJsonForShopOwner(String username, String storeName) {
+        JsonObject jsonObject = new JsonObject();
         ShopOwner currentShopOwner = (ShopOwner)systemUsersMap.get(username);
         List<Order> pickedStoreOrdersList =  currentShopOwner.getStoresOwned().get(storeName).getStoreOrdersHistory();
-        return new Gson().toJson(pickedStoreOrdersList);
+        jsonObject.add("ordersHistory" , new Gson().toJsonTree(pickedStoreOrdersList));
+        return jsonObject;
     }
 
     public void createNewStoreAndAddToZoneAndUser(ShopOwner currentShopOwner, String currentZoneName

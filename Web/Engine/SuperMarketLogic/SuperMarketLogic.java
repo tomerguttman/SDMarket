@@ -390,8 +390,8 @@ public class SuperMarketLogic {
         return (X_LOW_RANGE <= x && x <= X_TOP_RANGE) && (Y_LOW_RANGE <= y && y <= Y_TOP_RANGE);
     }
 
-    public void generateOrderForStore(String customerName, Store storeToOrderFrom, String userDateInput, int lastOrderID, List<StoreItem> orderItems, Location userLocationInput) {
-        storeToOrderFrom.generateOrder(customerName, userDateInput, lastOrderID, orderItems, userLocationInput);
+    public void generateOrderForStore(String customerName, Store storeToOrderFrom, String userDateInput, int lastOrderID, List<StoreItem> orderItems, Location userLocationInput, String zoneName) {
+        storeToOrderFrom.generateOrder(customerName, userDateInput, lastOrderID, orderItems, userLocationInput, zoneName);
     }
 
     public double calculateDistanceFromUser(Store storeToOrderFrom, Location userLocationInput) {
@@ -508,14 +508,14 @@ public class SuperMarketLogic {
     }
 
     public double updateStoreRevenue(String customerName, List<StoreItem> listOfItems, Store storeOfChoice,
-                                     Location userLocationInput, String userDateInput, int orderIDForAllOrdersIncluded) {
-        storeOfChoice.generateOrder(customerName, userDateInput, orderIDForAllOrdersIncluded, listOfItems, userLocationInput);
+                                     Location userLocationInput, String userDateInput, int orderIDForAllOrdersIncluded, String zoneName) {
+        storeOfChoice.generateOrder(customerName, userDateInput, orderIDForAllOrdersIncluded, listOfItems, userLocationInput, zoneName);
         return storeOfChoice.calculateDistance(userLocationInput) * storeOfChoice.getDeliveryPpk();
     }
 
-    public void generateDynamicOrderAndRecord(String customerName, List<StoreItem> itemsToOrder, Double totalDeliveryCost, String userDateInput, Location userLocationInput, int amountOfStoresParticipating, int orderIDForAllOrdersIncluded) {
+    public void generateDynamicOrderAndRecord(String customerName, List<StoreItem> itemsToOrder, Double totalDeliveryCost, String userDateInput, Location userLocationInput, int amountOfStoresParticipating, int orderIDForAllOrdersIncluded, String zoneName) {
         Order dynamicOrder = new Order(userDateInput, userLocationInput, orderIDForAllOrdersIncluded,
-                totalDeliveryCost, customerName, amountOfStoresParticipating, itemsToOrder);
+                totalDeliveryCost, customerName, amountOfStoresParticipating, itemsToOrder, zoneName);
         this.SDMarket.addDynamicOrder(dynamicOrder);
     }
 

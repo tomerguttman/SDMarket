@@ -27,7 +27,7 @@
                 </a>
                 <hr class="sidebar-divider my-0">
                 <ul class="nav navbar-nav text-light" id="accordionSidebar">
-                    <li class="nav-item"><a class="nav-link" href="dashboard-owner.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard-customer.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="zoneInformation.html"><i class="fas fa-user"></i><span>Zone Information</span></a></li>
                     <li class="nav-item"></li>
                     <li class="nav-item"><a class="nav-link" href="login.html"><i class="far fa-user-circle"></i><span>Login</span></a></li>
@@ -142,165 +142,165 @@
                     <div class="card-header py-3">
                         <p class="text-primary m-0 font-weight-bold">Orders History</p>
                         <div>
-                            <div class="modal fade" role="dialog" tabindex="-1" id="performPurchaseModal-1">
-                                <div class="modal-dialog modal-xl" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4>Perform Purchase</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
-                                        <div class="modal-body">
-                                            <form method="GET" action="#">
-                                                <div>
-                                                    <div class="form-row">
-                                                        <div class="col"><label class="col-form-label">Purchase Method</label></div>
-                                                        <div class="col col-lg-6"><input type="checkbox" id="purchaseMethodToggle-1" data-toggle="toggle" data-onstyle="primary" data-offstyle="primary" data-on="Dynamic" data-off="Static" data-width="174"></div>
-                                                    </div>
-                                                    <div class="form-row" style="margin-bottom: 10px;">
-                                                        <div class="col"><label class="col-form-label">Date Picker</label></div>
-                                                        <div class="col"><input class="form-control" type="date"></div>
-                                                        <div class="col"></div>
-                                                    </div>
-                                                    <div class="form-row">
-                                                        <div class="col"><label class="col-form-label">Zone Picker</label></div>
-                                                        <div class="col"><select class="form-control" name="zone_selected" value="Yaffo"><option value="undefined">Yaffo</option></select></div>
-                                                        <div class="col"><button class="btn btn-primary" id="pickZoneButton-1" type="button">Pick Zone</button></div>
-                                                    </div>
-                                                    <div class="form-row">
-                                                        <div class="col"><label class="col-form-label">Store Picker</label></div>
-                                                        <div class="col"><select class="form-control" id="storePickerSelectBox-1" name="store_selected" value="Benny Banana"><option value="Benny Banana">Benny Banana</option></select></div>
-                                                        <div class="col"><button class="btn btn-primary" id="pickStoreButton-1" type="button">Pick Store</button></div>
-                                                    </div>
-                                                    <div class="form-row">
-                                                        <div class="col"><label class="col-form-label">Destination Coordinates</label></div>
-                                                        <div class="col"><input class="form-control" type="number" id="destinationX-1" min="1" max="50" placeholder="X Coordinate"></div>
-                                                        <div class="col"><input class="form-control" type="number" id="destinationY-1" min="1" max="50" placeholder="Y Coordinate"></div>
-                                                    </div>
-                                                    <div class="form-row">
-                                                        <div class="col" style="border-radius: 0px;border-width: 0px;border-style: solid;">
-                                                            <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;"><label>Items To Choose From</label>
-                                                            <div class="table-responsive">
-                                                                <table class="table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>ID</th>
-                                                                            <th>Name</th>
-                                                                            <th>Category</th>
-                                                                            <th>Price</th>
-                                                                            <th>Is Available</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-row">
-                                                        <div class="col"><select class="form-control" id="itemNameSelectBox-1"><option value="undefined" hidden="">Item Name</option><option value="Lemon">Lemon</option></select></div>
-                                                        <div class="col"><input class="form-control" type="text" id="amountToAddTextInput-1" placeholder="Amount"></div>
-                                                        <div class="col"><button class="btn btn-primary" id="addToCartButton-1" type="button">Add To Cart</button></div>
-                                                    </div>
-                                                    <div class="form-row">
-                                                        <div class="col">
-                                                            <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;"><label>Shopping Cart</label>
-                                                            <div class="table-responsive">
-                                                                <table class="table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>ID</th>
-                                                                            <th>Name</th>
-                                                                            <th>Category</th>
-                                                                            <th>Amount</th>
-                                                                            <th>Price</th>
-                                                                            <th>Is Part Of Discount</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;">
-                                                    <div class="form-row">
-                                                        <div class="col"><label>Available Discounts</label>
-                                                            <div class="table-responsive">
-                                                                <table class="table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>ID</th>
-                                                                            <th>Item Name</th>
-                                                                            <th>Discount Name</th>
-                                                                            <th>Store Name</th>
-                                                                            <th>Type</th>
-                                                                            <th></th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td>-</td>
-                                                                            <td><button class="btn btn-primary btn-sm" type="button">Display Offer</button></td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col"><label>Discount Offers</label>
-                                                            <div class="form-row">
-                                                                <div class="col">
-                                                                    <div class="table-responsive">
-                                                                        <table class="table">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th>ID</th>
-                                                                                    <th>Item Name</th>
-                                                                                    <th>Quantity</th>
-                                                                                    <th>For Additional</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <td>-</td>
-                                                                                    <td>-</td>
-                                                                                    <td>-</td>
-                                                                                    <td>-</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-row">
-                                                                <div class="col"><select class="form-control"><option value="">Choose Item</option></select></div>
-                                                                <div class="col"><button class="btn btn-primary" type="button">Apply Discount</button></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer"><button class="btn btn-light" data-dismiss="modal" type="button">Close</button><button class="btn btn-primary" type="button">Order</button></div>
-                                    </div>
-                                </div>
-                            </div>
+<!--                            <div class="modal fade" role="dialog" tabindex="-1" id="performPurchaseModal-1">-->
+<!--                                <div class="modal-dialog modal-xl" role="document">-->
+<!--                                    <div class="modal-content">-->
+<!--                                        <div class="modal-header">-->
+<!--                                            <h4>Perform Purchase</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>-->
+<!--                                        <div class="modal-body">-->
+<!--                                            <form method="GET" action="#">-->
+<!--                                                <div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col"><label class="col-form-label">Purchase Method</label></div>-->
+<!--                                                        <div class="col col-lg-6"><input type="checkbox" id="purchaseMethodToggle-1" data-toggle="toggle" data-onstyle="primary" data-offstyle="primary" data-on="Dynamic" data-off="Static" data-width="174"></div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row" style="margin-bottom: 10px;">-->
+<!--                                                        <div class="col"><label class="col-form-label">Date Picker</label></div>-->
+<!--                                                        <div class="col"><input class="form-control" type="date"></div>-->
+<!--                                                        <div class="col"></div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col"><label class="col-form-label">Zone Picker</label></div>-->
+<!--                                                        <div class="col"><select class="form-control" name="zone_selected" value="Yaffo"><option value="undefined">Yaffo</option></select></div>-->
+<!--                                                        <div class="col"><button class="btn btn-primary" id="pickZoneButton-1" type="button">Pick Zone</button></div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col"><label class="col-form-label">Store Picker</label></div>-->
+<!--                                                        <div class="col"><select class="form-control" id="storePickerSelectBox-1" name="store_selected" value="Benny Banana"><option value="Benny Banana">Benny Banana</option></select></div>-->
+<!--                                                        <div class="col"><button class="btn btn-primary" id="pickStoreButton-1" type="button">Pick Store</button></div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col"><label class="col-form-label">Destination Coordinates</label></div>-->
+<!--                                                        <div class="col"><input class="form-control" type="number" id="destinationX-1" min="1" max="50" placeholder="X Coordinate"></div>-->
+<!--                                                        <div class="col"><input class="form-control" type="number" id="destinationY-1" min="1" max="50" placeholder="Y Coordinate"></div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col" style="border-radius: 0px;border-width: 0px;border-style: solid;">-->
+<!--                                                            <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;"><label>Items To Choose From</label>-->
+<!--                                                            <div class="table-responsive">-->
+<!--                                                                <table class="table">-->
+<!--                                                                    <thead>-->
+<!--                                                                        <tr>-->
+<!--                                                                            <th>ID</th>-->
+<!--                                                                            <th>Name</th>-->
+<!--                                                                            <th>Category</th>-->
+<!--                                                                            <th>Price</th>-->
+<!--                                                                            <th>Is Available</th>-->
+<!--                                                                        </tr>-->
+<!--                                                                    </thead>-->
+<!--                                                                    <tbody>-->
+<!--                                                                        <tr>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                        </tr>-->
+<!--                                                                    </tbody>-->
+<!--                                                                </table>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col"><select class="form-control" id="itemNameSelectBox-1"><option value="undefined" hidden="">Item Name</option><option value="Lemon">Lemon</option></select></div>-->
+<!--                                                        <div class="col"><input class="form-control" type="text" id="amountToAddTextInput-1" placeholder="Amount"></div>-->
+<!--                                                        <div class="col"><button class="btn btn-primary" id="addToCartButton-1" type="button">Add To Cart</button></div>-->
+<!--                                                    </div>-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col">-->
+<!--                                                            <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;"><label>Shopping Cart</label>-->
+<!--                                                            <div class="table-responsive">-->
+<!--                                                                <table class="table">-->
+<!--                                                                    <thead>-->
+<!--                                                                        <tr>-->
+<!--                                                                            <th>ID</th>-->
+<!--                                                                            <th>Name</th>-->
+<!--                                                                            <th>Category</th>-->
+<!--                                                                            <th>Amount</th>-->
+<!--                                                                            <th>Price</th>-->
+<!--                                                                            <th>Is Part Of Discount</th>-->
+<!--                                                                        </tr>-->
+<!--                                                                    </thead>-->
+<!--                                                                    <tbody>-->
+<!--                                                                        <tr>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                        </tr>-->
+<!--                                                                    </tbody>-->
+<!--                                                                </table>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
+<!--                                                    <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;">-->
+<!--                                                    <div class="form-row">-->
+<!--                                                        <div class="col"><label>Available Discounts</label>-->
+<!--                                                            <div class="table-responsive">-->
+<!--                                                                <table class="table">-->
+<!--                                                                    <thead>-->
+<!--                                                                        <tr>-->
+<!--                                                                            <th>ID</th>-->
+<!--                                                                            <th>Item Name</th>-->
+<!--                                                                            <th>Discount Name</th>-->
+<!--                                                                            <th>Store Name</th>-->
+<!--                                                                            <th>Type</th>-->
+<!--                                                                            <th></th>-->
+<!--                                                                        </tr>-->
+<!--                                                                    </thead>-->
+<!--                                                                    <tbody>-->
+<!--                                                                        <tr>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td>-</td>-->
+<!--                                                                            <td><button class="btn btn-primary btn-sm" type="button">Display Offer</button></td>-->
+<!--                                                                        </tr>-->
+<!--                                                                    </tbody>-->
+<!--                                                                </table>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                        <div class="col"><label>Discount Offers</label>-->
+<!--                                                            <div class="form-row">-->
+<!--                                                                <div class="col">-->
+<!--                                                                    <div class="table-responsive">-->
+<!--                                                                        <table class="table">-->
+<!--                                                                            <thead>-->
+<!--                                                                                <tr>-->
+<!--                                                                                    <th>ID</th>-->
+<!--                                                                                    <th>Item Name</th>-->
+<!--                                                                                    <th>Quantity</th>-->
+<!--                                                                                    <th>For Additional</th>-->
+<!--                                                                                </tr>-->
+<!--                                                                            </thead>-->
+<!--                                                                            <tbody>-->
+<!--                                                                                <tr>-->
+<!--                                                                                    <td>-</td>-->
+<!--                                                                                    <td>-</td>-->
+<!--                                                                                    <td>-</td>-->
+<!--                                                                                    <td>-</td>-->
+<!--                                                                                </tr>-->
+<!--                                                                            </tbody>-->
+<!--                                                                        </table>-->
+<!--                                                                    </div>-->
+<!--                                                                </div>-->
+<!--                                                            </div>-->
+<!--                                                            <div class="form-row">-->
+<!--                                                                <div class="col"><select class="form-control"><option value="">Choose Item</option></select></div>-->
+<!--                                                                <div class="col"><button class="btn btn-primary" type="button">Apply Discount</button></div>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </form>-->
+<!--                                        </div>-->
+<!--                                        <div class="modal-footer"><button class="btn btn-light" data-dismiss="modal" type="button">Close</button><button class="btn btn-primary" type="button">Order</button></div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
                         </div>
                     </div>
                     <div class="card-body">
@@ -393,17 +393,28 @@
                                 <form method="GET" action="#">
                                     <div>
                                         <div class="form-row">
-                                            <div class="col"><label class="col-form-label">Purchase Method</label></div>
-                                            <div class="col"><input type="checkbox" id="purchaseMethodToggle" data-toggle="toggle" data-onstyle="primary" data-offstyle="primary" data-on="Dynamic" data-off="Static" data-width="174"></div>
+                                            <div class="col">
+                                                <label class="col-form-label">Purchase Method</label>
+                                            </div>
+                                            <div class="col">
+                                                <input type="checkbox" id="purchaseMethodToggle" data-toggle="toggle" data-onstyle="primary" data-offstyle="primary" data-on="Dynamic" data-off="Static" data-width="174">
+                                            </div>
                                         </div>
                                         <div class="form-row" style="margin-bottom: 10px;">
-                                            <div class="col"><label class="col-form-label">Date Picker</label></div>
-                                            <div class="col"><input class="form-control" type="date"></div>
-                                            <div class="col"></div>
+                                            <div class="col">
+                                                <label class="col-form-label">Date Picker</label>
+                                            </div>
+                                            <div class="col">
+                                                <input id="datePicker" class="form-control" type="date">
+                                            </div>
                                         </div>
                                         <div class="form-row">
                                             <div class="col"><label class="col-form-label">Store Picker</label></div>
-                                            <div class="col"><select class="form-control" id="storePickerSelectBox" name="store_selected" value="Benny Banana"><option value="Benny Banana">Benny Banana</option></select></div>
+                                            <div class="col">
+                                                <select class="form-control" id="storePickerSelectBox" name="store_selected" value="Benny Banana">
+                                                    <option value="Benny Banana">Benny Banana</option>
+                                                </select>
+                                            </div>
                                             <div class="col"><button class="btn btn-primary" id="pickStoreButton" type="button">Pick Store</button></div>
                                         </div>
                                         <div class="form-row">
@@ -415,7 +426,7 @@
                                             <div class="col" style="border-radius: 0px;border-width: 0px;border-style: solid;">
                                                 <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;"><label>Items To Choose From</label>
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table id="availableItemsTable" class="table">
                                                         <thead>
                                                             <tr>
                                                                 <th>ID</th>
@@ -447,7 +458,7 @@
                                             <div class="col">
                                                 <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;"><label>Shopping Cart</label>
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table id="shoppingCartTable" class="table">
                                                         <thead>
                                                             <tr>
                                                                 <th>ID</th>
@@ -474,9 +485,10 @@
                                         </div>
                                         <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;">
                                         <div class="form-row">
-                                            <div class="col"><label>Available Discounts</label>
+                                            <div class="col">
+                                                <label>Available Discounts</label>
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table id="availableDiscountsTable" class="table">
                                                         <thead>
                                                             <tr>
                                                                 <th>ID</th>
@@ -504,7 +516,7 @@
                                                 <div class="form-row">
                                                     <div class="col">
                                                         <div class="table-responsive">
-                                                            <table class="table">
+                                                            <table id="discountOffersTable" class="table">
                                                                 <thead>
                                                                     <tr>
                                                                         <th>ID</th>
@@ -532,7 +544,9 @@
                                             </div>
                                         </div>
                                         <div class="form-row">
-                                            <div class="col"><a class="btn btn-primary btn-lg" role="button" data-toggle="modal" href="#showOrderSummaryModal" style="margin-left: 0px;background: rgb(246,95,62);color: rgb(255,255,255);border-color: transparent;margin-bottom: 10px;">Show Order Summary</a>
+                                            <div class="col">
+                                                <a class="btn btn-primary btn-lg" role="button" data-toggle="modal" href="#showOrderSummaryModal" style="margin-left: 0px;background: rgb(246,95,62);color: rgb(255,255,255);border-color: transparent;margin-bottom: 10px;"><i class="fas fa-file-invoice-dollar"></i> Show Order Summary</a>
+                                                <button id="resetOrderButton" class="btn btn-primary btn-lg"> <i class="fas fa-toilet"></i>  Reset Order</button>
                                                 <div
                                                     id="divFeedBackModal">
                                                     <div class="modal fade" role="dialog" tabindex="-1" id="feedbackModal">
@@ -559,13 +573,13 @@
                                                                                     <td>
                                                                                         <div class="form-group"><div class="form-group">
     <div class="text-left star-rating" style="font-size: 25px;color: #00F0B5;">
-		<span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="1"></span>
-		<span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="2"></span>
-		<span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;"data-rating="3"></span>
-		<span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="4"></span>
-		<span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="5"></span>
-		<input class="form-control rating-value" type="hidden" id="rate" name="Rating" value="0" />
-	</div>
+        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="1"></span>
+        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="2"></span>
+        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;"data-rating="3"></span>
+        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="4"></span>
+        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="5"></span>
+        <input class="form-control rating-value" type="hidden" id="rate" name="Rating" value="0" />
+    </div>
 </div></div>
                                                                                     </td>
                                                                                     <td><input class="form-control" type="text" id="reviewTextInput" placeholder="Write a review here" style="padding-left: 12px;" disabled=""></td>
@@ -721,6 +735,7 @@
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/script.min.js"></script>
+    <script src="assets/js/table-customer.js"></script>
 </body>
 
 </html>

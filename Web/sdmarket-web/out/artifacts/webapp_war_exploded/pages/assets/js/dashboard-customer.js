@@ -73,10 +73,10 @@ function refreshDashboardInformation() {
     });
 }
 
-function updateDashboardLabels(currentBalance, totalOrders, averageOrderCost, mostLovedItem) {
+function updateDashboardLabels(currentBalance, totalOrders, averageOrdersCost, mostLovedItem) {
     $("#currentBalanceSpan").html("$" + currentBalance);
     $("#totalOrdersSpan").html(totalOrders);
-    $("#averageOrdersCostSpan").html("$" + averageOrderCost);
+    $("#averageOrdersCostSpan").html("$" + averageOrdersCost);
     $("#mostLovedItemSpan").html(mostLovedItem);
 }
 
@@ -102,7 +102,7 @@ function updateDashboardActiveUsersTable(otherUsers) {
 }
 
 function loadNewDataToDashboard(data) {
-    updateDashboardLabels(data.currentBalance, data.totalOrders, data.averageOrderCost, data.mostLovedItem);
+    updateDashboardLabels(data.currentBalance, data.totalOrders, data.averageOrdersCost, data.mostLovedItem);
     updateDashboardZonesTable(data.systemZones);
     updateDashboardTransactionsTable(data.userTransactions);
     updateDashboardActiveUsersTable(data.otherUsers);
@@ -132,9 +132,12 @@ function createZonesTableRow(zone) {
 }
 
 function createActiveUserTableRow(user) {
+    var realUserType;
+    realUserType = user.userType === "customer" ? "Customer" : "Shop Owner";
+
     return $("<tr>\n" +
         "<td>" + user.name + "</td>\n" +
-        "<td>" + user.userType + "</td>\n" +
+        "<td>" + realUserType + "</td>\n" +
         "</tr>\n");
 }
 

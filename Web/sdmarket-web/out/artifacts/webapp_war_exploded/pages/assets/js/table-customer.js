@@ -30,13 +30,13 @@ function createFeedbackTableRow(feedback, feedbackNumber) {
         "<td>" + feedback.customerName + "</td>\n" +
         "<td>" + feedback.dateOfFeedback + "</td>\n" +
         "<td>" +
-            '<div class="row">' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-                '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-            '</div>' +
+        '<div class="row">' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
+        '</div>' +
         "<td>" + feedback.review + "</td>\n" +
         "</tr>\n");
 }

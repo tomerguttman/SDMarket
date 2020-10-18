@@ -13,6 +13,7 @@ public class Order {
     double deliveryCost;
     double costOfItemsInOrder;
     double totalOrderCost;
+    String zoneNameOfOrder;
     final String customerName;
     final String dateOrderWasMade;
     final String storeName;
@@ -22,7 +23,7 @@ public class Order {
     final List<StoreItem> itemsInOrder;
 
     public Order(String dateOrderWasMade, int orderId, int storeId, double deliveryCost,
-                 String customerName, String storeName, List<StoreItem> itemsInOrder, Location userLocation) {
+                 String customerName, String storeName, List<StoreItem> itemsInOrder, Location userLocation, String zoneWhereOrderWasMade) {
         this.dateOrderWasMade = dateOrderWasMade;
         this.orderId = orderId;
         this.storeId = storeId;
@@ -35,10 +36,11 @@ public class Order {
         this.orderDestination = userLocation;
         this.amountOfStoresRelatedToOrder = 1;
         this.amountItemsInOrder = getTotalNumberOfItemsInOrder();
+        this.zoneNameOfOrder = zoneWhereOrderWasMade;
     }
 
     public Order(String dateOrderWasMade, Location userLocation, int orderId,
-                 Double deliveryCost, String customerName, int amountOfStoresParticipating, List<StoreItem> itemsInOrder) {
+                 Double deliveryCost, String customerName, int amountOfStoresParticipating, List<StoreItem> itemsInOrder ,String zoneWhereOrderWasMade) {
         this.dateOrderWasMade = dateOrderWasMade;
         this.orderId = orderId;
         this.customerName = customerName;
@@ -51,6 +53,7 @@ public class Order {
         this.orderDestination = userLocation;
         this.amountOfStoresRelatedToOrder = amountOfStoresParticipating;
         this.amountItemsInOrder = getTotalNumberOfItemsInOrder();
+        this.zoneNameOfOrder = zoneWhereOrderWasMade;
     }
 
     public Order() {

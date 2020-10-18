@@ -1,5 +1,6 @@
 package sdmarket.servlets;
 
+import com.google.gson.JsonObject;
 import constants.Constants;
 import manager.SDMarketManager;
 import sdmarket.utils.ServletUtils;
@@ -12,25 +13,28 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class OrderHistoryForStoreServlet extends HttpServlet {
-    private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String json = null;
-        
+    synchronized private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JsonObject jsonObject = new JsonObject();
+        response.setContentType("application/json");
+
         try {
             String userType = SessionUtils.getUserType(request);
             String username = SessionUtils.getUsername(request);
             String storeName = request.getParameter("selectedStore");
+            String selectedZone = SessionUtils.getCurrentZone(request);
             SDMarketManager sdMarketManager = ServletUtils.getSDMarketManager(getServletContext());
 
-            if(userType.equals(Constants.CUSTOMER)) { json = sdMarketManager.getOrderHistoryJsonForCustomer(username); }
-            else { json = sdMarketManager.getOrderHistoryJsonForShopOwner(username, storeName); }
+            assert userType != null;
+            if(userType.equals(Constants.CUSTOMER)) { jsonObject = sdMarketManager.getOrderHistoryJsonForCustomer(username, selectedZone); }
+            else { jsonObject = sdMarketManager.getOrderHistoryJsonForShopOwner(username, storeName); }
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
-            json = ServletUtils.getJsonResponseString(e.getMessage(), false);
+            jsonObject.addProperty("message", e.getMessage());
         }
         finally {
             PrintWriter out = response.getWriter();
-            out.println(json);
+            out.println(jsonObject);
             out.flush();
         }
     }

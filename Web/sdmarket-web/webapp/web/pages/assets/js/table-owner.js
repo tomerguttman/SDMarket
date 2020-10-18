@@ -133,8 +133,6 @@ $("#ordersHistoryPickStoreButton").click(() => {
             $.ajax({
                 url : SELECTED_STORE_ORDERS_HISTORY_URL,
                 data : {"selectedStore" : selectedStore},
-                processData: false,
-                contentType: false,
                 type: "GET",
                 success: function(data) {
                     console.log('storeOrdersHistory: ' + data.ordersHistory);
@@ -143,6 +141,7 @@ $("#ordersHistoryPickStoreButton").click(() => {
                 },
                 error: function (data) {
                     alert(data.message);
+
                 }
             });
         }
