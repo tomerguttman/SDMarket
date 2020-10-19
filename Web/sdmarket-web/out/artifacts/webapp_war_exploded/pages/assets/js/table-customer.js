@@ -1,28 +1,18 @@
-var SELECTED_STORE_ORDERS_HISTORY_URL = buildUrlWithContextPath("getSelectedStoreOrdersHistory");
-var REFRESH_TABLE_OWNER_URL = buildUrlWithContextPath("getTableOwnerInformation")
-var CREATE_STORE_URL = buildUrlWithContextPath("createStore");
-var currentOrdersHistory;
-var currentZoneStores;
-var currentZoneItems;
+const GET_AVAILABLE_STORES_STATIC_URL = buildUrlWithContextPath("getAvailableStoresInZone");
+const GET_AVAILABLE_ITEMS_URL = buildUrlWithContextPath("getAllAvailableItemsInZone");
+const orderDetailsModalHref = '#orderDetailsModal';
+var currentAvailableStoresMap;
+var currentAvailableItemsMap;
+var currentCartBucketListOfItems;
 
 $(document).ready(function(){
-    refreshTableOwnerInformation();
-    //setInterval(refreshTableOwnerInformation, 1000);
+    initializePurchaseForm();
+    setInterval(initializePurchaseForm, 2000);
 })
 
 function createStoreOption(store) {
     const storeName = store.name;
     return $('<option value="' + storeName + '">' + storeName + '</option>"');
-}
-
-function updateOrderHistoryStorePickerSelectBox(storesAvailable) {
-    currentZoneStores = storesAvailable;
-
-    for(var store of storesAvailable){
-        if(!($('#ordersHistoryStoreSelectBox option[value=' + '"' + store.name + '"]').length > 0)) {
-            $("#ordersHistoryStoreSelectBox").append(createStoreOption(store));
-        }
-    }
 }
 
 function createFeedbackTableRow(feedback, feedbackNumber) {
@@ -59,31 +49,6 @@ function updateRelevantFeedbacksInTable(feedbacks) {
     }
 }
 
-function refreshTableOwnerInformation() {
-    $.ajax({
-        url : REFRESH_TABLE_OWNER_URL,
-        type: "GET",
-        success: function(data) {
-            console.log('storesAvailable: ' + data.storesAvailable);
-            updateOrderHistoryStorePickerSelectBox(data.storesAvailable);
-            updateRelevantFeedbacksInTable(data.feedbacks);
-            currentZoneItems = data.zoneItems;
-        },
-        error: function (data) {
-            alert(data.message);
-        }
-    });
-}
-
-function updateOrdersHistoryTableForStore(ordersHistory) {
-    if(ordersHistory.length !== 0){
-        $('#ordersHistoryTable tbody').empty();
-        for (var order of ordersHistory) {
-            $('#ordersHistoryTable tbody').append(createOrderTableRow(order));
-        }
-    }
-}
-
 function createOrderButton(orderId) {
     const onclickMethod = "activateOrderDetailsModal(" + orderId + ");";
     return '<a id="orderBtn' + orderId + ' ' +
@@ -107,7 +72,7 @@ function createItemTableRow(item) {
 
 function activateOrderDetailsModal(orderId) {
     $('#orderDetailsModalTable tbody').empty();
-    for(var item of currentOrdersHistory[orderId]) {
+    for(let item of currentOrdersHistory[orderId]) {
         $('#orderDetailsModalTable tbody').append(createItemTableRow(item));
     }
     $('#orderDetailsModal').modal('show');
@@ -125,33 +90,6 @@ function createOrderTableRow(order) {
         "<td>" + createOrderButton(order.orderId) + "</td>"+
         "</tr>\n");
 }
-
-$("#ordersHistoryPickStoreButton").click(() => {
-    if($("#ordersHistoryStoreSelectBox").val() !== ""){
-        const selectedStore = $("#ordersHistoryStoreSelectBox").val();
-        if(selectedStore !== "" && selectedStore != null) {
-            $.ajax({
-                url : SELECTED_STORE_ORDERS_HISTORY_URL,
-                data : {"selectedStore" : selectedStore},
-                type: "GET",
-                success: function(data) {
-                    console.log('storeOrdersHistory: ' + data.ordersHistory);
-                    currentOrdersHistory = data.ordersHistory;
-                    updateOrdersHistoryTableForStore(data.ordersHistory);
-                },
-                error: function (data) {
-                    alert(data.message);
-
-                }
-            });
-        }
-        else { alert("Please select an option before picking a store")}
-
-    }
-    else{
-        alert("Please choose a file first");
-    }
-});
 
 function isStoreNameUnique(storeName) {
     var validFlag = true;
@@ -231,38 +169,6 @@ function resetCreateStoreModal() {
     }
 }
 
-$("#createStoreButton").click(() => {
-    var storeItemsList = [];
-    const storeName = $("#createStoreModal [name='storeName']").val();
-    const ppk = $("#createStoreModal [name='ppk']").val();
-    const xCoordinate = $("#createStoreModal [name='x']").val();
-    const yCoordinate = $("#createStoreModal [name='y']").val();
-    const storeItemsDetails = $("#createStoreModal .itemRow");
-
-    $('#createStoreModal').modal("hide");
-    if (validateInput(storeName, ppk, xCoordinate, yCoordinate, storeItemsDetails, storeItemsList) ) {
-        $.ajax({
-            url : CREATE_STORE_URL,
-            data : {
-                "storeName" : storeName,
-                "ppk" : ppk,
-                "xCoordinate" : xCoordinate,
-                "yCoordinate" : yCoordinate,
-                "storeItems" : JSON.stringify(storeItemsList)
-            },
-            type: "POST",
-            success: function(data) {
-                alert(data.message);
-            },
-            error: function (data) {
-                alert(data.message);
-            }
-        });
-    }
-
-    resetCreateStoreModal();
-});
-
 function createPriceInputElement() {
     return '<input class="form-control" type="number" required="" style="width: 104px;" min="1">';
 }
@@ -280,14 +186,262 @@ function createRowForCreateStoreItemsTable(item) {
         "</tr>\n");
 }
 
-$("#openCreateStoreModalButton").click(() => {
-    $('#createStoreModal tbody').empty();
-    resetCreateStoreModal();
+function disableAndDeleteSelectBoxOptions() {
+    $('#storePickerSelectBox option').remove();
+    $('#storePickerSelectBox').prop('disabled', true);
+    $('#pickStoreButton').prop('disabled', true);
+}
 
-    for(var item of currentZoneItems) {
-        $('#createStoreModal tbody').append(createRowForCreateStoreItemsTable(item));
+function clearAllTables() {
+    $('#availableItemsTable tbody').empty();
+    $('#availableDiscountsTable tbody').empty();
+    $('#discountOffersTable tbody').empty();
+    $('#shoppingCartTable tbody').empty();
+}
+
+function createItemRowForAvailableItemsTable(availableItem, currentPurchaseMethod) {
+    let isAvailable = currentPurchaseMethod === 'static' ? availableItem.isAvailable : 'True';
+    return $("<tr class='itemRow'>\n" +
+        "<td>" + availableItem.Id + "</td>\n" +
+        "<td>" + availableItem.name + "</td>\n" +
+        "<td>" + availableItem.purchaseCategory + "</td>\n" +
+        "<td>" + availableItem.pricePerUnit + "</td>\n" +
+        "<td>" + isAvailable + "</td>\n" +
+        "</tr>\n");
+}
+
+function createItemSelectOption(availableItem) {
+    const itemId = availableItem.Id;
+    return $('<option value="item'+ itemId +'">' + itemId + ' | ' + availableItem.name + '</option>"');
+}
+
+function addItemToItemNameSelectBox(availableItem) {
+    // $('#itemNameSelectBox option').remove(); -> was already done in reset method.
+    const flag = (($('#itemNameSelectBox option[value= "item' + availableItem.Id + '"]')).length > 0);
+    if(!flag) {
+        $('#itemNameSelectBox').append(createItemSelectOption(availableItem));
+    }
+
+}
+
+function loadAvailItemsToTable(data, currentPurchaseMethod) {
+    const availableItems = data.availableItems;
+    $('#availableItemsTable tbody').empty();
+    for (var availableItem in availableItems) {
+        $('#availableItemsTable tbody').append(createItemRowForAvailableItemsTable(availableItems[availableItem], currentPurchaseMethod));
+
+        if(availableItems[availableItem].isAvailable === true || currentPurchaseMethod === 'dynamic') {
+            addItemToItemNameSelectBox(availableItems[availableItem]);
+        }
+    }
+}
+
+function toJsonMapOfItems(availableItems) {
+    var jsonMapItems = {};
+
+    for (const sItem in availableItems) {
+        jsonMapItems[availableItems[sItem].Id] =  availableItems[sItem];
+    }
+
+    return jsonMapItems;
+}
+
+function ajaxLoadAvailableItems(pickedStore) {
+    var currentPurchaseMethod = $('#purchaseMethodToggle').prop('checked') ? "dynamic" : "static";
+
+    $.ajax({
+        url : GET_AVAILABLE_ITEMS_URL,
+        type: "GET",
+        data: {
+            "currentPurchaseMethod": currentPurchaseMethod,
+            "pickedStore": pickedStore
+        },
+        success: function(data) {
+            loadAvailItemsToTable(data, currentPurchaseMethod);
+            currentAvailableItemsMap = toJsonMapOfItems(data.availableItems);
+        },
+        error: function (data) {
+            alert(data.message);
+        }
+    });
+}
+
+function loadAvailableStoreToSelectBox(data) {
+    //$('#storePickerSelectBox option').remove(); was already made in reset method.
+    for (var store in data.availableStore) {
+        const flag = (($('#storePickerSelectBox option[value=' + '"' + data.availableStore[store].name + '"]')).length > 0);
+        if(!flag) {
+            $('#storePickerSelectBox').append(createStoreOption(data.availableStore[store]));
+        }
+    }
+}
+
+function ajaxLoadStorePicker() {
+    $.ajax({
+        url : GET_AVAILABLE_STORES_STATIC_URL,
+        type: "GET",
+        success: function(data) {
+            loadAvailableStoreToSelectBox(data);
+            currentAvailableStoresMap = toJsonMapOfStores(data.availableStores);
+        },
+        error: function (data) {
+            alert(data.message);
+        }
+    });
+}
+
+function loadStorePicker() {
+    ajaxLoadStorePicker();
+}
+
+function resetOrderDetails(purchaseMethod) {
+    $('#datePicker').val("");
+    $('#destinationX').val("");
+    $('#destinationY').val("");
+    $('#showOrderSummaryButton').removeAttr('href').attr('hidden', true);
+    $('#discountsDiv').attr('hidden', true);
+    $('#itemNameSelectBox option').remove();
+    $('#storePickerSelectBox option').remove();
+    clearAllTables();
+}
+
+function enableAndDeleteSelectBoxOptions() {
+    //$('#storePickerSelectBox option').remove();
+    $('#storePickerSelectBox').prop('disabled', false);
+    $('#pickStoreButton').prop('disabled', false);
+}
+
+function initializePurchaseForm() {
+    const purchaseMethod = $('#purchaseMethodToggle').prop('checked') ? 'dynamic' : 'static';
+    if(purchaseMethod === 'dynamic') {
+        disableAndDeleteSelectBoxOptions();
+        ajaxLoadAvailableItems('dynamic');
+    }
+    else {
+        loadStorePicker();
+        enableAndDeleteSelectBoxOptions();
+    }
+}
+
+$("#purchaseMethodToggle").change(() => {
+    var purchaseMethod = 'static';
+    if($('#purchaseMethodToggle').prop('checked')) { purchaseMethod = "dynamic"; }
+    resetOrderDetails(purchaseMethod);
+    initializePurchaseForm();
+});
+
+$('#pickStoreButton').click(() => {
+   const pickedStoreForStaticPurchase = $('#storePickerSelectBox').val();
+   ajaxLoadAvailableItems(pickedStoreForStaticPurchase); // The items are being loaded to the table and the item select box in this method !
+});
+
+function createNewCartItemTableRow(itemToAdd, amountOfItem, wasPartOfDiscount) {
+    return $("<tr>\n" +
+        "<td>" + itemToAdd.Id + "</td>\n" +
+        "<td>" + itemToAdd.name + "</td>\n" +
+        "<td>" + itemToAdd.purchaseCategory + "</td>\n" +
+        "<td>" + amountOfItem + "</td>\n" +
+        "<td>" + itemToAdd.pricePerUnit + "</td>\n" +
+        "<td>" + wasPartOfDiscount + "</td>\n" +
+        "</tr>\n");
+}
+
+function addItemToCartTable(itemId, amountOfItem, wasPartOfDiscount) {
+    $('#shoppingCartTable tbody').append(createNewCartItemTableRow(currentAvailableItemsMap[itemId], amountOfItem, wasPartOfDiscount));
+}
+
+function validateAmountOfItemAndAddToCart(itemId, amountOfItem) {
+    const selectedItem = currentAvailableItemsMap[itemId];
+    var amountOfItemParsedFloat = parseFloat(amountOfItem);
+    var res = (typeof(amountOfItemParsedFloat) === 'number') && ((amountOfItemParsedFloat%1) === 0);
+
+    if( isNaN(amountOfItemParsedFloat) ) {
+        alert("The amount you entered is not a number");
+        $('#amountToAddTextInput').val("");
+    }
+    else {
+        if(selectedItem.purchaseCategory === 'Quantity') {
+
+            if(res) {
+                addItemToCartTable(itemId, amountOfItem, "No");
+            }
+            else {
+                alert("The amount you entered is not an integer");
+                $('#amountToAddTextInput').val("");
+            }
+        }
+        else {
+            addItemToCartTable(itemId, amountOfItem, "No");
+        }
+    }
+}
+
+$('#addToCartButton').click(() => {
+   const amountOfItem = $('#amountToAddTextInput').val();
+   const itemId = $('#itemNameSelectBox').val().substr(4); // take the 'item' out of the text.
+   validateAmountOfItemAndAddToCart(itemId, amountOfItem)
+});
+
+function generateCartItemsBucketForDiscounts(purchaseMethod) {
+    const allCartTableRows = $('#shoppingCartTable tbody tr');
+    currentCartBucketListOfItems = {};
+
+    for (const itemInCart of allCartTableRows) {
+        const itemId = itemInCart.find('td')[0];
+        const amountToAdd = itemInCart.find('td')[3];
+        if (currentCartBucketListOfItems[itemId] !== undefined) {
+            currentCartBucketListOfItems[itemId] = currentCartBucketListOfItems[itemId] + parseFloat(amountToAdd);
+        }
+        else { currentCartBucketListOfItems[itemId] = parseFloat(amountToAdd); }
+    }
+}
+
+function getDiscountsPerItemMap(store) {
+    //for (const discount of store.storeDiscounts) {
+        //store.storeDiscounts[discount]
+    //}
+}
+
+function getRelevantDiscountsFromSpecificStoreAndAddToTable() {
+    const selectedStore = $('#storePickerSelectBox').val();
+    const discountOfSelectedStore = getDiscountsPerItemMap(currentAvailableStoresMap[selectedStore])
+    //loadDiscountsToTable(discountOfSelectedStore);
+}
+
+function getRelevantDiscountFromWholeZoneAndAddToTable() {
+
+}
+
+function loadRelevantDiscountsToTable(purchaseMethod) {
+    if (purchaseMethod === 'dynamic') { getRelevantDiscountFromWholeZoneAndAddToTable(); }
+    else { getRelevantDiscountsFromSpecificStoreAndAddToTable(); }
+}
+
+$('#goToCheckoutButton').click(() => {
+    const allCartTableRows = $('#shoppingCartTable tbody tr');
+
+    if(allCartTableRows.length > 0) {
+        $('#showOrderSummaryButton').attr('href', orderDetailsModalHref).removeAttr('hidden');
+        $('#discountsDiv').removeAttr('hidden');
+        const purchaseMethod = $('#purchaseMethodToggle').prop('checked') ? "dynamic" : "static";
+        generateCartItemsBucketForDiscounts(purchaseMethod)
+        //currentCartBucketListOfItems is now updated and ready for use.
+        loadRelevantDiscountsToTable(purchaseMethod)
+    }
+    else {
+        alert("You can't proceed to checkout with an empty cart");
     }
 });
+
+function toJsonMapOfStores(availableStores) {
+    var jsonMapOfStores = {};
+
+    for (const store in availableStores) {
+        jsonMapOfStores[availableStores[store].name] =  availableStores[store];
+    }
+
+    return jsonMapOfStores;
+}
 
 
 

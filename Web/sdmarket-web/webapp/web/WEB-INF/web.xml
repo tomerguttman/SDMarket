@@ -102,4 +102,21 @@
         <url-pattern>/pages/getRelevantDashboardForUser</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>GetAvailableStoresInZoneServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.GetAvailableStoresInZoneServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetAvailableStoresInZoneServlet</servlet-name>
+        <url-pattern>/pages/getAvailableStoresInZone</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetAvailableItemsForPurchaseServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.GetAvailableItemsForPurchaseServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetAvailableItemsForPurchaseServlet</servlet-name>
+        <url-pattern>/pages/getAllAvailableItemsInZone</url-pattern>
+    </servlet-mapping>
 </web-app>

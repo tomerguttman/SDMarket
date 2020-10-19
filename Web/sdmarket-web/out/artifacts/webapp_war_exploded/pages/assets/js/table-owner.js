@@ -7,7 +7,7 @@ var currentZoneItems;
 
 $(document).ready(function(){
     refreshTableOwnerInformation();
-    //setInterval(refreshTableOwnerInformation, 1000);
+    setInterval(refreshTableOwnerInformation, 1000);
 })
 
 function createStoreOption(store) {

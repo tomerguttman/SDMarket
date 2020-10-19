@@ -125,4 +125,13 @@ public class SDMarketManager {
         this.SDMLogic.getSystemZones().values().forEach(zone -> zonesNames.add(zone.getZoneName()));
         return zonesNames;
     }
+
+    public Store getSelectedStoreByName(String currentZoneName, String pickedStoreName) {
+        HashMap<Integer, Store> storesInZone = this.SDMLogic.getSystemZones().get(currentZoneName).getStoresInZone();
+        for (Store store : storesInZone.values()) {
+            if(store.getName().equals(pickedStoreName)) { return store; }
+        }
+
+        return null;
+    }
 }

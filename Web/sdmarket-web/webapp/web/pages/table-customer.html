@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.css">
+    <script src="assets/js/context-path-helper.js"></script>
 </head>
 
 <body id="page-top">
@@ -330,7 +331,7 @@
                                         <td>-</td>
                                         <td>-</td>
                                         <td>
-                                            <div><a class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal" href="#orderDetailsModal">Order Details</a>
+                                            <div><a id="anchorOrderDetailsModal" class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal" href="#orderDetailsModal">Order Details</a>
                                                 <div class="modal fade" role="dialog" tabindex="-1" id="orderDetailsModal">
                                                     <div class="modal-dialog modal-lg" role="document">
                                                         <div class="modal-content">
@@ -411,8 +412,7 @@
                                         <div class="form-row">
                                             <div class="col"><label class="col-form-label">Store Picker</label></div>
                                             <div class="col">
-                                                <select class="form-control" id="storePickerSelectBox" name="store_selected" value="Benny Banana">
-                                                    <option value="Benny Banana">Benny Banana</option>
+                                                <select class="form-control" id="storePickerSelectBox" name="store_selected">
                                                 </select>
                                             </div>
                                             <div class="col"><button class="btn btn-primary" id="pickStoreButton" type="button">Pick Store</button></div>
@@ -450,7 +450,11 @@
                                             </div>
                                         </div>
                                         <div class="form-row">
-                                            <div class="col"><select class="form-control" id="itemNameSelectBox"><option value="undefined" hidden="">Item Name</option><option value="Lemon">Lemon</option></select></div>
+                                            <div class="col">
+                                                <select class="form-control" id="itemNameSelectBox">
+                                                    <option value="undefined" hidden="">Item Name</option>
+                                                </select>
+                                            </div>
                                             <div class="col"><input class="form-control" type="text" id="amountToAddTextInput" placeholder="Amount"></div>
                                             <div class="col"><button class="btn btn-primary" id="addToCartButton" type="button">Add To Cart</button></div>
                                         </div>
@@ -483,72 +487,83 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;">
                                         <div class="form-row">
-                                            <div class="col">
-                                                <label>Available Discounts</label>
-                                                <div class="table-responsive">
-                                                    <table id="availableDiscountsTable" class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>ID</th>
-                                                                <th>Item Name</th>
-                                                                <th>Discount Name</th>
-                                                                <th>Store Name</th>
-                                                                <th>Type</th>
-                                                                <th></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td><button class="btn btn-primary btn-sm" type="button">Display Offer</button></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="col"><label>Discount Offers</label>
-                                                <div class="form-row">
-                                                    <div class="col">
-                                                        <div class="table-responsive">
-                                                            <table id="discountOffersTable" class="table">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>ID</th>
-                                                                        <th>Item Name</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>For Additional</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>-</td>
-                                                                        <td>-</td>
-                                                                        <td>-</td>
-                                                                        <td>-</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
+                                            <button class="btn btn-lg btn-success" id="goToCheckoutButton"> <i class="fas fa-cash-register" style="padding-right: 7px"></i>  Go To Checkout</button>
+                                        </div>
+                                        <div id="discountsDiv" hidden>
+                                            <hr style="margin-top: 35px;margin-bottom: 35px;border-radius: 0px;border: 1px solid rgb(221,224,255) ;">
+                                            <div class="form-row">
+                                                <div class="col">
+                                                    <label>Available Discounts</label>
+                                                    <div class="table-responsive">
+                                                        <table id="availableDiscountsTable" class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>ID</th>
+                                                                    <th>Item Name</th>
+                                                                    <th>Discount Name</th>
+                                                                    <th>Store Name</th>
+                                                                    <th>Type</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td><button class="btn btn-primary btn-sm" type="button">Display Offer</button></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
-                                                <div class="form-row">
-                                                    <div class="col"><select class="form-control"><option value="">Choose Item</option></select></div>
-                                                    <div class="col"><button class="btn btn-primary" type="button">Apply Discount</button></div>
+                                                <div class="col">
+                                                    <label>Discount Offers</label>
+                                                    <div class="form-row">
+                                                        <div class="col">
+                                                            <div class="table-responsive">
+                                                                <table id="discountOffersTable" class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>ID</th>
+                                                                            <th>Item Name</th>
+                                                                            <th>Quantity</th>
+                                                                            <th>For Additional</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>-</td>
+                                                                            <td>-</td>
+                                                                            <td>-</td>
+                                                                            <td>-</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <div class="col"><select class="form-control"><option value="">Choose Item</option></select></div>
+                                                        <div class="col"><button class="btn btn-primary" type="button">Apply Discount</button></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-row">
                                             <div class="col">
-                                                <a class="btn btn-primary btn-lg" role="button" data-toggle="modal" href="#showOrderSummaryModal" style="margin-left: 0px;background: rgb(246,95,62);color: rgb(255,255,255);border-color: transparent;margin-bottom: 10px;"><i class="fas fa-file-invoice-dollar"></i> Show Order Summary</a>
-                                                <button id="resetOrderButton" class="btn btn-primary btn-lg"> <i class="fas fa-toilet"></i>  Reset Order</button>
-                                                <div
-                                                    id="divFeedBackModal">
+                                                <a id="showOrderSummaryButton" class="btn btn-primary btn-lg" role="button" data-toggle="modal" href="#showOrderSummaryModal" style="margin-left: 0px;background: rgb(246,95,62);color: rgb(255,255,255);border-color: transparent;margin-bottom: 10px;">
+                                                    <i class="fas fa-file-invoice-dollar" style="padding-right: 7px">
+                                                    </i> Show Order Summary
+                                                </a>
+                                                    <button id="resetOrderButton" class="btn btn-primary btn-lg">
+                                                        <i class="fas fa-toilet" style="padding-right: 7px"></i>
+                                                        Reset Order
+                                                    </button>
+                                                <div id="divFeedBackModal">
                                                     <div class="modal fade" role="dialog" tabindex="-1" id="feedbackModal">
                                                         <div class="modal-dialog modal-lg" role="document">
                                                             <div class="modal-content">

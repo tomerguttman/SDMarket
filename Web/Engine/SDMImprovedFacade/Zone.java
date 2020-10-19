@@ -88,7 +88,7 @@ public class Zone {
             Store improvedStore = storesInZone.get(currentStore.getId());
 
             for (SDMSell currentItem : currentStore.getSDMPrices().getSDMSell()) {
-                storeItemsForSaleImproved.put(currentItem.getItemId(), new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem));
+                storeItemsForSaleImproved.put(currentItem.getItemId(), new StoreItem(SDMItemsMap.get(currentItem.getItemId()), currentItem, true));
             }
 
             improvedStore.setItemBeingSold(storeItemsForSaleImproved);

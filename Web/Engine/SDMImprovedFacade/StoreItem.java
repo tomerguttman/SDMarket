@@ -14,12 +14,12 @@ public class StoreItem {
     private boolean isAvailable;
     private boolean wasPartOfDiscount;
 
-    public StoreItem(SDMItem inputItem, SDMSell inputPrice){
+    public StoreItem(SDMItem inputItem, SDMSell inputPrice, boolean isAvailable){
         this.Id = inputItem.getId();
         this.name = inputItem.getName();
         this.purchaseCategory = inputItem.getPurchaseCategory();
         this.pricePerUnit = inputPrice.getPrice();
-        this.isAvailable = false;
+        this.isAvailable = isAvailable;
         this.wasPartOfDiscount = false;
     }
 
