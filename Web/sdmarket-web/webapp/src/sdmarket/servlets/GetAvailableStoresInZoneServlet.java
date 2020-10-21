@@ -36,7 +36,7 @@ public class GetAvailableStoresInZoneServlet extends HttpServlet {
         HashMap<Integer, Store> currentZoneStoresMap = sdMarketManager.getSystemZones().get(currentZoneName).getStoresInZone();
 
         try {
-            json.add("availableStore", gson.toJsonTree(currentZoneStoresMap));
+            json.add("availableStores", gson.toJsonTree(currentZoneStoresMap));
         } catch (Exception e) {
             json.addProperty("message", e.getMessage());
             System.out.println(e.getMessage());
