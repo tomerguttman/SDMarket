@@ -119,4 +119,13 @@
         <servlet-name>GetAvailableItemsForPurchaseServlet</servlet-name>
         <url-pattern>/pages/getAllAvailableItemsInZone</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PostOrderServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.PostOrderServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostOrderServlet</servlet-name>
+        <url-pattern>/pages/postOrder</url-pattern>
+    </servlet-mapping>
 </web-app>

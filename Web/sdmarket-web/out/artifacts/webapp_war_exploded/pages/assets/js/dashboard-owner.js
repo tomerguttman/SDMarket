@@ -64,8 +64,9 @@ function refreshDashboardInformation() {
 function updateDashboardLabels(currentEarning, storesOwned, ordersMadeFromOwnedStores, averageRating) {
     $("#earningsSpan").html("$" + currentEarning);
     $("#storesOwnedSpan").html(storesOwned);
-    $("#ordersMadeFromOwnedStoresSpan").html("$" + ordersMadeFromOwnedStores);
+    $("#ordersMadeFromOwnedStoresSpan").html(ordersMadeFromOwnedStores);
     $("#averageRatingSpan").html(averageRating);
+    $("#currentBalanceSpan").html("$" + currentEarning);
 }
 
 function updateDashboardZonesTable(systemZones) {
@@ -110,7 +111,7 @@ function createZonesTableRow(zone) {
         "<td>" + zone.amountOfItemTypesInZone + "</td>\n" +
         "<td>" + zone.amountOfStoresInZone + "</td>\n" +
         "<td>" + zone.amountOfOrdersInZone + "</td>" +
-        "<td>" + zone.averageOrdersCostWithoutDelivery + "</td>" +
+        "<td>" + zone.averageOrdersCostWithoutDelivery.toFixed(2) + "</td>" +
         "<td>" +
         "<form method='GET' action='/pages/order'>\n" +
         createZoneButton(zone.zoneName) +

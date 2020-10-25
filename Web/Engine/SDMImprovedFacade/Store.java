@@ -152,6 +152,22 @@ public class Store {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public double getTotalItemsRevenue() {
+        return totalItemsRevenue;
+    }
+
+    public double getTotalDeliveryRevenue() {
+        return totalDeliveryRevenue;
+    }
+
+    public HashMap<Integer, List<Feedback>> getFeedbackHashMap() {
+        return feedbackHashMap;
+    }
+
     public String displayStoreForPurchase() {
         return "- ID: " + this.Id + ", Name: " +
                 this.name + ", PPK: " + this.deliveryPpk + "\n";
@@ -178,5 +194,12 @@ public class Store {
         }
 
         return sumOfDiscounts;
+    }
+
+    public void addOrderToStore(Order order) {
+        this.storeOrdersHistory.add(order);
+        this.totalDeliveryRevenue += order.deliveryCost;
+        this.totalItemsRevenue += order.costOfItemsInOrder;
+        this.totalOrdersRevenue += order.totalOrderCost;
     }
 }

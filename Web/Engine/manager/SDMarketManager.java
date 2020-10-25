@@ -4,8 +4,6 @@ import SDMImprovedFacade.*;
 import SuperMarketLogic.SuperMarketLogic;
 import com.google.gson.*;
 import generatedClasses.Location;
-
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -133,5 +131,82 @@ public class SDMarketManager {
         }
 
         return null;
+    }
+
+    public void addNewOrder(String purchaseMethod, String orderString, String currentUserName, String currentZoneName) {
+        if (purchaseMethod.equals("dynamic")) { /*addDynamicOrder(orderString, currentUserName, currentZoneName);*/ }
+        else { addStaticOrder(orderString, currentUserName, currentZoneName); }
+
+
+    }
+
+    private void addStaticOrder(String orderString, String currentUserName, String currentZoneName) {
+        JsonObject jObject = new JsonParser().parse(orderString).getAsJsonObject();
+        int storeIdToOrderFrom = jObject.get("storeId").getAsInt();
+        double deliveryCost = jObject.get("deliveryCost").getAsDouble();
+        double costOfItemsInOrder = jObject.get("costOfItemsInOrder").getAsDouble();
+        double totalOrderCost =  jObject.get("totalOrderCost").getAsDouble();
+        String dateOrderWasMade = jObject.get("dateOrderWasMade").getAsString();
+        String storeName = jObject.get("storeName").getAsString();
+        Location orderDestination = new Location();
+        orderDestination.setX(jObject.get("orderDestination").getAsJsonObject().get("xCoordinate").getAsInt());
+        orderDestination.setY(jObject.get("orderDestination").getAsJsonObject().get("yCoordinate").getAsInt());
+        int amountOfStoresRelatedToOrder = 1;
+        List<StoreItem> itemsInOrder = createItemsInOrderList(jObject.get("itemsInOrder").getAsJsonArray(), currentZoneName);
+        Order order = new Order(dateOrderWasMade, getSDMLogic().getLastOrderID(), storeIdToOrderFrom, deliveryCost, currentUserName, storeName, itemsInOrder,orderDestination, currentZoneName);
+        addOrderToCustomer(order, currentUserName);
+        addOrderToStore(order);
+        this.getSystemZones().get(currentZoneName).addOrderToZone(order);
+        addTransactionsToShopOwnerAndCustomer(order, currentUserName, currentZoneName);
+        //add alerts
+    }
+
+    private void addTransactionsToShopOwnerAndCustomer(Order order, String currentUserName, String currentZoneName) {
+        String shopOwnerName = this.getSystemZones().get(currentZoneName).getStoresInZone().get(order.getStoreId()).getOwnerName();
+        addTransactionToShopOwner(shopOwnerName, order);
+        addTransactionToCustomer(currentUserName, order);
+    }
+
+    private void addTransactionToCustomer(String currentUserName, Order order) {
+        Customer customer = (Customer)getUser(currentUserName);
+        customer.addTransaction("Payment Made", Double.toString(order.getTotalOrderCost()*(-1)), order.getDateOrderWasMade());
+    }
+
+    private void addTransactionToShopOwner(String shopOwnerName, Order order) {
+        ShopOwner shopOwner = (ShopOwner)getUser(shopOwnerName);
+        shopOwner.addTransaction("Payment Received", Double.toString(order.getTotalOrderCost()), order.getDateOrderWasMade());
+    }
+
+    private void addOrderToStore(Order order) {
+        Store storeToBuyFrom = this.getSystemZones().get(order.getZoneNameOfOrder()).getStoresInZone().get(order.getStoreId());
+        storeToBuyFrom.addOrderToStore(order);
+        getUser(storeToBuyFrom.getOwnerName()).addOrder(order);
+    }
+
+    private void addOrderToCustomer(Order order, String currentUserName) {
+        this.systemUsersMap.get(currentUserName).addOrder(order);
+
+    }
+
+    private List<StoreItem> createItemsInOrderList(JsonArray itemsInOrderJsonArray, String currentZoneName) {
+        List<StoreItem> outputItemsInOrderList = new ArrayList<>();
+
+        for (JsonElement jsonItem : itemsInOrderJsonArray) {
+            StoreItem sItem = createItemFromOrderList(jsonItem.getAsJsonObject(), currentZoneName);
+            outputItemsInOrderList.add(sItem);
+        }
+
+        return outputItemsInOrderList;
+    }
+
+    private StoreItem createItemFromOrderList(JsonObject jsonItem, String currentZoneName) {
+        int itemId = jsonItem.get("Id").getAsInt();
+        String itemName = jsonItem.get("name").getAsString();
+        String purchaseCategory = jsonItem.get("purchaseCategory").getAsString();
+        double amount = jsonItem.get("amount").getAsFloat();
+        int pricePerUnit = jsonItem.get("pricePerUnit").getAsInt();
+        boolean wasPartOfDiscount = jsonItem.get("wasPartOfDiscount").getAsString().equals("Yes");
+
+        return new StoreItem(itemId, amount, pricePerUnit, itemName, purchaseCategory, wasPartOfDiscount);
     }
 }

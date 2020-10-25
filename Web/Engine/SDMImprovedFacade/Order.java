@@ -196,6 +196,14 @@ public class Order {
         return stbOrder.toString();
     }
 
+    public String getZoneNameOfOrder() {
+        return zoneNameOfOrder;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
     @Override
     public String toString() {
         return  "\tOrder ID: " + orderId + "\n" +
@@ -218,4 +226,6 @@ public class Order {
                 "\t\tDelivery Cost: " + String.format("%.2f", deliveryCost) + "\n" +
                 "\t\tTotal Cost Of Order: " + String.format("%.2f",totalOrderCost) + "\n";
     }
+
+
 }

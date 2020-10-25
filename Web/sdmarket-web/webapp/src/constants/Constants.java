@@ -11,5 +11,8 @@ public class Constants {
     public static final String CURRENT_ZONE = "currentZone" ;
     public static final String LOGIN_URL = "login.html";
     public static final String DASHBOARD_OWNER_URL = "dashboard-owner.html";
+    public static final String DASHBOARD_CUSTOMER_URL = "dashboard-customer.html";
+
+
 
 }

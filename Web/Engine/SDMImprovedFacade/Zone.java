@@ -18,7 +18,6 @@ public class Zone {
     private int amountOfOrdersInZone;
     private double averageOrdersCostWithoutDelivery;
     private double totalRevenue;
-
     private final HashMap<Integer, Store> storesInZone = new HashMap<>();
     private final HashMap<Integer, Order> ordersMadeInZone = new HashMap<>();
     private final HashMap<Integer, StoreItem> itemsAvailableInZone = new HashMap<>();
@@ -177,5 +176,21 @@ public class Zone {
     public void addStoreToZone(Store storeToAdd) {
         this.storesInZone.put(storeToAdd.getId(), storeToAdd);
         this.amountOfStoresInZone += 1;
+    }
+
+    public void addOrderToZone(Order order) {
+        this.ordersMadeInZone.put(order.orderId, order);
+        amountOfOrdersInZone += 1;
+        totalRevenue += order.totalOrderCost;
+        this.averageOrdersCostWithoutDelivery = calculateAverageCostOfOrdersInZone();
+    }
+
+    private double calculateAverageCostOfOrdersInZone() {
+        double sum = 0;
+        for (Order order : this.ordersMadeInZone.values()) {
+            sum += order.totalOrderCost;
+        }
+
+       return this.ordersMadeInZone.values().size() != 0 ? sum / this.ordersMadeInZone.values().size() : 0 ;
     }
 }

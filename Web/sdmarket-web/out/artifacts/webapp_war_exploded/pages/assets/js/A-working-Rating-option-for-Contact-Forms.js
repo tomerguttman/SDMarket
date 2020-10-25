@@ -16,6 +16,4 @@ $star_rating.on('click', function() {
 });
 
 SetRatingStar();
-$(document).ready(function() {
-
-});
+$(document).ready(function() {});

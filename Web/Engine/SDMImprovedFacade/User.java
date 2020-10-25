@@ -77,4 +77,12 @@ public class User {
 
         return (userOrdersMap.size() != 0) ? (sumOrders / userOrdersMap.size()) : 0;
     }
+
+    public void addOrder(Order order) {
+        this.userOrdersMap.put(order.orderId, order);
+    }
+
+    public void updateBalance(double amountToAdd) {
+        this.balance += amountToAdd;
+    }
 }

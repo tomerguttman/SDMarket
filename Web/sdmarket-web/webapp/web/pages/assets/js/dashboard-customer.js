@@ -51,8 +51,8 @@ function addTransactionToTransactionsOverview(transactionType, datePicked, amoun
                 "<td>" + transactionType + "</td>\n" +
                 "<td>" + datePicked + "</td>\n" +
                 "<td>" + "$" + amountToRecharge + "</td>\n" +
-                "<td>" + "$" + balanceBefore + "</td>\n" +
-                "<td>" +  "$" + balanceAfter + "</td>" +
+                "<td>" + "$" + balanceBefore.toFixed(2) + "</td>\n" +
+                "<td>" +  "$" + balanceAfter.toFixed(2) + "</td>" +
                 "</tr>\n");
     $('#transactionsOverviewTable tbody').append(newTransactionRow);
 }
@@ -76,7 +76,7 @@ function refreshDashboardInformation() {
 function updateDashboardLabels(currentBalance, totalOrders, averageOrdersCost, mostLovedItem) {
     $("#currentBalanceSpan").html("$" + currentBalance);
     $("#totalOrdersSpan").html(totalOrders);
-    $("#averageOrdersCostSpan").html("$" + averageOrdersCost);
+    $("#averageOrdersCostSpan").html("$" + averageOrdersCost.toFixed(2));
     $("#mostLovedItemSpan").html(mostLovedItem);
 }
 
@@ -122,7 +122,7 @@ function createZonesTableRow(zone) {
         "<td>" + zone.amountOfItemTypesInZone + "</td>\n" +
         "<td>" + zone.amountOfStoresInZone + "</td>\n" +
         "<td>" + zone.amountOfOrdersInZone + "</td>" +
-        "<td>" + zone.averageOrdersCostWithoutDelivery + "</td>" +
+        "<td>" + zone.averageOrdersCostWithoutDelivery.toFixed(2) + "</td>" +
         "<td>" +
             "<form method='GET' action='/pages/order'>\n" +
                 createZoneButton(zone.zoneName) +

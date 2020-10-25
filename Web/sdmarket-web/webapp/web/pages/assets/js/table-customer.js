@@ -1,5 +1,6 @@
 const GET_AVAILABLE_STORES_STATIC_URL = buildUrlWithContextPath("getAvailableStoresInZone");
 const GET_AVAILABLE_ITEMS_URL = buildUrlWithContextPath("getAllAvailableItemsInZone");
+const POST_ORDER_URL = buildUrlWithContextPath("postOrder");
 let itemsInOrderList;
 let dynamicItemToStoreMap;
 let staticOrder;
@@ -311,7 +312,6 @@ function resetOrderDetails(purchaseMethod) {
     clearAllTables();
     setDisablePropertyForPurchaseOrderComponents(false);
     $('#displayStoreOrderSummaryButton').removeAttr('hidden');
-
 }
 
 function enableAndDeleteSelectBoxOptions() {
@@ -332,9 +332,10 @@ function initializePurchaseForm() {
     }
 }
 
-function createNewCartItemTableRow(itemToAdd, amountOfItem, wasPartOfDiscount, forAdditional) {
+function createNewCartItemTableRow(itemToAdd, amountOfItem, wasPartOfDiscount, forAdditional, discountName) {
     let pricePerUnit = wasPartOfDiscount === 'Yes' ? forAdditional : itemToAdd.pricePerUnit;
-    return $("<tr>\n" +
+    let discountNameToAdd = (discountName !== undefined) ? discountName.replace(/\s/g,'_') : "";
+    return $("<tr id='" + discountNameToAdd + "'>\n" +
         "<td>" + itemToAdd.Id + "</td>\n" +
         "<td>" + itemToAdd.name + "</td>\n" +
         "<td>" + itemToAdd.purchaseCategory + "</td>\n" +
@@ -344,8 +345,8 @@ function createNewCartItemTableRow(itemToAdd, amountOfItem, wasPartOfDiscount, f
         "</tr>\n");
 }
 
-function addItemToCartTable(itemId, amountOfItem, wasPartOfDiscount, forAdditional) {
-    if(wasPartOfDiscount === 'Yes') { $('#shoppingCartTable tbody').append(createNewCartItemTableRow(currentAvailableItemsMap[itemId], amountOfItem, wasPartOfDiscount, forAdditional));}
+function addItemToCartTable(itemId, amountOfItem, wasPartOfDiscount, forAdditional, discountName) {
+    if(wasPartOfDiscount === 'Yes') { $('#shoppingCartTable tbody').append(createNewCartItemTableRow(currentAvailableItemsMap[itemId], amountOfItem, wasPartOfDiscount, forAdditional, discountName));}
     else { $('#shoppingCartTable tbody').append(createNewCartItemTableRow(currentAvailableItemsMap[itemId], amountOfItem, wasPartOfDiscount)); }
 }
 
@@ -432,7 +433,7 @@ function loadDiscountOfferToOfferTable(discountName, storeName, itemToBuyId) {
     const purchaseMethod = $('#purchaseMethodToggle').prop('checked') ? 'dynamic' : 'static';
     let currentItemDiscounts;
 
-    if(purchaseMethod === 'static') { currentItemDiscounts = currentDiscountsOfSelectedStore[itemToBuyId]; }
+    if(purchaseMethod === 'static') { currentItemDiscounts = currentAvailableStoresMap[storeName].storeDiscounts[itemToBuyId]; }
     else { currentItemDiscounts = dynamicItemToStoreMap[itemToBuyId].storeToBuyFrom.storeDiscounts[itemToBuyId]; }
 
     for (const discount in currentItemDiscounts) {
@@ -561,7 +562,7 @@ function findRelevantDiscount(discountName) {
 function addSelectedOfferItemToCart(selectedOfferItemId, discountName) {
     let itemToAddRow = getRowOfSelectedOfferItem(selectedOfferItemId);
     let forAdditional = $(itemToAddRow).find("td")[3].textContent;
-    addItemToCartTable(selectedOfferItemId, $(itemToAddRow).find("td")[2].textContent, 'Yes', forAdditional)
+    addItemToCartTable(selectedOfferItemId, $(itemToAddRow).find("td")[2].textContent, 'Yes', forAdditional, discountName)
 }
 
 function resetDiscountOffersTableAndReloadAvailableDiscounts() {
@@ -643,7 +644,8 @@ function createItemsInOrderList(shoppingCartRows) {
             "amount" : parseFloat(tds[3].textContent),
             "pricePerUnit" : parseInt(tds[4].textContent),
             "wasPartOfDiscount" :tds[5].textContent,
-            "storeThatItemWasBoughtIn" : getCheapestStoreForItem(parseInt(tds[0].textContent)).storeToBuyFrom
+            "storeThatItemWasBoughtIn" : getCheapestStoreForItem(parseInt(tds[0].textContent)).storeToBuyFrom,
+            "discountName" : $(itemRow).attr("id")
         };
 
         itemsInOrderList.push(itemObject);
@@ -699,9 +701,29 @@ function loadStaticOrderSummaryInformation(storeToOrderFrom, itemsInOrder, xCoor
     $('#ppkSpan').html("$" + storeToOrderFrom.deliveryPpk);
     $('#totalDeliveryCostSpan').html("$" + totalDeliveryCost.toFixed(2));
     $('#deliveryCostSpan').html("$" + totalDeliveryCost.toFixed(2));
+    $('#orderSummaryStoreNameSelectBox option').remove();
     $('#orderSummaryStoreNameSelectBox').append(createStoreOption(storeToOrderFrom));
     $('#displayStoreOrderSummaryButton').attr('hidden', true);
     loadStoreItemListToTable(itemsInOrder);
+    createStaticOrder(storeToOrderFrom, totalDeliveryCost, orderCost, distance, xCoordinate, yCoordinate, itemsInOrder);
+}
+
+function createStaticOrder(storeToOrderFrom, totalDeliveryCost, orderCost, distance, xCoordinate, yCoordinate, itemsInOrder) {
+    staticOrder = {
+        "purchaseMethod" : 'static',
+        "storeId" : storeToOrderFrom.Id,
+        "deliveryCost": totalDeliveryCost,
+        "costOfItemsInOrder" : orderCost,
+        "totalOrderCost": totalDeliveryCost + orderCost,
+        "dateOrderWasMade" : $('#datePicker').val(),
+        "storeName" : storeToOrderFrom.name,
+        "orderDestination" : {
+            "xCoordinate" : xCoordinate,
+            "yCoordinate" : yCoordinate
+        },
+        "amountOfStoresRelatedToOrder" : 1,
+        "itemsInOrder" : itemsInOrder
+    };
 }
 
 function generateStaticOrderAndFillOrderSummaryModal() {
@@ -746,6 +768,10 @@ function loadDynamicOrderSummaryInformation(storesParticipating, itemsInOrder, x
     let totalDeliveryCost = calculateTotalDeliveryCostForDynamicPurchase(storesParticipating, xCoordinate, yCoordinate);
     $('#orderCostSpan').html("$" + totalOrderCost.toFixed(2));
     $('#totalDeliveryCostSpan').html("$" + totalDeliveryCost.toFixed(2));
+    $('#ppkSpan').html("$0");
+    $('#distanceSpan').html("0");
+    $('#deliveryCostSpan').html("$0");
+    $('#orderSummaryStoreItemsTable tbody tr').remove();
     loadStoresToOrderSummaryStoresSelectBox(storesParticipating)
 }
 
@@ -756,6 +782,39 @@ function generateDynamicOrderAndFillOrderSummaryModal() {
     let xCoordinateParsed = parseInt($('#destinationX').val());
     let yCoordinateParsed = parseInt($('#destinationY').val());
     loadDynamicOrderSummaryInformation(storesParticipatingInOrder, itemsInOrderList, xCoordinateParsed, yCoordinateParsed);
+}
+
+function isDiscountExistsInSelectedStore(discountName, selectedStoreName) {
+    const storeDiscounts = currentAvailableStoresMap[selectedStoreName].storeDiscounts;
+
+    for (const itemIdToDiscount in storeDiscounts) {
+        for (const index in storeDiscounts[itemIdToDiscount]) {
+            const listOfDiscountsPerItem = storeDiscounts[itemIdToDiscount];
+            if(listOfDiscountsPerItem[index].name === discountName.replace(/_/g, " ")) { return true; }
+        }
+    }
+
+    return false;
+}
+
+function createItemInOrderMap(selectedStoreName) {
+    let itemListOfSelectedStore = [];
+    for (const item of itemsInOrderList) {
+        if(item.wasPartOfDiscount === 'No') {
+            if(dynamicItemToStoreMap[item.Id].storeToBuyFrom.name === selectedStoreName) {
+                item.pricePerUnit = dynamicItemToStoreMap[item.Id].minPriceForItem;
+                itemListOfSelectedStore.push(item);
+            }
+        }
+        else {
+            //Check if the item was bought as part of a discount in the selectedStoreName
+            if(isDiscountExistsInSelectedStore(item.discountName, selectedStoreName)) {
+                itemListOfSelectedStore.push(item);
+            }
+        }
+    }
+
+    return itemListOfSelectedStore;
 }
 
 $("#purchaseMethodToggle").change(() => {
@@ -831,30 +890,8 @@ $('#pickStoreButton').click(() => {
 $('#showOrderSummaryButton').click(() => {
     const purchaseMethod = $('#purchaseMethodToggle').prop('checked') ? 'dynamic' : 'static';
     if( purchaseMethod === 'static') { generateStaticOrderAndFillOrderSummaryModal(); }
-    else {
-        //dont forget to add <option value="Store Name" hidden>Store Name</option>
-        generateDynamicOrderAndFillOrderSummaryModal();
-    }
+    else { generateDynamicOrderAndFillOrderSummaryModal(); }
 });
-
-function createItemInOrderMap(selectedStoreName) {
-    let itemListOfSelectedStore = [];
-    for (const item of itemsInOrderList) {
-        if(item.wasPartOfDiscount === 'No') {
-            if(dynamicItemToStoreMap[item.Id].storeToBuyFrom.name === selectedStoreName) {
-                item.pricePerUnit = dynamicItemToStoreMap[item.Id].minPriceForItem;
-            }
-        }
-        else {
-            //Check if the item was bought as part of a discount in the selectedStoreName
-            if(item.storeThatItemWasBoughtIn.name === selectedStoreName) {
-                itemListOfSelectedStore.push(item);
-            }
-        }
-    }
-
-    return itemListOfSelectedStore;
-}
 
 $('#displayStoreOrderSummaryButton').click(() => {
     const selectedStoreName = $('#orderSummaryStoreNameSelectBox').val();
@@ -871,9 +908,103 @@ $('#displayStoreOrderSummaryButton').click(() => {
     else { alert("Please select a store first"); }
 });
 
+$('#cancelOrderButton').click(() => {
+    resetOrderDetails();
+});
+
+function createFeedbackRow(Id, storeName) {
+    return $("<tr>\n" +
+        "<td>" + Id + "</td>\n" +
+        "<td>" + storeName + "</td>\n" +
+        "<td>" +
+            '<div class="form-group">\n' +
+                '<div class="form-group">\n' +
+                    '<fieldset class="rating">\n' +
+                        '<input type="radio" id="star5" name="rating" value="5"/><label style="padding-right: 1px;padding-left: 1px;" for="star5" class="full"></label>\n' +
+                        '<input type="radio" id="star4" name="rating" value="4"/><label style="padding-right: 1px;padding-left: 1px;" for="star4" class="full"></label>\n' +
+                        '<input type="radio" id="star3" name="rating" value="3"/><label style="padding-right: 1px;padding-left: 1px;" for="star3" class="full"></label>\n' +
+                        '<input type="radio" id="star2" name="rating" value="2"/><label style="padding-right: 1px;padding-left: 1px;" for="star2" class="full"></label>\n' +
+                        '<input type="radio" id="star1" name="rating" value="1"/><label style="padding-right: 1px;padding-left: 1px;" for="star1" class="full"></label>\n' +
+                    '</fieldset>\n' +
+                 '</div>\n' +
+            '</div>\n' +
+        '</td>\n' +
+        "<td>" +
+            '<input class="form-control" type="text" id="review' + storeName + '" placeholder="Write a review here" style="padding-left: 12px;" disabled="">\n' +
+        "</td>\n" +
+        "</tr>\n");
+}
+
+function getFeedback(order) {
+    var feedbackRow;
+    $('#feedbackModal tbody').empty();
+    if(order.purchaseMethod === 'static') {
+        feedbackRow = createFeedbackRow(currentAvailableStoresMap[order.storeName].Id, order.storeName.replace(/\s/g,""));
+        $('#feedbackModal tbody').append(feedbackRow);
+        check123('#review' + order.storeName.replace(/\s/g,""), feedbackRow);
+    }
+    else {
+        for (const store in order.storesParticipating) {
+            const currentStore = (order.storesParticipating)[store];
+            feedbackRow = createFeedbackRow(currentAvailableStoresMap[currentStore.storeName].Id, currentStore.storeName.replace(/\s/g,""));
+            $('#feedbackModal tbody').append(feedbackRow);
+
+            $(feedbackRow).find('#star1'+ currentStore.storeName.replace(/\s/g,"")).on('click', function() {
+                $("#review" + currentStore.storeName.replace(/\s/g,"")).prop('disabled', false);
+            });
+        }
+    }
 
 
 
+    $('#feedbackModal').modal('show');
+}
+
+function onPurchaseSuccess(data) {
+    alert(data.message);
+    const order = $('#purchaseMethodToggle').prop('checked') ? dynamicOrder : staticOrder;
+    getFeedback(order);
+}
+
+$('#performPurchaseButton').click(() => {
+    let purchaseMethod = $('#purchaseMethodToggle').prop('checked') ? "dynamic" : "static";
+    let order = purchaseMethod === 'dynamic' ? dynamicOrder : staticOrder;
+    $.ajax({
+        url : POST_ORDER_URL,
+        data: {
+            "purchaseMethod" : purchaseMethod,
+            "order" : JSON.stringify(order)
+        },
+        type: "POST",
+        success: function(data) {
+            $('#showOrderSummaryModal').modal('hide');
+            onPurchaseSuccess(data);
+        },
+        error: function (data) {
+            alert(data.message);
+        }
+    });
+});
+
+function check123(str, row) {
+    let star = $(row).find('[type="radio"]');
+    for (let i = 0; i < star.length; i++) {
+        star[i].addEventListener('click', function () {
+            i = this.value;
+            $(str).prop('disabled', false);
+        });
+    }
+}
+
+$('#saveStoresFeedBackModalButton').click(() => {
+    var modalRows = $('#feedbackModal tbody tr');
+    for (const feedbackRow of modalRows) {
+        if($(feedbackRow).find("[type='text']").prop('disabled')) {
+            //there is rating.
+            //take rating and text and push to json object for later.
+        }
+    }
+});
 
 
 
