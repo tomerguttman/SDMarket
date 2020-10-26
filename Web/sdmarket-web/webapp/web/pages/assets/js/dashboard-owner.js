@@ -38,9 +38,9 @@ function addTransactionToTransactionsOverview(transactionType, datePicked, amoun
     var newTransactionRow = $("<tr>\n" +
         "<td>" + transactionType + "</td>\n" +
         "<td>" + datePicked + "</td>\n" +
-        "<td>" + "$" + amountToRecharge + "</td>\n" +
-        "<td>" + "$" + balanceBefore + "</td>\n" +
-        "<td>" +  "$" + balanceAfter + "</td>" +
+        "<td>" + "$" + amountToRecharge.toFixed(2) + "</td>\n" +
+        "<td>" + "$" + balanceBefore.toFixed(2) + "</td>\n" +
+        "<td>" +  "$" + balanceAfter.toFixed(2) + "</td>" +
         "</tr>\n");
     $('#transactionsOverviewTable tbody').append(newTransactionRow);
 }
@@ -62,11 +62,11 @@ function refreshDashboardInformation() {
 }
 
 function updateDashboardLabels(currentEarning, storesOwned, ordersMadeFromOwnedStores, averageRating) {
-    $("#earningsSpan").html("$" + currentEarning);
+    $("#earningsSpan").html("$" + currentEarning.toFixed(2));
     $("#storesOwnedSpan").html(storesOwned);
     $("#ordersMadeFromOwnedStoresSpan").html(ordersMadeFromOwnedStores);
-    $("#averageRatingSpan").html(averageRating);
-    $("#currentBalanceSpan").html("$" + currentEarning);
+    $("#averageRatingSpan").html(averageRating.toFixed(2));
+    $("#currentBalanceSpan").html("$" + currentEarning.toFixed(2));
 }
 
 function updateDashboardZonesTable(systemZones) {

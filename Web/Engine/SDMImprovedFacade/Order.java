@@ -2,10 +2,7 @@ package SDMImprovedFacade;
 
 import generatedClasses.Location;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Order {
     final int orderId;
@@ -70,6 +67,23 @@ public class Order {
         this.amountOfStoresRelatedToOrder = -1;
         this.amountItemsInOrder = -1;
     }
+
+    public Order(List<StoreItem> currentOrderList, Location location, String dateOfOrder, String storeName, String username, String zoneName, int orderId, int storeId, double deliveryCost) {
+        this.orderId = orderId;
+        this.storeName = storeName;
+        this.customerName = username;
+        this.zoneNameOfOrder = zoneName;
+        this.dateOrderWasMade = dateOfOrder;
+        this.orderDestination = location;
+        this.itemsInOrder = currentOrderList;
+        this.storeId = storeId;
+        this.costOfItemsInOrder = calculateTotalCostOfItemsInOrder();
+        this.amountItemsInOrder = getTotalNumberOfItemsInOrder();
+        this.amountOfStoresRelatedToOrder = 1;
+        this.deliveryCost = deliveryCost;
+        this.totalOrderCost = this.deliveryCost + this.costOfItemsInOrder;
+    }
+
 
     public int getNumberOfItemsTypesInOrder(){
         Set<Integer> itemsInOrderSet = new HashSet<>();

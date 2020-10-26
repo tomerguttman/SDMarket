@@ -712,4 +712,37 @@ public class SuperMarketLogic {
     public void addStoreToZoneInSystem(String currentZoneName, Store newStoreToAdd) {
         this.SDMarket.getSystemZones().get(currentZoneName).addStoreToZone(newStoreToAdd);
     }
+
+    public List<Order> generateNewDynamicOrderSubOrders(Map<String, List<StoreItem>> storeToItemListMapOfOrder, double totalDeliveryCost,
+                                         double orderCost, Location location, String date, String username, String zoneName, HashMap<Integer, Store> storesInZone) {
+        int allOrdersId = getLastOrderID();
+        return createAllOrders(storeToItemListMapOfOrder, location, date, username, zoneName, allOrdersId, storesInZone);
+    }
+
+    private List<Order> createAllOrders(Map<String, List<StoreItem>> storeToItemListMapOfOrder, Location location, String dateOfOrder, String username, String zoneName, int orderId, HashMap<Integer, Store> storesInZone) {
+        List<Order> allSubOrders = new ArrayList<>();
+        for (String storeName : storeToItemListMapOfOrder.keySet()) {
+            List<StoreItem> currentOrderList = storeToItemListMapOfOrder.get(storeName);
+            Store currentStore = getStoreByNameFromZone(storesInZone, storeName);
+            assert currentStore != null;
+            double distanceFromUser = calculateDistanceFromUser(currentStore, location);
+            allSubOrders.add(new Order(currentOrderList, location, dateOfOrder, storeName, username, zoneName, orderId, currentStore.getId(), distanceFromUser * currentStore.getDeliveryPpk()));
+        }
+
+        return allSubOrders;
+    }
+
+    private Store getStoreByNameFromZone(HashMap<Integer, Store> storesInZone, String storeName) {
+        for (Store store : storesInZone.values()) {
+            if(store.getName().equals(storeName)){
+                return store;
+            }
+        }
+
+        return null;
+    }
+
+    public void addDynamicOrderToSDMarket(Order dynamicOrder) {
+        this.SDMarket.addDynamicOrder(dynamicOrder);
+    }
 }

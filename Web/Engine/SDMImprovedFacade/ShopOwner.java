@@ -69,4 +69,12 @@ public class ShopOwner extends User {
         Alerts?
          */
     }
+
+    public void addFeedback(String zoneName, Feedback feedback) {
+        if(!this.feedbackMapPerZone.containsKey(zoneName)) {
+            this.feedbackMapPerZone.put(zoneName, new ArrayList<Feedback>());
+        }
+
+        this.feedbackMapPerZone.get(zoneName).add(feedback);
+    }
 }

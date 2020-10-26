@@ -26,8 +26,9 @@ function updateOrderHistoryStorePickerSelectBox(storesAvailable) {
 }
 
 function createFeedbackTableRow(feedback, feedbackNumber) {
-    return $("<tr id='feedback'" + feedbackNumber + ">\n" +
+    return $("<tr id='feedback" + feedbackNumber + "'>\n" +
         "<td>" + feedback.customerName + "</td>\n" +
+        "<td>" + feedback.storeName + "</td>\n" +
         "<td>" + feedback.dateOfFeedback + "</td>\n" +
         "<td>" +
             '<div class="row">' +
@@ -42,18 +43,18 @@ function createFeedbackTableRow(feedback, feedbackNumber) {
 }
 
 function updateRelevantFeedbacksInTable(feedbacks) {
-    if(feedback !== null && feedback !== undefined) {
+    if(feedbacks !== null && feedbacks !== undefined) {
         $("#feedbackTable tbody").empty();
         var feedbackNumber = 1;
 
         for(var feedback of feedbacks){
             $("#feedbackTable tbody").append(createFeedbackTableRow(feedback, feedbackNumber));
             var feedbackId = "#feedback" + feedbackNumber;
-            var ratingStars = $(feedbackId + "i");
+            var ratingStars = $(feedbackId);
             feedbackNumber += 1;
 
             for(var i = 0; i < feedback.rating; i++){
-                ratingStars[i].setAttribute("style", "color: #00F0B5");
+                $(ratingStars).find('.fa')[i].setAttribute("style", "color: #00F0B5");
             }
         }
     }
@@ -76,8 +77,9 @@ function refreshTableOwnerInformation() {
 }
 
 function updateOrdersHistoryTableForStore(ordersHistory) {
+    $('#ordersHistoryTable tbody').empty();
+
     if(ordersHistory.length !== 0){
-        $('#ordersHistoryTable tbody').empty();
         for (var order of ordersHistory) {
             $('#ordersHistoryTable tbody').append(createOrderTableRow(order));
         }
@@ -86,7 +88,7 @@ function updateOrdersHistoryTableForStore(ordersHistory) {
 
 function createOrderButton(orderId) {
     const onclickMethod = "activateOrderDetailsModal(" + orderId + ");";
-    return '<a id="orderBtn' + orderId + ' ' +
+    return '<a id="orderBtn' + orderId + '"' +
         'class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal"' +
         'onclick=' + onclickMethod + ">" +
         "Order Details" +
@@ -107,9 +109,18 @@ function createItemTableRow(item) {
 
 function activateOrderDetailsModal(orderId) {
     $('#orderDetailsModalTable tbody').empty();
-    for(var item of currentOrdersHistory[orderId]) {
-        $('#orderDetailsModalTable tbody').append(createItemTableRow(item));
+
+    for(var index in currentOrdersHistory) {
+        if(currentOrdersHistory[index].orderId === orderId){
+            const itemsInOrder = currentOrdersHistory[index].itemsInOrder;
+            for(let item in itemsInOrder) {
+                $('#orderDetailsModalTable tbody').append(createItemTableRow(itemsInOrder[item]));
+            }
+
+            break;
+        }
     }
+
     $('#orderDetailsModal').modal('show');
 }
 
@@ -118,8 +129,8 @@ function createOrderTableRow(order) {
         "<td>" + order.orderId + "</td>\n" +
         "<td>" + order.dateOrderWasMade + "</td>\n" +
         "<td>" + order.customerName + "</td>\n" +
-        "<td>" + order.orderDestination + "</td>\n" +
-        "<td>" + order.averageOrdersCostWithoutDelivery + "</td>" +
+        "<td>(" + order.orderDestination.x + "," + order.orderDestination.y + ")</td>\n" +
+        "<td>" + order.amountItemsInOrder + "</td>" +
         "<td>" + order.costOfItemsInOrder + "</td>" +
         "<td>" + order.deliveryCost + "</td>" +
         "<td>" + createOrderButton(order.orderId) + "</td>"+

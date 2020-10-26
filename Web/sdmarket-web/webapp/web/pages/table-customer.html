@@ -399,7 +399,15 @@
                                                                 <div class="modal-header">
                                                                     <h4>Stores Feedback</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
                                                                 <div class="modal-body">
-                                                                    <div></div>
+                                                                    <div>
+                                                                        <div class="form-row">
+                                                                            <div class="col">
+                                                                                <select id="storeReviewSelectBox" class="form-control">
+                                                                                    <option></option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                     <div class="table-responsive">
                                                                         <table class="table">
                                                                             <thead>
@@ -408,26 +416,10 @@
                                                                                     <th>Name</th>
                                                                                     <th>Rating</th>
                                                                                     <th>Review</th>
+                                                                                    <th></th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                <tr>
-                                                                                    <td>Cell 1</td>
-                                                                                    <td>Cell 2</td>
-                                                                                    <td>
-                                                                                        <div class="form-group"><div class="form-group">
-    <div class="text-left star-rating" style="font-size: 25px;color: #00F0B5;">
-        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="1"></span>
-        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="2"></span>
-        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;"data-rating="3"></span>
-        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="4"></span>
-        <span class="fa fa-star-o" style="padding-right: 1px;padding-left: 1px;" data-rating="5"></span>
-        <input class="form-control rating-value" type="hidden" id="rate" name="Rating" value="0" />
-    </div>
-</div></div>
-                                                                                    </td>
-                                                                                    <td><input class="form-control" type="text" id="reviewTextInput" placeholder="Write a review here" style="padding-left: 12px;" disabled=""></td>
-                                                                                </tr>
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
@@ -597,8 +589,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/script.min.js"></script>
     <script src="assets/js/table-customer.js"></script>
-    <script src="assets/js/A-working-Rating-option-for-Contact-Forms.js"></script>
-    <script src="assets/js/star-ratings.js"></script>
+<!--    <script src="assets/js/A-working-Rating-option-for-Contact-Forms.js"></script>-->
+<!--    <script src="assets/js/star-ratings.js"></script>-->
 </body>
 
 </html>

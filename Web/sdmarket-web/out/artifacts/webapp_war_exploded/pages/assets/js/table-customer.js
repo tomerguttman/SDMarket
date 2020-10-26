@@ -1,6 +1,8 @@
 const GET_AVAILABLE_STORES_STATIC_URL = buildUrlWithContextPath("getAvailableStoresInZone");
 const GET_AVAILABLE_ITEMS_URL = buildUrlWithContextPath("getAllAvailableItemsInZone");
 const POST_ORDER_URL = buildUrlWithContextPath("postOrder");
+const POST_FEEDBACKS_URL = buildUrlWithContextPath("postFeedbacks");
+let currentFeedbackMap;
 let itemsInOrderList;
 let dynamicItemToStoreMap;
 let staticOrder;
@@ -170,7 +172,7 @@ function resetCreateStoreModal() {
     for (var itemRow of storeItemsDetails) {
         $(itemRow).find("[type='number']").val("")
         if($(itemRow).find("[type='checkbox']").prop('checked')) {
-            $(itemRow).find("[role='button']").addClass('btn-danger off').removeClass('btb-success');
+            $(itemRow).find("[role='button']").addClass('btn-danger off').removeClass('btn-success');
         }
     }
 }
@@ -300,7 +302,7 @@ function loadStorePicker() {
     ajaxLoadStorePicker();
 }
 
-function resetOrderDetails(purchaseMethod) {
+function resetOrderDetails() {
     $('#datePicker').val("");
     $('#destinationX').val("");
     $('#destinationY').val("");
@@ -632,11 +634,21 @@ function setDisablePropertyForPurchaseOrderComponents(booleanValue) {
     $('#goToCheckoutButton').prop('disabled', booleanValue);
 }
 
+function getStoreNameOfDiscount(itemId, discountName) {
+    for (const store in currentAvailableStoresMap) {
+        if ( isDiscountExistsInSelectedStore(discountName, currentAvailableStoresMap[store].name )) {
+            return currentAvailableStoresMap[store].name;
+        }
+    }
+
+    return null;
+}
+
 function createItemsInOrderList(shoppingCartRows) {
     itemsInOrderList = [];
-
     for (const itemRow of shoppingCartRows) {
         const tds = $(itemRow).find('td');
+        let storeName = tds[5].textContent === 'Yes' ? getStoreNameOfDiscount(parseInt(tds[0].textContent), $(itemRow).attr("id")): "";
         let itemObject = {
             "Id" : parseInt(tds[0].textContent),
             "name" : tds[1].textContent,
@@ -645,7 +657,8 @@ function createItemsInOrderList(shoppingCartRows) {
             "pricePerUnit" : parseInt(tds[4].textContent),
             "wasPartOfDiscount" :tds[5].textContent,
             "storeThatItemWasBoughtIn" : getCheapestStoreForItem(parseInt(tds[0].textContent)).storeToBuyFrom,
-            "discountName" : $(itemRow).attr("id")
+            "discountName" : $(itemRow).attr("id"),
+            "storeNameOfDiscount" : storeName
         };
 
         itemsInOrderList.push(itemObject);
@@ -733,6 +746,7 @@ function generateStaticOrderAndFillOrderSummaryModal() {
     let xCoordinateParsed = parseInt($('#destinationX').val());
     let yCoordinateParsed = parseInt($('#destinationY').val());
     loadStaticOrderSummaryInformation(storeToOrderFrom, itemsInOrderList, xCoordinateParsed, yCoordinateParsed);
+    
 }
 
 function getStoresParticipatingNameToStoreMap() {
@@ -759,7 +773,6 @@ function calculateTotalDeliveryCostForDynamicPurchase(storesParticipating, xCoor
         currentStoreDistance = calculateDistance(xCoordinate, yCoordinate, storesParticipating[storeKey].storeLocation);
         totalDeliveryCost += storesParticipating[storeKey].deliveryPpk * currentStoreDistance;
     }
-
     return totalDeliveryCost;
 }
 
@@ -775,13 +788,41 @@ function loadDynamicOrderSummaryInformation(storesParticipating, itemsInOrder, x
     loadStoresToOrderSummaryStoresSelectBox(storesParticipating)
 }
 
+function createDynamicOrder(storesParticipatingInOrder, totalDeliveryCost, orderCost, xCoordinate, yCoordinate, itemsInOrder, dateOfOrder) {
+    dynamicOrder = {};
+    dynamicOrder['storesParticipatingWithRelevantItems'] = {};
+    for (const storeName in storesParticipatingInOrder) {
+        dynamicOrder['storesParticipatingWithRelevantItems'][storeName] = [];
+    }
+    let storesMap = dynamicOrder['storesParticipatingWithRelevantItems'];
+
+    for (const item of itemsInOrder) {
+       if(item.wasPartOfDiscount === 'Yes') {
+           storesMap[item.storeNameOfDiscount].push(item);
+       }
+
+        storesMap[item.storeThatItemWasBoughtIn.name].push(item);
+    }
+
+    dynamicOrder['totalDeliveryCost'] = totalDeliveryCost;
+    dynamicOrder['orderCost'] = orderCost;
+    dynamicOrder['location'] = {
+        "xCoordinate" : xCoordinate,
+        "yCoordinate" : yCoordinate
+    };
+    dynamicOrder['date'] = dateOfOrder;
+}
+
 function generateDynamicOrderAndFillOrderSummaryModal() {
     const storesParticipatingInOrder = getStoresParticipatingNameToStoreMap();
+    const dateOfOrder = $('#datePicker').val();
     const shoppingCartRows = $('#shoppingCartTable tbody tr');
     createItemsInOrderList(shoppingCartRows);
     let xCoordinateParsed = parseInt($('#destinationX').val());
     let yCoordinateParsed = parseInt($('#destinationY').val());
     loadDynamicOrderSummaryInformation(storesParticipatingInOrder, itemsInOrderList, xCoordinateParsed, yCoordinateParsed);
+    createDynamicOrder(storesParticipatingInOrder, calculateTotalDeliveryCostForDynamicPurchase(storesParticipatingInOrder, xCoordinateParsed, yCoordinateParsed)
+        , calculateOrderCostForDynamicPurchase(itemsInOrderList), xCoordinateParsed, yCoordinateParsed, itemsInOrderList, dateOfOrder);
 }
 
 function isDiscountExistsInSelectedStore(discountName, selectedStoreName) {
@@ -815,6 +856,28 @@ function createItemInOrderMap(selectedStoreName) {
     }
 
     return itemListOfSelectedStore;
+}
+
+function ajaxUploadStoresFeedback(currentFeedbackMap) {
+    if(Object.keys(currentFeedbackMap).length > 0) {
+        $.ajax({
+            url : POST_FEEDBACKS_URL,
+            data: {
+                "feedbackMap" : JSON.stringify(currentFeedbackMap)
+            },
+            type: "POST",
+            success: function(data) {
+                $('#feedbackModal').modal('hide');
+                alert(data.message);
+            },
+            error: function (data) {
+                alert(data.message);
+            }
+        });
+    }
+
+    $('#feedbackModal').modal('hide');
+    resetOrderDetails();
 }
 
 $("#purchaseMethodToggle").change(() => {
@@ -878,7 +941,10 @@ $('#goToCheckoutButton').click(() => {
 $('#addToCartButton').click(() => {
     const amountOfItem = $('#amountToAddTextInput').val();
     const itemId = $('#itemNameSelectBox').val().substr(4); // take the 'item' out of the text.
-    validateAmountOfItemAndAddToCart(itemId, amountOfItem)
+    if($('#itemNameSelectBox').val() !== undefined) {
+        validateAmountOfItemAndAddToCart(itemId, amountOfItem);
+    }
+    else { alert('Please choose an item'); }
 });
 
 $('#pickStoreButton').click(() => {
@@ -913,18 +979,18 @@ $('#cancelOrderButton').click(() => {
 });
 
 function createFeedbackRow(Id, storeName) {
-    return $("<tr>\n" +
+    return $("<tr id='row" + storeName + "'>\n" +
         "<td>" + Id + "</td>\n" +
-        "<td>" + storeName + "</td>\n" +
+        "<td>" + storeName.replace(/_/g," ") + "</td>\n" +
         "<td>" +
             '<div class="form-group">\n' +
                 '<div class="form-group">\n' +
                     '<fieldset class="rating">\n' +
-                        '<input type="radio" id="star5" name="rating" value="5"/><label style="padding-right: 1px;padding-left: 1px;" for="star5" class="full"></label>\n' +
-                        '<input type="radio" id="star4" name="rating" value="4"/><label style="padding-right: 1px;padding-left: 1px;" for="star4" class="full"></label>\n' +
-                        '<input type="radio" id="star3" name="rating" value="3"/><label style="padding-right: 1px;padding-left: 1px;" for="star3" class="full"></label>\n' +
-                        '<input type="radio" id="star2" name="rating" value="2"/><label style="padding-right: 1px;padding-left: 1px;" for="star2" class="full"></label>\n' +
-                        '<input type="radio" id="star1" name="rating" value="1"/><label style="padding-right: 1px;padding-left: 1px;" for="star1" class="full"></label>\n' +
+                        '<input type="radio" id="star5' + storeName +'" name="rating" value="5"/><label style="padding-right: 1px;padding-left: 1px;" for="star5' + storeName +'" class="full"></label>\n' +
+                        '<input type="radio" id="star4' + storeName +'" name="rating" value="4"/><label style="padding-right: 1px;padding-left: 1px;" for="star4' + storeName +'" class="full"></label>\n' +
+                        '<input type="radio" id="star3' + storeName +'" name="rating" value="3"/><label style="padding-right: 1px;padding-left: 1px;" for="star3' + storeName +'" class="full"></label>\n' +
+                        '<input type="radio" id="star2' + storeName +'" name="rating" value="2"/><label style="padding-right: 1px;padding-left: 1px;" for="star2' + storeName +'" class="full"></label>\n' +
+                        '<input type="radio" id="star1' + storeName +'" name="rating" value="1"/><label style="padding-right: 1px;padding-left: 1px;" for="star1' + storeName +'" class="full"></label>\n' +
                     '</fieldset>\n' +
                  '</div>\n' +
             '</div>\n' +
@@ -932,34 +998,56 @@ function createFeedbackRow(Id, storeName) {
         "<td>" +
             '<input class="form-control" type="text" id="review' + storeName + '" placeholder="Write a review here" style="padding-left: 12px;" disabled="">\n' +
         "</td>\n" +
+        "<td>" +
+            '<button id="btn'+ storeName + '" class="btn btn-primary" type="button">Add Review</button>\n' +
+        "</td>" +
         "</tr>\n");
 }
 
 function getFeedback(order) {
-    var feedbackRow;
+    currentFeedbackMap = {};
+
+    let feedbackRow;
     $('#feedbackModal tbody').empty();
     if(order.purchaseMethod === 'static') {
-        feedbackRow = createFeedbackRow(currentAvailableStoresMap[order.storeName].Id, order.storeName.replace(/\s/g,""));
+        $('#storeReviewSelectBox').attr('hidden', true);
+        feedbackRow = createFeedbackRow(currentAvailableStoresMap[order.storeName].Id, order.storeName.replace(/\s/g,"_"));
         $('#feedbackModal tbody').append(feedbackRow);
-        check123('#review' + order.storeName.replace(/\s/g,""), feedbackRow);
+        initializeOnStarClick('#review' + order.storeName.replace(/\s/g,"_"), feedbackRow);
+        setOnClickForAddReviewButton(order.storeName);
     }
     else {
-        for (const store in order.storesParticipating) {
-            const currentStore = (order.storesParticipating)[store];
-            feedbackRow = createFeedbackRow(currentAvailableStoresMap[currentStore.storeName].Id, currentStore.storeName.replace(/\s/g,""));
-            $('#feedbackModal tbody').append(feedbackRow);
-
-            $(feedbackRow).find('#star1'+ currentStore.storeName.replace(/\s/g,"")).on('click', function() {
-                $("#review" + currentStore.storeName.replace(/\s/g,"")).prop('disabled', false);
-            });
+        $('#storeReviewSelectBox').removeAttr('hidden');
+        $('#storeReviewSelectBox option').remove();
+        let hiddenOption =  $('<option value="undefined" hidden>Select Store</option>"');
+        $('#storeReviewSelectBox').append(hiddenOption);
+        for (const store in order.storesParticipatingWithRelevantItems) {
+            $('#storeReviewSelectBox').append(createStoreOption(currentAvailableStoresMap[store]));
         }
     }
-
-
 
     $('#feedbackModal').modal('show');
 }
 
+function setOnClickForAddReviewButton(storeName) {
+    let buttonId = '#btn' + storeName.replace(/\s/g,"_");
+
+    $(buttonId).click(() => {
+        const feedbackRow = $('#feedbackModal tbody tr')[0];
+        let rating = getStoreRating($(feedbackRow).find('[type="radio"]'));
+        let review = $(feedbackRow).find('[type="text"]').val();
+        if(rating > 0) {
+            const dateOfFeedback = $('#datePicker').val();
+            currentFeedbackMap[storeName] = {
+                "storeName" : storeName,
+                "rating" : rating,
+                "reviewText" : review,
+                "date" : dateOfFeedback
+            }
+        }
+        else { alert("You can't add a feedback with no rating"); }
+    });
+}
 function onPurchaseSuccess(data) {
     alert(data.message);
     const order = $('#purchaseMethodToggle').prop('checked') ? dynamicOrder : staticOrder;
@@ -986,15 +1074,66 @@ $('#performPurchaseButton').click(() => {
     });
 });
 
-function check123(str, row) {
-    let star = $(row).find('[type="radio"]');
-    for (let i = 0; i < star.length; i++) {
-        star[i].addEventListener('click', function () {
+function initializeOnStarClick(textInputId, feedbackRow) {
+    let stars = $(feedbackRow).find('[type="radio"]');
+    for (let i = 0; i < stars.length; i++) {
+        stars[i].addEventListener('click', function () {
             i = this.value;
-            $(str).prop('disabled', false);
+            $(textInputId).prop('disabled', false);
         });
     }
 }
+
+function getStoreRating(starsArray) {
+    for (let i = starsArray.length - 1; i >= 0; i--){
+        if($(starsArray[i]).prop('checked')){
+            return 5 - i;
+        }
+    }
+
+    return 0;
+}
+
+$('#saveStoresFeedBackModalButton').click(() => {
+    ajaxUploadStoresFeedback(currentFeedbackMap);
+});
+
+$('#storeReviewSelectBox').on('change', () => {
+    $('#feedbackModal tbody').empty();
+    const selectedStore = $('#storeReviewSelectBox').val();
+
+    if(selectedStore !== undefined && selectedStore !== null) {
+        let feedbackRow = createFeedbackRow(currentAvailableStoresMap[selectedStore].Id, selectedStore.replace(/\s/g,"_"));
+        $('#feedbackModal tbody').append(feedbackRow);
+        let textInputId= '#review' + selectedStore.replace(/\s/g,"_");
+        let rowId = "#row" + selectedStore.replace(/\s/g,"_");
+        let stars = $(rowId).find('[type="radio"]');
+        for (let i = 0; i < stars.length; i++) {
+            stars[i].addEventListener('click', function () {
+                i = this.value;
+                $(textInputId).prop('disabled', false);
+            });
+        }
+        let buttonId = '#btn' + selectedStore.replace(/\s/g,"_");
+        $(buttonId).click(() => {
+            const feedbackRow = $('#feedbackModal tbody tr')[0];
+            let storeName = $(feedbackRow).find('td')[1].textContent;
+            let rating = getStoreRating($(feedbackRow).find('[type="radio"]'));
+            let review = $(feedbackRow).find('[type="text"]').val();
+            if(rating > 0) {
+                const dateOfFeedback = $('#datePicker').val();
+                currentFeedbackMap[storeName] = {
+                    "storeName" : storeName,
+                    "rating" : rating,
+                    "reviewText" : review,
+                    "date" : dateOfFeedback
+                }
+                alert("Your feedback to " + storeName + " was updated successfully");
+            }
+            else { alert("You can't add a feedback with no rating"); }
+        });
+    }
+});
 
 
 

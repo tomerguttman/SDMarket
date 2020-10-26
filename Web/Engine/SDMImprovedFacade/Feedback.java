@@ -7,6 +7,14 @@ public class Feedback {
     private String dateOfFeedback;
     private String storeName;
 
+    public Feedback(int rating, String review, String customerName, String dateOfFeedback, String storeName) {
+        this.rating = rating;
+        this.review = review;
+        this.customerName = customerName;
+        this.dateOfFeedback = dateOfFeedback;
+        this.storeName = storeName;
+    }
+
     public String getCustomerName() {
         return customerName;
     }

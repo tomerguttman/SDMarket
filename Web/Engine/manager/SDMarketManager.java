@@ -134,10 +134,62 @@ public class SDMarketManager {
     }
 
     public void addNewOrder(String purchaseMethod, String orderString, String currentUserName, String currentZoneName) {
-        if (purchaseMethod.equals("dynamic")) { /*addDynamicOrder(orderString, currentUserName, currentZoneName);*/ }
+        if (purchaseMethod.equals("dynamic")) { addDynamicOrder(orderString, currentUserName, currentZoneName); }
         else { addStaticOrder(orderString, currentUserName, currentZoneName); }
+    }
 
+    private void addDynamicOrder(String orderString, String currentUserName, String currentZoneName) {
+        JsonObject jsonDynamicOrder = new JsonParser().parse(orderString).getAsJsonObject();
+        double totalDeliveryCost = jsonDynamicOrder.get("totalDeliveryCost").getAsDouble();
+        double orderCost = jsonDynamicOrder.get("orderCost").getAsDouble();
+        Location location = new Location();
+        String dateOfOrder = jsonDynamicOrder.get("date").getAsString();
+        location.setX(jsonDynamicOrder.get("location").getAsJsonObject().get("xCoordinate").getAsInt());
+        location.setY(jsonDynamicOrder.get("location").getAsJsonObject().get("yCoordinate").getAsInt());
+        Map<String, List<StoreItem>> storeToItemListMapOfOrder = createStoreToItemListMapOfOrder(jsonDynamicOrder.get("storesParticipatingWithRelevantItems").getAsJsonObject());
+        List<Order> subOrdersList = this.getSDMLogic().generateNewDynamicOrderSubOrders(storeToItemListMapOfOrder, totalDeliveryCost, orderCost, location, dateOfOrder, currentUserName, currentZoneName, this.getSystemZones().get(currentZoneName).getStoresInZone());
 
+        Order dynamicOrder = createDynamicOrderFromSubOrdersList(subOrdersList, currentUserName, currentZoneName, location, dateOfOrder);
+
+        this.getSystemZones().get(currentZoneName).addOrderToZone(dynamicOrder);
+        addOrderToCustomer(dynamicOrder, currentUserName);
+        addTransactionToCustomer(currentUserName, dynamicOrder);
+        this.SDMLogic.addDynamicOrderToSDMarket(dynamicOrder);
+        addOrdersToStoresInZone(subOrdersList, currentZoneName);
+    }
+
+    private void addOrdersToStoresInZone(List<Order> subOrdersList, String zoneName) {
+
+        for (Order order : subOrdersList) {
+            addOrderToStore(order);
+            getSelectedStoreByName(zoneName, order.getStoreName());
+            addTransactionToShopOwner(getSelectedStoreByName(zoneName, order.getStoreName()).getOwnerName(), order);
+        }
+    }
+
+    private Order createDynamicOrderFromSubOrdersList(List<Order> subOrdersList, String username, String zoneName, Location deliveryLocation, String dateOfOrder) {
+
+        double totalDeliveryCost = 0;
+        Order sampleOrder = subOrdersList.get(0);
+        int orderId = sampleOrder.getOrderId();
+        List<StoreItem> itemsInOrder = new ArrayList<>();
+
+        for (Order order : subOrdersList) {
+            totalDeliveryCost += order.getDeliveryCost();
+            itemsInOrder.addAll(order.getItemsInOrder());
+        }
+
+        return new Order(dateOfOrder, deliveryLocation, orderId, totalDeliveryCost, username, subOrdersList.size(), itemsInOrder, zoneName);
+    }
+
+    private Map<String, List<StoreItem>> createStoreToItemListMapOfOrder(JsonObject storesParticipatingWithRelevantItems) {
+        Map<String, List<StoreItem>> outStoreToItemListMapOfOrder = new HashMap<>();
+        for (String storeKey : storesParticipatingWithRelevantItems.keySet()) {
+            List<StoreItem> currentStoreItems = createItemsInOrderList(storesParticipatingWithRelevantItems.get(storeKey).getAsJsonArray());
+            outStoreToItemListMapOfOrder.put(storeKey, currentStoreItems);
+        }
+
+        return outStoreToItemListMapOfOrder;
     }
 
     private void addStaticOrder(String orderString, String currentUserName, String currentZoneName) {
@@ -152,13 +204,13 @@ public class SDMarketManager {
         orderDestination.setX(jObject.get("orderDestination").getAsJsonObject().get("xCoordinate").getAsInt());
         orderDestination.setY(jObject.get("orderDestination").getAsJsonObject().get("yCoordinate").getAsInt());
         int amountOfStoresRelatedToOrder = 1;
-        List<StoreItem> itemsInOrder = createItemsInOrderList(jObject.get("itemsInOrder").getAsJsonArray(), currentZoneName);
+        List<StoreItem> itemsInOrder = createItemsInOrderList(jObject.get("itemsInOrder").getAsJsonArray());
         Order order = new Order(dateOrderWasMade, getSDMLogic().getLastOrderID(), storeIdToOrderFrom, deliveryCost, currentUserName, storeName, itemsInOrder,orderDestination, currentZoneName);
         addOrderToCustomer(order, currentUserName);
         addOrderToStore(order);
         this.getSystemZones().get(currentZoneName).addOrderToZone(order);
         addTransactionsToShopOwnerAndCustomer(order, currentUserName, currentZoneName);
-        //add alerts
+        //ADD ALERTS!
     }
 
     private void addTransactionsToShopOwnerAndCustomer(Order order, String currentUserName, String currentZoneName) {
@@ -185,21 +237,20 @@ public class SDMarketManager {
 
     private void addOrderToCustomer(Order order, String currentUserName) {
         this.systemUsersMap.get(currentUserName).addOrder(order);
-
     }
 
-    private List<StoreItem> createItemsInOrderList(JsonArray itemsInOrderJsonArray, String currentZoneName) {
+    private List<StoreItem> createItemsInOrderList(JsonArray itemsInOrderJsonArray) {
         List<StoreItem> outputItemsInOrderList = new ArrayList<>();
 
         for (JsonElement jsonItem : itemsInOrderJsonArray) {
-            StoreItem sItem = createItemFromOrderList(jsonItem.getAsJsonObject(), currentZoneName);
+            StoreItem sItem = createItemFromOrderList(jsonItem.getAsJsonObject());
             outputItemsInOrderList.add(sItem);
         }
 
         return outputItemsInOrderList;
     }
 
-    private StoreItem createItemFromOrderList(JsonObject jsonItem, String currentZoneName) {
+    private StoreItem createItemFromOrderList(JsonObject jsonItem) {
         int itemId = jsonItem.get("Id").getAsInt();
         String itemName = jsonItem.get("name").getAsString();
         String purchaseCategory = jsonItem.get("purchaseCategory").getAsString();
@@ -208,5 +259,35 @@ public class SDMarketManager {
         boolean wasPartOfDiscount = jsonItem.get("wasPartOfDiscount").getAsString().equals("Yes");
 
         return new StoreItem(itemId, amount, pricePerUnit, itemName, purchaseCategory, wasPartOfDiscount);
+    }
+
+    public void addFeedbacks(String feedbackMap, String currentUserName, String currentZoneName) {
+        JsonObject jFeedbackMap = new JsonParser().parse(feedbackMap).getAsJsonObject();
+        Map<String, Feedback> realFeedbackMap = new HashMap<>();
+        for (String jsonFeedback : jFeedbackMap.keySet()) {
+            JsonObject jFeedback = jFeedbackMap.get(jsonFeedback).getAsJsonObject();
+            Feedback feedback = createFeedbackFromJsonObject(jFeedback, currentUserName);
+            realFeedbackMap.put(jsonFeedback, feedback);
+        }
+
+        pushFeedbacksToShopOwners(realFeedbackMap, currentZoneName);
+        //Alerts?
+    }
+
+    private void pushFeedbacksToShopOwners(Map<String, Feedback> feedbackMap, String zoneName) {
+        feedbackMap.forEach((storeName, feedback) -> {
+            int storeId = this.getSelectedStoreByName(zoneName, storeName).getId();
+            String ownerName = this.getSystemZones().get(zoneName).getStoresInZone().get(storeId).getOwnerName();
+            ShopOwner shopOwner = (ShopOwner)this.getUser(ownerName);
+            shopOwner.addFeedback(zoneName, feedback);
+        });
+    }
+
+    private Feedback createFeedbackFromJsonObject(JsonObject jsonFeedback, String username) {
+        int rating = jsonFeedback.get("rating").getAsInt();
+        String textReview = jsonFeedback.get("reviewText").getAsString();
+        String storeName = jsonFeedback.get("storeName").getAsString();
+        String date = jsonFeedback.get("date").getAsString();
+        return new Feedback(rating, textReview, username, date, storeName);
     }
 }
