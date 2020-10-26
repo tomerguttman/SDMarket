@@ -3,7 +3,7 @@
 </p>
 
 # SDMarket 🏪🛒
-Java based super market system
+A java based super-market system
 
 <br>Technology stack include:<br /> `Java` `Javascript` `jQuery` `Ajax` `HTML` `Bootstrap` `CSS` `Java FX` `XML` `JSON` `Tomcat` `Servelts`
 
@@ -25,6 +25,10 @@ SDMarket allows you to set up stores that sell various items and will allow the 
 - [x] Multiple skins can be selected 
 - [x] Load data from an XML file
 - [x] Full web-application
+- [x] Users transaction system
+- [x] Users alert system for various events
+- [x] Chat between the system users
+- [x] Stores feedback and rating system
 
 ## Contributing
 
