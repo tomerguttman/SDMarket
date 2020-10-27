@@ -1,19 +1,20 @@
 package SDMImprovedFacade;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ShopOwner extends User {
 
     HashMap<String, Zone> zonesOwned;
     HashMap<String, Store> storesOwned; //String -> store name
     Map<String, List<Feedback>> feedbackMapPerZone;
+    List<Notification> relevantNotifications;
 
     public ShopOwner(int userID, String username, String userType) {
         super(username, userType, userID);
         zonesOwned = new HashMap<>();
         storesOwned = new HashMap<>();
         feedbackMapPerZone = new HashMap<>();
+        relevantNotifications = new ArrayList<>();
     }
 
     public HashMap<String, Zone> getZoneOwned() {
@@ -43,6 +44,18 @@ public class ShopOwner extends User {
         zoneToAdd.getStoresInZone().forEach((storeId, store) ->{
             this.storesOwned.put(store.getName(), store);
         });
+    }
+
+    public HashMap<String, Zone> getZonesOwned() {
+        return zonesOwned;
+    }
+
+    public Map<String, List<Feedback>> getFeedbackMapPerZone() {
+        return feedbackMapPerZone;
+    }
+
+    public List<Notification> getRelevantNotifications() {
+        return relevantNotifications;
     }
 
     public List<Feedback> getZoneFeedbacks(String currentZoneName) {
@@ -76,5 +89,13 @@ public class ShopOwner extends User {
         }
 
         this.feedbackMapPerZone.get(zoneName).add(feedback);
+    }
+
+    public List<Notification> getNewestNotifications(int amountOfNotifications) {
+        if(amountOfNotifications < relevantNotifications.size()){
+            return relevantNotifications.subList(amountOfNotifications, relevantNotifications.size());
+        }
+
+        return new ArrayList<>();
     }
 }

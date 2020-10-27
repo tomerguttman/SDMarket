@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class GetAvailableStoresInZoneServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -32,7 +33,7 @@ public class GetAvailableStoresInZoneServlet extends HttpServlet {
         }
         if(currentUserType.equals(Constants.SHOP_OWNER)) { response.sendRedirect(Constants.DASHBOARD_OWNER_URL); }
 
-        String currentZoneName = SessionUtils.getCurrentZone(request);
+        String currentZoneName = Objects.requireNonNull(SessionUtils.getCurrentZone(request));
         HashMap<Integer, Store> currentZoneStoresMap = sdMarketManager.getSystemZones().get(currentZoneName).getStoresInZone();
 
         try {

@@ -138,4 +138,14 @@
         <url-pattern>/pages/postFeedbacks</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>GetOrderHistoryInZone</servlet-name>
+        <servlet-class>sdmarket.servlets.GetOrderHistoryInZone</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetOrderHistoryInZone</servlet-name>
+        <url-pattern>/pages/getOrderHistoryInZone</url-pattern>
+    </servlet-mapping>
+
+
 </web-app>

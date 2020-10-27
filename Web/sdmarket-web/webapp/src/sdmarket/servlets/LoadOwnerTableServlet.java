@@ -33,14 +33,18 @@ public class LoadOwnerTableServlet extends HttpServlet {
             String currentUserName = SessionUtils.getUsername(request);
             ShopOwner currentShopOwner = (ShopOwner) sdMarketManager.getUser(currentUserName);
             String currentZoneName = SessionUtils.getCurrentZone(request);
+
             if(currentZoneName != null) {
                 List<Feedback> zoneFeedbackList = currentShopOwner.getZoneFeedbacks(currentZoneName);
                 List<Store> zoneStores = currentShopOwner.getZoneStores(currentZoneName);
                 List<StoreItem> zoneItemsList = currentShopOwner.getZoneItems(currentZoneName);
+                int amountOfNotifications = Integer.parseInt(request.getParameter("amountOfNotifications"));
+                List<Notification> newestNotifications = currentShopOwner.getNewestNotifications(amountOfNotifications);
 
                 if (zoneFeedbackList != null) { jsonObject.add("feedbacks", gson.toJsonTree(zoneFeedbackList)); }
                 if (zoneStores != null) { jsonObject.add("storesAvailable", gson.toJsonTree(zoneStores)); }
                 if(zoneItemsList != null) { jsonObject.add("zoneItems", gson.toJsonTree(zoneItemsList)); }
+                jsonObject.add("notifications", gson.toJsonTree(newestNotifications));
             }
             else { response.sendRedirect(DASHBOARD_OWNER_URL); } //Arrived without selecting a zone
 

@@ -85,4 +85,14 @@ public class User {
     public void updateBalance(double amountToAdd) {
         this.balance += amountToAdd;
     }
+
+    public HashMap<Integer, Order> getOrderHistoryByZoneName(String currentZoneName) {
+        HashMap<Integer, Order> outOrderHistoryForZoneMap = new HashMap<>();
+
+        for (Order order : userOrdersMap.values()) {
+            if(order.getZoneNameOfOrder().equals(currentZoneName)) { outOrderHistoryForZoneMap.put(order.orderId, order); }
+        }
+
+        return outOrderHistoryForZoneMap;
+    }
 }

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class GetAvailableItemsForPurchaseServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -30,7 +31,7 @@ public class GetAvailableItemsForPurchaseServlet extends HttpServlet {
 
         String currentUserName = SessionUtils.getUsername(request);
         String currentUserType = SessionUtils.getUserType(request);
-        String currentZoneName = SessionUtils.getCurrentZone(request);
+        String currentZoneName = Objects.requireNonNull(SessionUtils.getCurrentZone(request)).replace(" ", "");
         String purchaseMethod = request.getParameter("currentPurchaseMethod");
 
         assert currentUserType != null;
@@ -43,10 +44,10 @@ public class GetAvailableItemsForPurchaseServlet extends HttpServlet {
             pickedStoreName = request.getParameter("pickedStore");
             selectedStore = sdMarketManager.getSelectedStoreByName(currentZoneName, pickedStoreName);
             newStoreItemMap.putAll(selectedStore.getItemsBeingSold());
-            pushNonAvailableItemsToMap(sdMarketManager.getSystemItems(), newStoreItemMap);
+            pushNonAvailableItemsToMap(sdMarketManager.getSystemZones().get(currentZoneName).getItemsAvailableInZone(), newStoreItemMap);
         }
         else {
-            newStoreItemMap.putAll(sdMarketManager.getSystemItems());
+            newStoreItemMap.putAll(sdMarketManager.getSystemZones().get(currentZoneName).getItemsAvailableInZone());
         }
 
         try {
@@ -61,8 +62,8 @@ public class GetAvailableItemsForPurchaseServlet extends HttpServlet {
         }
     }
 
-    private void pushNonAvailableItemsToMap(Map<Integer, StoreItem> systemItems, HashMap<Integer, StoreItem> newStoreItemMap) {
-        for (StoreItem sItem : systemItems.values() ) {
+    private void pushNonAvailableItemsToMap(Map<Integer, StoreItem> zoneItems, HashMap<Integer, StoreItem> newStoreItemMap) {
+        for (StoreItem sItem : zoneItems.values() ) {
             if(!newStoreItemMap.containsKey(sItem.getId())) {
                 newStoreItemMap.put(sItem.getId(), sItem);
                 newStoreItemMap.get(sItem.getId()).setIsAvailable(false);

@@ -1,5 +1,6 @@
 package sdmarket.servlets;
 
+import SDMImprovedFacade.ShopOwner;
 import SDMImprovedFacade.Zone;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -28,6 +29,7 @@ public class LoadZoneSelectBoxInformationServlet extends HttpServlet {
         SDMarketManager sdMarketManager = ServletUtils.getSDMarketManager(getServletContext());
 
         String currentUserName = SessionUtils.getUsername(request);
+        String currentUserType = SessionUtils.getUserType(request);
 
         if(currentUserName == null){
             response.sendRedirect(Constants.LOGIN_URL);
@@ -36,7 +38,14 @@ public class LoadZoneSelectBoxInformationServlet extends HttpServlet {
         List<String> availableZonesNames = sdMarketManager.getZonesNames();
 
         try {
+            if(currentUserType.equals(Constants.SHOP_OWNER)){
+                int amountOfNotifications = Integer.parseInt(request.getParameter("amountOfNotifications"));
+                ShopOwner currentShopOwner = (ShopOwner)sdMarketManager.getUser(currentUserName);
+                jsonObject.add("notifications", gson.toJsonTree(currentShopOwner.getNewestNotifications(amountOfNotifications)));
+            }
+
             jsonObject.add("zonesAvailable", gson.toJsonTree(availableZonesNames));
+            jsonObject.addProperty("userType", currentUserType);
         } catch (Exception e) {
             jsonObject.addProperty("message", e.getMessage());
             System.out.println(e.getMessage());

@@ -4,6 +4,9 @@ import SDMImprovedFacade.*;
 import SuperMarketLogic.SuperMarketLogic;
 import com.google.gson.*;
 import generatedClasses.Location;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,7 +94,22 @@ public class SDMarketManager {
         currentShopOwner.addStoreToUser(currentZoneName, newStoreToAdd);
         //newStore is already updated with the zone average price. (not the whole system)
         this.SDMLogic.addStoreToZoneInSystem(currentZoneName, newStoreToAdd);
+        addNotificationToZoneOwner(currentZone, newStoreToAdd, currentShopOwner);
 
+    }
+
+    private void addNotificationToZoneOwner(Zone currentZone, Store newStoreToAdd, ShopOwner currentShopOwner) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDateTime now = LocalDateTime.now();
+        dateTimeFormatter.format(now);
+        String subject = String.format("A new store named '%s' was created in %s. The store is located at (%d,%d) and sells %d items, out of %d available in the zone."
+                ,newStoreToAdd.getName(), currentZone.getZoneName(), newStoreToAdd.getStoreLocation().getX(),newStoreToAdd.getStoreLocation().getY(),
+                newStoreToAdd.getItemsBeingSold().size(), currentZone.getAmountOfItemTypesInZone());
+        StoreCreatedNotification notification = new StoreCreatedNotification(currentShopOwner.getName(), currentZone.getOwnerName(),
+                subject, newStoreToAdd.getName(), newStoreToAdd.getStoreLocation(), dateTimeFormatter.format(now));
+        notification.setTotalItemsSellingOutOfTotalItemsAvailableString(newStoreToAdd.getItemsBeingSold().size(), currentZone.getAmountOfItemTypesInZone());
+        ShopOwner zoneOwner = (ShopOwner) getUser(currentZone.getOwnerName());
+        zoneOwner.getRelevantNotifications().add(notification);
     }
 
     public Map<Integer, StoreItem> createItemsBeingSoldFromJson(String storeItems, String currentZoneName) {
@@ -159,12 +177,19 @@ public class SDMarketManager {
     }
 
     private void addOrdersToStoresInZone(List<Order> subOrdersList, String zoneName) {
-
         for (Order order : subOrdersList) {
             addOrderToStore(order);
-            getSelectedStoreByName(zoneName, order.getStoreName());
-            addTransactionToShopOwner(getSelectedStoreByName(zoneName, order.getStoreName()).getOwnerName(), order);
+            Store currentStore = getSelectedStoreByName(zoneName, order.getStoreName());
+            addTransactionToShopOwner(currentStore.getOwnerName(), order);
         }
+    }
+
+    private OrderNotification createOrderNotificationToAddToShopOwner(Order order, Store currentStore) {
+        String subject = String.format("Order #%d was made by %s from %s. The amount of item types in order is %d, the total item cost is %.2f and the total delivery cost is %.2f.",
+                order.getOrderId(), order.getCustomerName(), currentStore.getName(), order.getNumberOfItemsTypesInOrder(),
+                order.getCostOfItemsInOrder(), order.getDeliveryCost());
+        return new OrderNotification(order.getCustomerName(), currentStore.getOwnerName(), subject,
+                order.getOrderId(), order.getNumberOfItemsTypesInOrder(), order.getCostOfItemsInOrder(), order.getDeliveryCost(), order.getDateOrderWasMade());
     }
 
     private Order createDynamicOrderFromSubOrdersList(List<Order> subOrdersList, String username, String zoneName, Location deliveryLocation, String dateOfOrder) {
@@ -210,7 +235,6 @@ public class SDMarketManager {
         addOrderToStore(order);
         this.getSystemZones().get(currentZoneName).addOrderToZone(order);
         addTransactionsToShopOwnerAndCustomer(order, currentUserName, currentZoneName);
-        //ADD ALERTS!
     }
 
     private void addTransactionsToShopOwnerAndCustomer(Order order, String currentUserName, String currentZoneName) {
@@ -233,6 +257,10 @@ public class SDMarketManager {
         Store storeToBuyFrom = this.getSystemZones().get(order.getZoneNameOfOrder()).getStoresInZone().get(order.getStoreId());
         storeToBuyFrom.addOrderToStore(order);
         getUser(storeToBuyFrom.getOwnerName()).addOrder(order);
+        storeToBuyFrom.updateNumberOfItemsSoldForAllItemsInOrder(order);
+        OrderNotification orderNotification = createOrderNotificationToAddToShopOwner(order, storeToBuyFrom);
+        ShopOwner currentShopOwner = (ShopOwner)getUser(storeToBuyFrom.getOwnerName());
+        currentShopOwner.getRelevantNotifications().add(orderNotification);
     }
 
     private void addOrderToCustomer(Order order, String currentUserName) {
@@ -271,15 +299,18 @@ public class SDMarketManager {
         }
 
         pushFeedbacksToShopOwners(realFeedbackMap, currentZoneName);
-        //Alerts?
     }
 
     private void pushFeedbacksToShopOwners(Map<String, Feedback> feedbackMap, String zoneName) {
         feedbackMap.forEach((storeName, feedback) -> {
             int storeId = this.getSelectedStoreByName(zoneName, storeName).getId();
             String ownerName = this.getSystemZones().get(zoneName).getStoresInZone().get(storeId).getOwnerName();
-            ShopOwner shopOwner = (ShopOwner)this.getUser(ownerName);
+            ShopOwner shopOwner = (ShopOwner) this.getUser(ownerName);
             shopOwner.addFeedback(zoneName, feedback);
+
+            String subject = String.format("A new %d stars rating was given to %s by %s.",feedback.getRating(), storeName, feedback.getCustomerName());
+            FeedbackNotification notification = new FeedbackNotification(feedback.getCustomerName(), ownerName, subject, feedback, feedback.getDateOfFeedback());
+            shopOwner.getRelevantNotifications().add(notification);
         });
     }
 

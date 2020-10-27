@@ -2,8 +2,8 @@ var SELECTED_ZONE_INFORMATION_URL = buildUrlWithContextPath("getSelectedZoneInfo
 var REFRESH_ZONE_INFORMATION_URL = buildUrlWithContextPath("getZoneInformation")
 var currentZoneStores;
 var currentZoneItems;
-
-$(document).ready(function(){
+var currentNotifications = [];
+$(document).ready(function() {
     refreshZoneInformationPage();
     setInterval(refreshZoneInformationPage, 1000);
 })
@@ -20,12 +20,19 @@ function updateZoneSelectBoxPicker(data) {
     }
 }
 
+function setHiddenPropertyForNotificationDropDownIfNeeded(userType) {
+    if(userType === 'customer') { $('#notificationsCenter').attr('hidden', true); }
+}
+
 function refreshZoneInformationPage() {
     $.ajax({
         url : REFRESH_ZONE_INFORMATION_URL,
         type: "GET",
+        data: { "amountOfNotifications" : currentNotifications.length },
         success: function(data) {
             updateZoneSelectBoxPicker(data);
+            if(data.userType === "shop_owner") { updateDashboardNotificationsDropdownMenu(data.notifications); }
+            setHiddenPropertyForNotificationDropDownIfNeeded(data.userType);
         },
         error: function (data) {
             alert(data.message);
@@ -55,7 +62,7 @@ function updateZoneInformationPage(data) {
     $('#zoneOwnerLabel').html(data.ownerName);
     $('#numberOfStoresLabel').html(data.amountOfStoresInZone);
     $('#numberOfItemsLabel').html(data.amountOfItemTypesInZone);
-    $('#totalRevenueLabel').html("$" + data.totalRevenue);
+    $('#totalRevenueLabel').html("$" + data.totalRevenue.toFixed(2));
     updateStoresInSelectedZoneTable();
     updateItemsInSelectedZoneTable();
 }
@@ -66,7 +73,7 @@ $("#displayZoneDetailsButton").click(() => {
         if(selectedZone !== "" && selectedZone != null) {
             $.ajax({
                 url : SELECTED_ZONE_INFORMATION_URL,
-                data : {"selectedZone" : selectedZone},
+                data : {"selectedZone" : selectedZone.replace(/ /g,"")},
                 type: "GET",
                 success: function(data) {
                     currentZoneStores = data.storesInZone;
@@ -121,8 +128,8 @@ function createRowForStoreInSelectedZoneTable(store) {
         "<td> (" + store.storeLocation.x + ', ' + store.storeLocation.y + ')' + "</td>\n" +
         "<td>" + store.storeOrdersHistory.length + "</td>\n" +
         "<td>" + store.deliveryPpk + "</td>\n" +
-        "<td>" + store.totalItemsRevenue + "</td>\n" +
-        "<td>" + store.totalDeliveryRevenue + "</td>\n" +
+        "<td>" + store.totalItemsRevenue.toFixed(2) + "</td>\n" +
+        "<td>" + store.totalDeliveryRevenue.toFixed(2) + "</td>\n" +
         "<td>" + createDisplayItemsButton(store.Id) + "</td>\n" +
         "</tr>\n");
 }
@@ -133,7 +140,7 @@ function createRowForItemInSelectedZoneTable(item) {
         "<td>" + item.name + "</td>\n" +
         "<td>" + item.purchaseCategory + "</td>\n" +
         "<td>" + item.amountOfStoresSellingThisItem + "</td>\n" +
-        "<td>" + item.averagePriceOfTheItem + "</td>\n" +
+        "<td>" + item.averagePriceOfTheItem.toFixed(2) + "</td>\n" +
         "<td>" + item.totalItemsSold + "</td>\n" +
         "</tr>\n");
 }
@@ -147,6 +154,55 @@ $("#openCreateStoreModalButton").click(() => {
     }
 });
 
+function createDropdownMenuNotification(notification) {
+    let bgClass;
+    let iconClass;
 
+    if (notification.notificationType === "storeCreatedNotification" ){
+        bgClass = 'bg-primary';
+        iconClass = 'fas fa-store text-white';
+    }
+    else if (notification.notificationType === "feedbackNotification" ) {
+        bgClass = 'bg-danger';
+        iconClass = 'fas fa-star text-white';
+    }
+    else {
+        bgClass = 'bg-success';
+        iconClass = 'fas fa-shopping-cart text-white';
+    }
+
+    return $('<a class="d-flex align-items-center dropdown-item" href="#">\n' +
+        '<div class="mr-3">\n' +
+        '<div class="' + bgClass+ ' icon-circle">\n' +
+        '<i class="' + iconClass + '"></i>\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '<div>\n' +
+        '<span class="small text-gray-500">' + notification.dateOfNotification + '</span>\n' +
+        '<p>' + notification.subject + '</p>\n' +
+        '</div>\n' +
+        '</a>\n');
+}
+
+function updateDashboardNotificationsDropdownMenu(notifications) {
+    notifications.forEach(notification => currentNotifications.push(notification));
+
+    if(currentNotifications.length !== 0) {
+        if($('#notificationsCounterSpan').text() === "0") {
+            $('#dropDownNotificationsMenu a').remove();
+        }
+
+        for (const notification of notifications) {
+            $('#dropDownNotificationsMenu').prepend(createDropdownMenuNotification(notification));
+        }
+    }
+    else {
+        $('#dropDownNotificationsMenu a').remove();
+        let noNotifications = $('<a class="text-cetner dropdown-item small text-gray-500">No notifications to show</a>')
+        $('#dropDownNotificationsMenu').append(noNotifications);
+    }
+
+    $('#notificationsCounterSpan').text(currentNotifications.length);
+}
 
 

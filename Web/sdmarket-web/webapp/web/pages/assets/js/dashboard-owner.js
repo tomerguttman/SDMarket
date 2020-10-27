@@ -1,6 +1,6 @@
 var UPLOAD_XML_URL = buildUrlWithContextPath("uploadXML");
 var REFRESH_DASHBOARD_URL = buildUrlWithContextPath("load-dashboard")
-
+var currentNotifications = [];
 
 $(document).ready(function(){
     refreshDashboardInformation();
@@ -8,7 +8,7 @@ $(document).ready(function(){
 })
 
 $("#uploadXMLButton").click(() => {
-    if(document.getElementById("chooseXMLButton").textContent !== "Choose XML File"){
+    if($("#inputFile").val() !== ""){
         var inputFile = new FormData();
         inputFile.append('file', $('#inputFile')[0].files[0]);
         $.ajax({
@@ -50,6 +50,7 @@ function refreshDashboardInformation() {
         type: 'GET',
         contentType: "application/json charset=utf-8",
         url: REFRESH_DASHBOARD_URL,
+        data: { "amountOfNotifications" : currentNotifications.length },
         success:function(data){
             //'data' is the value returned.
             loadNewDataToDashboard(data);
@@ -95,6 +96,8 @@ function loadNewDataToDashboard(data) {
     updateDashboardZonesTable(data.systemZones);
     updateDashboardTransactionsTable(data.userTransactions);
     updateDashboardActiveUsersTable(data.otherUsers);
+    updateDashboardNotificationsDropdownMenu(data.notifications) //all notifications must be new.
+
 }
 
 function createZoneButton(zoneName) {
@@ -130,5 +133,53 @@ function createActiveUserTableRow(user) {
         "</tr>\n");
 }
 
+function updateDashboardNotificationsDropdownMenu(notifications) {
+    notifications.forEach(notification => currentNotifications.push(notification));
 
+    if(currentNotifications.length !== 0) {
+        if($('#notificationsCounterSpan').text() === "0") {
+            $('#dropDownNotificationsMenu a').remove();
+        }
 
+        for (const notification of notifications) {
+            $('#dropDownNotificationsMenu').prepend(createDropdownMenuNotification(notification));
+        }
+    }
+    else {
+        $('#dropDownNotificationsMenu a').remove();
+        let noNotifications = $('<a class="text-cetner dropdown-item small text-gray-500">No notifications to show</a>')
+        $('#dropDownNotificationsMenu').append(noNotifications);
+    }
+
+    $('#notificationsCounterSpan').text(currentNotifications.length);
+}
+
+function createDropdownMenuNotification(notification) {
+    let bgClass;
+    let iconClass;
+
+    if (notification.notificationType === "storeCreatedNotification" ){
+        bgClass = 'bg-primary';
+        iconClass = 'fas fa-store text-white';
+    }
+    else if (notification.notificationType === "feedbackNotification" ) {
+        bgClass = 'bg-danger';
+        iconClass = 'fas fa-star text-white';
+    }
+    else {
+        bgClass = 'bg-success';
+        iconClass = 'fas fa-shopping-cart text-white';
+    }
+
+    return $('<a class="d-flex align-items-center dropdown-item" href="#">\n' +
+        '<div class="mr-3">\n' +
+        '<div class="' + bgClass+ ' icon-circle">\n' +
+        '<i class="' + iconClass + '"></i>\n' +
+        '</div>\n' +
+        '</div>\n' +
+        '<div>\n' +
+        '<span class="small text-gray-500">' + notification.dateOfNotification + '</span>\n' +
+        '<p>' + notification.subject + '</p>\n' +
+        '</div>\n' +
+        '</a>\n');
+}

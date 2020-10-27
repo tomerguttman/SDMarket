@@ -74,7 +74,7 @@ function refreshDashboardInformation() {
 }
 
 function updateDashboardLabels(currentBalance, totalOrders, averageOrdersCost, mostLovedItem) {
-    $("#currentBalanceSpan").html("$" + currentBalance);
+    $("#currentBalanceSpan").html("$" + currentBalance.toFixed(2));
     $("#totalOrdersSpan").html(totalOrders);
     $("#averageOrdersCostSpan").html("$" + averageOrdersCost.toFixed(2));
     $("#mostLovedItemSpan").html(mostLovedItem);
@@ -109,8 +109,7 @@ function loadNewDataToDashboard(data) {
 }
 
 function createZoneButton(zoneName) {
-    const customHref = "/pages/order?zone=" + zoneName;
-    return '<button class="btn btn-primary btn-sm" type="submit" name="zoneName" value=' + zoneName + '>' +
+    return '<button class="btn btn-primary btn-sm" type="submit" name="zoneName" value=' + zoneName.replace(/ /g, "_") + '>' +
         "Go To Zone" +
     "</button>";
 }

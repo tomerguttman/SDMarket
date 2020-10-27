@@ -35,7 +35,7 @@ public class Customer extends User {
         return customerOrders;
     }
 
-    public int getMostLovedItem() {
+    public String getMostLovedItem() {
         Map<Integer,Double> itemsBucketMap = new HashMap<>();
         for (Order order : this.getUserOrdersMap().values()) {
             for (StoreItem sItem : order.getItemsInOrder()) {
@@ -45,6 +45,7 @@ public class Customer extends User {
                 else { itemsBucketMap.put(sItem.getId(), sItem.getTotalItemsSold()); }
             }
         }
+
         int lovedItemId = -1;
         double maxAmount = -1;
         for (Integer itemId : itemsBucketMap.keySet()) {
@@ -54,7 +55,22 @@ public class Customer extends User {
             }
         }
 
-        return lovedItemId;
+
+        return getMostLovedItemNameFromItemId(lovedItemId);
+    }
+
+    private String getMostLovedItemNameFromItemId(int lovedItemId) {
+        if( lovedItemId == -1) { return "None"; }
+
+        for (Order order : this.getUserOrdersMap().values()) {
+            for(StoreItem sItem : order.getItemsInOrder()){
+                if(sItem.getId() == lovedItemId){
+                    return sItem.getName();
+                }
+            }
+        }
+
+        return "None";
     }
 
     public List<Order> getCustomerOrdersOfSelectedZone(String zoneName) {

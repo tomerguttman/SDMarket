@@ -2,6 +2,7 @@ const GET_AVAILABLE_STORES_STATIC_URL = buildUrlWithContextPath("getAvailableSto
 const GET_AVAILABLE_ITEMS_URL = buildUrlWithContextPath("getAllAvailableItemsInZone");
 const POST_ORDER_URL = buildUrlWithContextPath("postOrder");
 const POST_FEEDBACKS_URL = buildUrlWithContextPath("postFeedbacks");
+const GET_CUSTOMER_ORDER_HISTORY_IN_ZONE_URL = buildUrlWithContextPath("getOrderHistoryInZone");
 let currentFeedbackMap;
 let itemsInOrderList;
 let dynamicItemToStoreMap;
@@ -12,186 +13,33 @@ let currentAvailableStoresMap;
 let currentAvailableItemsMap;
 let currentCartBucketListOfItems;
 let currentDiscountsOfSelectedStore;
+let currentOrdersHistory = {};
 
 $(document).ready(function(){
     initializePurchaseForm();
     setInterval(initializePurchaseForm, 2000);
 })
 
-function createStoreOption(store) {
-    const storeName = store.name;
-    return $('<option value="' + storeName + '">' + storeName + '</option>"');
-}
-
-function createFeedbackTableRow(feedback, feedbackNumber) {
-    return $("<tr id='feedback'" + feedbackNumber + ">\n" +
-        "<td>" + feedback.customerName + "</td>\n" +
-        "<td>" + feedback.dateOfFeedback + "</td>\n" +
-        "<td>" +
-        '<div class="row">' +
-        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-        '<div class="col col-auto"><i class="fa fa-star"></i></div>' +
-        '</div>' +
-        "<td>" + feedback.review + "</td>\n" +
-        "</tr>\n");
-}
-
-function updateRelevantFeedbacksInTable(feedbacks) {
-    if(feedback !== null && feedback !== undefined) {
-        $("#feedbackTable tbody").empty();
-        var feedbackNumber = 1;
-
-        for(var feedback of feedbacks){
-            $("#feedbackTable tbody").append(createFeedbackTableRow(feedback, feedbackNumber));
-            var feedbackId = "#feedback" + feedbackNumber;
-            var ratingStars = $(feedbackId + "i");
-            feedbackNumber += 1;
-
-            for(var i = 0; i < feedback.rating; i++){
-                ratingStars[i].setAttribute("style", "color: #00F0B5");
-            }
-        }
-    }
-}
-
-function createOrderButton(orderId) {
-    const onclickMethod = "activateOrderDetailsModal(" + orderId + ");";
-    return '<a id="orderBtn' + orderId + ' ' +
-        'class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal"' +
-        'onclick=' + onclickMethod + ">" +
-        "Order Details" +
-        "</a>";
-}
-
-function createItemTableRow(item) {
+function createItemTableRowForOrderHistory(item, order) {
+    let storeInfo = (order.storeName === "Dynamic Order " + order.orderId) ? ("Dynamic Order " + order.orderId) : (order.storeId + " | " + order.storeName);
     return $("<tr>\n" +
         "<td>" + item.Id + "</td>\n" +
         "<td>" + item.name + "</td>\n" +
         "<td>" + item.purchaseCategory + "</td>\n" +
-        "<td>" + item.totalItemsSold + "</td>\n" +
+        "<td>" + storeInfo + "</td>\n" +
+        "<td>" + item.totalItemsSold + "</td>" +
         "<td>" + item.pricePerUnit + "</td>" +
-        "<td>" + item.pricePerUnit * item.totalItemsSold + "</td>" +
+        "<td>" + (item.pricePerUnit * item.totalItemsSold).toFixed(2) + "</td>" +
         "<td>" + item.wasPartOfDiscount + "</td>" +
         "</tr>\n");
 }
 
 function activateOrderDetailsModal(orderId) {
-    $('#orderDetailsModalTable tbody').empty();
-    for(let item of currentOrdersHistory[orderId]) {
-        $('#orderDetailsModalTable tbody').append(createItemTableRow(item));
+    $('#orderDetailsModal tbody').empty();
+    for(let item of currentOrdersHistory[orderId].itemsInOrder) {
+        $('#orderDetailsModal tbody').append(createItemTableRowForOrderHistory(item, currentOrdersHistory[orderId]));
     }
     $('#orderDetailsModal').modal('show');
-}
-
-function createOrderTableRow(order) {
-    return $("<tr>\n" +
-        "<td>" + order.orderId + "</td>\n" +
-        "<td>" + order.dateOrderWasMade + "</td>\n" +
-        "<td>" + order.customerName + "</td>\n" +
-        "<td>" + order.orderDestination + "</td>\n" +
-        "<td>" + order.averageOrdersCostWithoutDelivery + "</td>" +
-        "<td>" + order.costOfItemsInOrder + "</td>" +
-        "<td>" + order.deliveryCost + "</td>" +
-        "<td>" + createOrderButton(order.orderId) + "</td>"+
-        "</tr>\n");
-}
-
-function isStoreNameUnique(storeName) {
-    var validFlag = true;
-    for (var store of currentZoneStores) {
-        if(store.name === storeName) {
-            validFlag = false;
-            break;
-        }
-    }
-
-    return validFlag;
-}
-
-function storeLocationUnique(xCoordinate, yCoordinate) {
-    var validFlag = true;
-    for (var store of currentZoneStores) {
-        if(store.storeLocation.x === xCoordinate && store.storeLocation.y === yCoordinate) {
-            validFlag = false;
-            break;
-        }
-    }
-
-    return validFlag;
-}
-
-function isStoreItemsValid(storeItemsDetails, storeItemsList) {
-    var validItemsFlag = true;
-    var itemToAddCounter = 0;
-
-    for (var itemRow of storeItemsDetails) {
-        if($(itemRow).find("[type='checkbox']").prop('checked')) {
-            if($(itemRow).find("[type='number']").val() !== "") {
-                storeItemsList.push({
-                    "id" : parseInt($(itemRow).children()[0].textContent),
-                    "price" : parseInt($(itemRow).find("[type='number']").val())
-                });
-                itemToAddCounter += 1;
-            }
-            else { alert("One of the included items does not contain a price"); return false; }
-        }
-    }
-    if (itemToAddCounter === 0) { alert("A store must sell at least one item"); return false;}
-
-    return validItemsFlag;
-}
-
-function validateInput(storeName, ppk, xCoordinate, yCoordinate, storeItemsDetails, storeItemsList) {
-    var validFlag = false;
-    if(storeName !== "") {
-        if(isStoreNameUnique(storeName)) {
-            if(storeLocationUnique(xCoordinate, yCoordinate)) {
-                if(isStoreItemsValid(storeItemsDetails, storeItemsList)) {
-                    validFlag = true;
-                }
-            }
-            else { alert("The location entered already contains another store"); }
-        }
-        else { alert("The store name " + "'" + storeName + "'" + " already exists in the zone, please choose another one"); }
-    }
-    else { alert("Please enter a store name"); }
-
-    return validFlag;
-}
-
-function resetCreateStoreModal() {
-    $("#createStoreModal [name='storeName']").val("");
-    const ppk = $("#createStoreModal [name='ppk']").val("");
-    const xCoordinate = $("#createStoreModal [name='x']").val("");
-    const yCoordinate = $("#createStoreModal [name='y']").val("");
-    const storeItemsDetails = $("#createStoreModal .itemRow");
-
-    for (var itemRow of storeItemsDetails) {
-        $(itemRow).find("[type='number']").val("")
-        if($(itemRow).find("[type='checkbox']").prop('checked')) {
-            $(itemRow).find("[role='button']").addClass('btn-danger off').removeClass('btn-success');
-        }
-    }
-}
-
-function createPriceInputElement() {
-    return '<input class="form-control" type="number" required="" style="width: 104px;" min="1">';
-}
-
-function createToggleButtonElement() {
-    return '<input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="Yes" data-off="No">\n';
-}
-
-function createRowForCreateStoreItemsTable(item) {
-    return $("<tr class='itemRow'>\n" +
-        "<td>" + item.Id + "</td>\n" +
-        "<td>" + item.name + "</td>\n" +
-        "<td>" + createPriceInputElement() + "</td>\n" +
-        "<td>" + createToggleButtonElement() + "</td>\n" +
-        "</tr>\n");
 }
 
 function disableAndDeleteSelectBoxOptions() {
@@ -322,6 +170,57 @@ function enableAndDeleteSelectBoxOptions() {
     $('#pickStoreButton').prop('disabled', false);
 }
 
+function createOrderDetailsButton(orderId) {
+    let onclickMethod = "activateOrderDetailsModal(" + orderId + ");";
+    return '<a id="orderDetailsBtn' + orderId + '"' +
+        'class="btn btn-primary btn-lg btn-sm" role="button" data-toggle="modal"' +
+        'onclick=' + onclickMethod + ">" +
+        "Order Details" +
+        "</a>";
+}
+
+function createOrderHistoryTableRow(order) {
+    return $("<tr>\n" +
+        "<td>" + order.orderId + "</td>\n" +
+        "<td>" + order.dateOrderWasMade + "</td>\n" +
+        "<td>(" + order.orderDestination.x + "," + order.orderDestination.y + ")</td>\n" +
+        "<td>" + order.amountOfStoresRelatedToOrder + "</td>\n" +
+        "<td>" + order.amountItemsInOrder + "</td>" +
+        "<td>" + order.costOfItemsInOrder.toFixed(2) + "</td>" +
+        "<td>" + order.deliveryCost.toFixed(2) + "</td>" +
+        "<td>" + order.totalOrderCost .toFixed(2)+ "</td>" +
+        "<td>" + createOrderDetailsButton(order.orderId) + "</td>"+
+        "</tr>\n");
+}
+
+function loadOrderHistoryTable(orderHistory) {
+
+    $('#orderHistoryTable tbody').empty();
+
+    for(const orderId in orderHistory){
+        $('#orderHistoryTable tbody').prepend(createOrderHistoryTableRow(orderHistory[orderId]));
+    }
+}
+
+function createStoreOption(store) {
+    const storeName = store.name;
+    return $('<option value="' + storeName + '">' + storeName + '</option>"');
+}
+
+function ajaxOrderHistory() {
+    $.ajax({
+        url : GET_CUSTOMER_ORDER_HISTORY_IN_ZONE_URL,
+        type: "GET",
+        success: function(data) {
+            loadOrderHistoryTable(data.ordersHistory);
+            currentOrdersHistory = data.ordersHistory;
+        },
+        error: function (data) {
+            alert(data.message);
+        }
+    });
+}
+
 function initializePurchaseForm() {
     const purchaseMethod = $('#purchaseMethodToggle').prop('checked') ? 'dynamic' : 'static';
     if(purchaseMethod === 'dynamic') {
@@ -332,6 +231,8 @@ function initializePurchaseForm() {
         loadStorePicker();
         enableAndDeleteSelectBoxOptions();
     }
+
+    ajaxOrderHistory();
 }
 
 function createNewCartItemTableRow(itemToAdd, amountOfItem, wasPartOfDiscount, forAdditional, discountName) {
@@ -800,8 +701,12 @@ function createDynamicOrder(storesParticipatingInOrder, totalDeliveryCost, order
        if(item.wasPartOfDiscount === 'Yes') {
            storesMap[item.storeNameOfDiscount].push(item);
        }
+       //this is a new change that might not work.
+       else {
+           item.pricePerUnit = dynamicItemToStoreMap[item.Id].minPriceForItem;
+           storesMap[item.storeThatItemWasBoughtIn.name].push(item);
+       }
 
-        storesMap[item.storeThatItemWasBoughtIn.name].push(item);
     }
 
     dynamicOrder['totalDeliveryCost'] = totalDeliveryCost;
@@ -945,6 +850,8 @@ $('#addToCartButton').click(() => {
         validateAmountOfItemAndAddToCart(itemId, amountOfItem);
     }
     else { alert('Please choose an item'); }
+
+    $('#amountToAddTextInput').val("");
 });
 
 $('#pickStoreButton').click(() => {
@@ -1048,6 +955,7 @@ function setOnClickForAddReviewButton(storeName) {
         else { alert("You can't add a feedback with no rating"); }
     });
 }
+
 function onPurchaseSuccess(data) {
     alert(data.message);
     const order = $('#purchaseMethodToggle').prop('checked') ? dynamicOrder : staticOrder;
@@ -1134,6 +1042,16 @@ $('#storeReviewSelectBox').on('change', () => {
         });
     }
 });
+
+$('#closeStoresFeedBackModalButton').click(() => {
+    resetOrderDetails();
+});
+
+$('#feedbackModal').on('hide.bs.modal', () => {
+    resetOrderDetails();
+});
+
+
 
 
 

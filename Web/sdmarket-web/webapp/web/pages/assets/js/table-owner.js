@@ -4,6 +4,7 @@ var CREATE_STORE_URL = buildUrlWithContextPath("createStore");
 var currentOrdersHistory;
 var currentZoneStores;
 var currentZoneItems;
+var currentNotifications = [];
 
 $(document).ready(function(){
     refreshTableOwnerInformation();
@@ -64,10 +65,12 @@ function refreshTableOwnerInformation() {
     $.ajax({
         url : REFRESH_TABLE_OWNER_URL,
         type: "GET",
+        data: { "amountOfNotifications" : currentNotifications.length },
         success: function(data) {
             console.log('storesAvailable: ' + data.storesAvailable);
             updateOrderHistoryStorePickerSelectBox(data.storesAvailable);
             updateRelevantFeedbacksInTable(data.feedbacks);
+            updateDashboardNotificationsDropdownMenu(data.notifications);
             currentZoneItems = data.zoneItems;
         },
         error: function (data) {
@@ -131,8 +134,8 @@ function createOrderTableRow(order) {
         "<td>" + order.customerName + "</td>\n" +
         "<td>(" + order.orderDestination.x + "," + order.orderDestination.y + ")</td>\n" +
         "<td>" + order.amountItemsInOrder + "</td>" +
-        "<td>" + order.costOfItemsInOrder + "</td>" +
-        "<td>" + order.deliveryCost + "</td>" +
+        "<td>" + order.costOfItemsInOrder.toFixed(2) + "</td>" +
+        "<td>" + order.deliveryCost.toFixed(2) + "</td>" +
         "<td>" + createOrderButton(order.orderId) + "</td>"+
         "</tr>\n");
 }
@@ -262,9 +265,6 @@ $("#createStoreButton").click(() => {
                 "storeItems" : JSON.stringify(storeItemsList)
             },
             type: "POST",
-            success: function(data) {
-                alert(data.message);
-            },
             error: function (data) {
                 alert(data.message);
             }
@@ -300,6 +300,55 @@ $("#openCreateStoreModalButton").click(() => {
     }
 });
 
+function createDropdownMenuNotification(notification) {
+    let bgClass;
+    let iconClass;
 
+    if (notification.notificationType === "storeCreatedNotification" ){
+        bgClass = 'bg-primary';
+        iconClass = 'fas fa-store text-white';
+    }
+    else if (notification.notificationType === "feedbackNotification" ) {
+        bgClass = 'bg-danger';
+        iconClass = 'fas fa-star text-white';
+    }
+    else {
+        bgClass = 'bg-success';
+        iconClass = 'fas fa-shopping-cart text-white';
+    }
+
+    return $('<a class="d-flex align-items-center dropdown-item" href="#">\n' +
+        '<div class="mr-3">\n' +
+            '<div class="' + bgClass+ ' icon-circle">\n' +
+                '<i class="' + iconClass + '"></i>\n' +
+            '</div>\n' +
+        '</div>\n' +
+        '<div>\n' +
+        '<span class="small text-gray-500">' + notification.dateOfNotification + '</span>\n' +
+        '<p>' + notification.subject + '</p>\n' +
+        '</div>\n' +
+        '</a>\n');
+}
+
+function updateDashboardNotificationsDropdownMenu(notifications) {
+    notifications.forEach(notification => currentNotifications.push(notification));
+
+    if(currentNotifications.length !== 0) {
+        if($('#notificationsCounterSpan').text() === "0") {
+            $('#dropDownNotificationsMenu a').remove();
+        }
+
+        for (const notification of notifications) {
+            $('#dropDownNotificationsMenu').prepend(createDropdownMenuNotification(notification));
+        }
+    }
+    else {
+        $('#dropDownNotificationsMenu a').remove();
+        let noNotifications = $('<a class="text-cetner dropdown-item small text-gray-500">No notifications to show</a>')
+        $('#dropDownNotificationsMenu').append(noNotifications);
+    }
+
+    $('#notificationsCounterSpan').text(currentNotifications.length);
+}
 
 

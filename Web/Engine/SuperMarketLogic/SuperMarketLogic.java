@@ -344,15 +344,15 @@ public class SuperMarketLogic {
         return locationIsValidFlag.get();
     }
 
-    public void updateStoreAndSystemItemAmountInformationAccordingToNewOrder(List<StoreItem> orderItems, Store storeToOrderFrom) {
-        orderItems.forEach(itemInOrder -> {
-            double currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
-            storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
-
-            currentItemAmount = this.SDMarket.getSystemItems().get(itemInOrder.getId()).getTotalItemsSold();
-            this.SDMarket.getSystemItems().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
-        });
-    }
+//    public void updateStoreAndSystemItemAmountInformationAccordingToNewOrder(List<StoreItem> orderItems, Store storeToOrderFrom) {
+//        orderItems.forEach(itemInOrder -> {
+//            double currentItemAmount = storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).getTotalItemsSold();
+//            storeToOrderFrom.getItemsBeingSold().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
+//
+//            currentItemAmount = this.SDMarket.getSystemItems().get(itemInOrder.getId()).getTotalItemsSold();
+//            this.SDMarket.getSystemItems().get(itemInOrder.getId()).setTotalItemsSold(currentItemAmount + itemInOrder.getTotalItemsSold());
+//        });
+//    }
 
     public int getLastOrderID() {
         return this.SDMarket.getOrderID();
@@ -567,34 +567,34 @@ public class SuperMarketLogic {
         }
     }
 
-    public void loadStaticOrdersHistory (String staticOrdersPath, Gson gson) throws IOException {
-        try {
-            Map<Integer, Store> systemStores;
-            File staticOrdersFile = new File(staticOrdersPath);
-            FileReader fReader = new FileReader(staticOrdersFile);
-            List<Order> staticOrders = gson.fromJson(fReader, new TypeToken<List<Order>>() {}.getType());
-            resetStoresInformationBeforeLoad();//resets orderHistoryList, ordersRevenue = 0, each itemBeingSold -> amount = 0.
-            resetSystemItemAmountSoldStats();//each itemBeingSold -> amount = 0
-            systemStores = this.getStores();
-            addStaticOrdersToStoresAndUpdateSystemInfo(systemStores, staticOrders);
-
-        } catch (IOException e) {
-            throw new IOException("<There was a problem loading the static orders file>");
-        }
-    }
+//    public void loadStaticOrdersHistory (String staticOrdersPath, Gson gson) throws IOException {
+//        try {
+//            Map<Integer, Store> systemStores;
+//            File staticOrdersFile = new File(staticOrdersPath);
+//            FileReader fReader = new FileReader(staticOrdersFile);
+//            List<Order> staticOrders = gson.fromJson(fReader, new TypeToken<List<Order>>() {}.getType());
+//            resetStoresInformationBeforeLoad();//resets orderHistoryList, ordersRevenue = 0, each itemBeingSold -> amount = 0.
+//            resetSystemItemAmountSoldStats();//each itemBeingSold -> amount = 0
+//            systemStores = this.getStores();
+//            addStaticOrdersToStoresAndUpdateSystemInfo(systemStores, staticOrders);
+//
+//        } catch (IOException e) {
+//            throw new IOException("<There was a problem loading the static orders file>");
+//        }
+//    }
 
     private void resetSystemItemAmountSoldStats() {
         this.SDMarket.getSystemItems().values().forEach(systemItem -> systemItem.setTotalItemsSold(0));
     }
 
-    private void addStaticOrdersToStoresAndUpdateSystemInfo(Map<Integer, Store> systemStores, List<Order> staticOrders) {
-        staticOrders.forEach(order -> {
-            int storeID = order.getStoreId();
-            systemStores.get(storeID).getStoreOrdersHistory().add(order);
-            systemStores.get(storeID).setTotalOrdersRevenue( systemStores.get(storeID).getTotalOrdersRevenue() + order.getTotalOrderCost());
-            updateStoreAndSystemItemAmountInformationAccordingToNewOrder(order.getItemsInOrder(), systemStores.get(storeID));
-        });
-    }
+//    private void addStaticOrdersToStoresAndUpdateSystemInfo(Map<Integer, Store> systemStores, List<Order> staticOrders) {
+//        staticOrders.forEach(order -> {
+//            int storeID = order.getStoreId();
+//            systemStores.get(storeID).getStoreOrdersHistory().add(order);
+//            systemStores.get(storeID).setTotalOrdersRevenue( systemStores.get(storeID).getTotalOrdersRevenue() + order.getTotalOrderCost());
+//            updateStoreAndSystemItemAmountInformationAccordingToNewOrder(order.getItemsInOrder(), systemStores.get(storeID));
+//        });
+//    }
 
     private void resetStoresInformationBeforeLoad() {
         this.getStores().values().forEach(store -> {

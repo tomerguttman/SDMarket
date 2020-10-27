@@ -19,7 +19,7 @@ public class OrdersZoneServlet extends HttpServlet {
             if(userType.equals(Constants.CUSTOMER)) { redirectURL = CUSTOMER_ORDER_URL; }
             else { redirectURL = SHOP_OWNER_ORDER_URL; }
 
-            request.getSession().setAttribute(Constants.CURRENT_ZONE ,request.getParameter(Constants.ZONE_NAME));
+            request.getSession().setAttribute(Constants.CURRENT_ZONE ,request.getParameter(Constants.ZONE_NAME).replace("_", ""));
             response.sendRedirect(redirectURL);
         }
         catch (Exception e) {

@@ -183,6 +183,11 @@ public class Zone {
         amountOfOrdersInZone += 1;
         totalRevenue += order.totalOrderCost;
         this.averageOrdersCostWithoutDelivery = calculateAverageCostOfOrdersInZone();
+
+        for(StoreItem sItem : order.getItemsInOrder()){
+            StoreItem itemInZone = this.itemsAvailableInZone.get(sItem.getId());
+            itemInZone.setTotalItemsSold(itemInZone.getTotalItemsSold() + sItem.getTotalItemsSold());
+        }
     }
 
     private double calculateAverageCostOfOrdersInZone() {

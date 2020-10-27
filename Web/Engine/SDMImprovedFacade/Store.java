@@ -202,4 +202,11 @@ public class Store {
         this.totalItemsRevenue += order.costOfItemsInOrder;
         this.totalOrdersRevenue += order.totalOrderCost;
     }
+
+    public void updateNumberOfItemsSoldForAllItemsInOrder(Order order) {
+        for(StoreItem sItem : order.getItemsInOrder()){
+            StoreItem itemInStore = this.itemsBeingSold.get(sItem.getId());
+            itemInStore.setTotalItemsSold(itemInStore.getTotalItemsSold() + sItem.getTotalItemsSold());
+        }
+    }
 }
