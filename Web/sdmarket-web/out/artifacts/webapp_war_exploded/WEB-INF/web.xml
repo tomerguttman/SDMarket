@@ -147,5 +147,13 @@
         <url-pattern>/pages/getOrderHistoryInZone</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>PostNewItemServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.PostNewItemServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostNewItemServlet</servlet-name>
+        <url-pattern>/pages/createNewItem</url-pattern>
+    </servlet-mapping>
 
 </web-app>

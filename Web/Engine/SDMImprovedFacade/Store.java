@@ -210,4 +210,8 @@ public class Store {
             itemInStore.setTotalItemsSold(itemInStore.getTotalItemsSold() + sItem.getTotalItemsSold());
         }
     }
+
+    public void addNewItemToStore(StoreItem newItemToAdd) {
+        this.itemsBeingSold.put(newItemToAdd.getId(), newItemToAdd);
+    }
 }

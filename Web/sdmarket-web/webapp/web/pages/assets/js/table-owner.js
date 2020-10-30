@@ -1,6 +1,7 @@
 var SELECTED_STORE_ORDERS_HISTORY_URL = buildUrlWithContextPath("getSelectedStoreOrdersHistory");
 var REFRESH_TABLE_OWNER_URL = buildUrlWithContextPath("getTableOwnerInformation")
 var CREATE_STORE_URL = buildUrlWithContextPath("createStore");
+var CREATE_NEW_ITEM_URL = buildUrlWithContextPath("createNewItem");
 var currentOrdersHistory;
 var currentZoneStores;
 var currentUserZoneStores;
@@ -9,8 +10,16 @@ var currentNotifications = [];
 
 $(document).ready(function(){
     refreshTableOwnerInformation();
+    appendPurchaseCategoryOptions();
     setInterval(refreshTableOwnerInformation, 1000);
 })
+
+function appendPurchaseCategoryOptions() {
+    $('#selectPurchaseCategory option').remove();
+    $('#selectPurchaseCategory').append($('<option value = "undefined" hidden > Choose Purchase Category </option>'));
+    $('#selectPurchaseCategory').append($('<option value = "Weight"> Weight </option>'));
+    $('#selectPurchaseCategory').append($('<option value = "Quantity" > Quantity </option>'));
+}
 
 function createStoreOption(store) {
     const storeName = store.name;
@@ -67,6 +76,10 @@ function updateWholeZoneCurrentAvailableStores(wholeZoneStores) {
     currentZoneStores = wholeZoneStores;
 }
 
+function updateAddNewItemButtonHiddenProperty(isZoneOwner) {
+    if(isZoneOwner) { $('#addNewItemButton').removeAttr("hidden"); }
+}
+
 function refreshTableOwnerInformation() {
     $.ajax({
         url : REFRESH_TABLE_OWNER_URL,
@@ -78,8 +91,8 @@ function refreshTableOwnerInformation() {
             updateOrderHistoryStorePickerSelectBox(data.storesAvailable);
             updateRelevantFeedbacksInTable(data.feedbacks);
             updateDashboardNotificationsDropdownMenu(data.notifications);
-            //updateCurrentZon
             $('#usernameTopRightSpan').html(data.userName);
+            updateAddNewItemButtonHiddenProperty(data.isZoneOwner);
             currentZoneItems = data.zoneItems;
         },
         error: function (data) {
@@ -223,6 +236,30 @@ function isStoreItemsValid(storeItemsDetails, storeItemsList) {
     return validItemsFlag;
 }
 
+function isStoresValid(storeDetailsRows, storesToAddItemToList) {
+    var validStoresFlag = true;
+    var storeThatSellsCounter = 0;
+
+    for (var storeRow of storeDetailsRows) {
+        if($(storeRow).find("[type='checkbox']").prop('checked')) {
+            if($(storeRow).find("[type='number']").val() !== "") {
+                if(parseInt($(storeRow).find("[type='number']").val()) === parseFloat($(storeRow).find("[type='number']").val())){
+                    storesToAddItemToList.push({
+                        "storeId" : parseInt($(storeRow).children()[0].textContent),
+                        "price" : parseInt($(storeRow).find("[type='number']").val())
+                    });
+                    storeThatSellsCounter += 1;
+                }
+                else{ alert("An item's price must be an integer"); return false;}
+            }
+            else { alert("One of the included stores does not have a price for the new item"); return false; }
+        }
+    }
+    if (storeThatSellsCounter === 0) { alert("At least one store must sell the new item"); return false;}
+
+    return validStoresFlag;
+}
+
 function validateInput(storeName, ppk, xCoordinate, yCoordinate, storeItemsDetails, storeItemsList) {
     var validFlag = false;
     if(storeName !== "") {
@@ -235,6 +272,21 @@ function validateInput(storeName, ppk, xCoordinate, yCoordinate, storeItemsDetai
             else { alert("The location entered already contains another store"); }
         }
         else { alert("The store name " + "'" + storeName + "'" + " already exists in the zone, please choose another one"); }
+    }
+    else { alert("Please enter a store name"); }
+
+    return validFlag;
+}
+
+function validateNewItemInput(itemName, purchaseCategory,  storeDetailsRows, storesToAddItemToList) {
+    var validFlag = false;
+    if(itemName !== "") {
+        if(purchaseCategory !== "undefined") {
+            if(isStoresValid(storeDetailsRows, storesToAddItemToList)) {
+                validFlag = true;
+            }
+        }
+        else{ alert("Please choose a purchase category"); }
     }
     else { alert("Please enter a store name"); }
 
@@ -305,6 +357,15 @@ function createRowForCreateStoreItemsTable(item) {
         "</tr>\n");
 }
 
+function createRowForCreateNewItemTable(store) {
+    return $("<tr class='storeRow'>\n" +
+        "<td>" + store.Id + "</td>\n" +
+        "<td>" + store.name + "</td>\n" +
+        "<td>" + createPriceInputElement() + "</td>\n" +
+        "<td>" + createToggleButtonElement() + "</td>\n" +
+        "</tr>\n");
+}
+
 $("#openCreateStoreModalButton").click(() => {
     $('#createStoreModal tbody').empty();
     resetCreateStoreModal();
@@ -365,4 +426,48 @@ function updateDashboardNotificationsDropdownMenu(notifications) {
     }
 }
 
+function resetAddNewItemModal() {
+    $("#addNewItemModal [name='itemName']").val("");
+    $("#addNewItemModal [name='purchaseCategory']").val("undefined");
+    $("#addNewItemModal tbody").empty();
+}
 
+$('#addNewItemButton').click( () => {
+    $('#addNewItemModal tbody').empty();
+    resetAddNewItemModal();
+
+    for(var store of currentZoneStores) {
+        if(store.ownerName === $('#usernameTopRightSpan').html()) {
+            $('#addNewItemModal tbody').append(createRowForCreateNewItemTable(store));
+        }
+    }
+});
+
+$("#createNewItemButton").click(() => {
+    var storesToAddItemToList = [];
+    const itemName = $("#addNewItemModal [name='itemName']").val();
+    const purchaseCategory = $("#addNewItemModal [name='purchaseCategory']").val();
+    const storeDetailsRows = $("#addNewItemModal tbody tr");
+
+    if (validateNewItemInput(itemName, purchaseCategory, storeDetailsRows, storesToAddItemToList) ) {
+        $.ajax({
+            url : CREATE_NEW_ITEM_URL,
+            data : {
+                "itemName" : itemName,
+                "purchaseCategory" : purchaseCategory,
+                "storesToAddItemToList" : JSON.stringify(storesToAddItemToList)
+            },
+            type: "POST",
+            success: function (data) {
+                $('#addNewItemModal').modal("hide");
+                alert(data.message);
+            },
+            error: function (data) {
+                $('#addNewItemModal').modal("hide");
+                alert(data.message);
+            }
+        });
+    }
+
+    resetAddNewItemModal();
+});

@@ -157,15 +157,6 @@
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                <tr>
-                                                                    <td>-</td>
-                                                                    <td>-</td>
-                                                                    <td>
-                                                                        <input class="form-control" type="number" required="" style="width: 104px;" min="1"></td>
-                                                                    <td>
-                                                                        <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="Yes" data-off="No">
-                                                                    </td>
-                                                                </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -176,6 +167,53 @@
                                         <div class="modal-footer">
                                             <button class="btn btn-danger" data-dismiss="modal" type="button">Cancel</button>
                                             <button id="createStoreButton" class="btn btn-primary" type="button" >Create</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col col-12 col-sm-5 col-md-6 col-lg-6" style="padding: 0px;padding-left: 0px;">
+                        <div style="padding-left: 5px;"><a hidden id="addNewItemButton" class="btn btn-info btn-lg" role="button" data-toggle="modal" href="#addNewItemModal" style="padding-top: 6px;margin-top: 6px;">Add New Item</a>
+                            <div class="modal fade" role="dialog" tabindex="-1" id="addNewItemModal">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>Add New Item</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                                        <div class="modal-body">
+                                            <div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Item Name</label></div>
+                                                    <div class="col"><input class="form-control" type="text" style="width: 308px;" name="itemName"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Purchase Category</label></div>
+                                                    <div class="col">
+                                                        <select id="selectPurchaseCategory" class="form-control" required="" style="width: 308px;" name="purchaseCategory"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>ID</th>
+                                                                    <th>Store Name</th>
+                                                                    <th>Price</th>
+                                                                    <th>Include</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-danger" data-dismiss="modal" type="button">Cancel</button>
+                                            <button id="createNewItemButton" class="btn btn-primary" type="button" >Add</button></div>
                                     </div>
                                 </div>
                             </div>

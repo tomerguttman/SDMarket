@@ -320,4 +320,51 @@ public class SDMarketManager {
         String date = jsonFeedback.get("date").getAsString();
         return new Feedback(rating, textReview, username, date, storeName);
     }
+
+    public Map<Integer, Integer> createStoreListFromJson(String storesToAddItemToList, String currentZoneName) {
+        Map<Integer, Integer> outputItemPriceToStoreMap = new HashMap<>();
+        JsonElement jsonStoresList = new JsonParser().parse(storesToAddItemToList);
+        for (JsonElement jsonItem : jsonStoresList.getAsJsonArray()) {
+            int storeId = jsonItem.getAsJsonObject().get("storeId").getAsInt();
+            int price = jsonItem.getAsJsonObject().get("price").getAsInt();
+            Store store = this.getSystemZones().get(currentZoneName).getStoresInZone().get(storeId);
+            outputItemPriceToStoreMap.put(store.getId(), price);
+        }
+
+        return outputItemPriceToStoreMap;
+    }
+
+    public void createNewItemAndAddToStoresAndZone(ShopOwner currentShopOwner, String currentZoneName,
+                                                   String itemName, String purchaseCategory, Map<Integer, Integer> storeIdToItemPriceMap) {
+        StoreItem newItemToAdd;
+        int newItemId = this.getSystemZones().get(currentZoneName).getItemsAvailableInZone().size() + 1;
+
+        for (Integer storeId : storeIdToItemPriceMap.keySet()) {
+            if(this.getSystemZones().containsKey(currentZoneName)){
+                if(this.getSystemZones().get(currentZoneName).getStoresInZone().containsKey(storeId)){
+                    Store storeToAddItemTo = this.getSystemZones().get(currentZoneName).getStoresInZone().get(storeId);
+                    newItemToAdd = createNewItem(newItemId, itemName, purchaseCategory, storeIdToItemPriceMap.get(storeId));
+                    storeToAddItemTo.addNewItemToStore(newItemToAdd);
+                }
+            }
+        }
+
+        if(this.getSystemZones().containsKey(currentZoneName)) {
+            newItemToAdd = createNewItem(newItemId, itemName, purchaseCategory, 0);
+            addItemToZone(currentZoneName, newItemToAdd);
+        }
+    }
+
+    private void addItemToZone(String currentZoneName, StoreItem newItemToAdd) {
+        getSystemZones().get(currentZoneName).addItemToZone(newItemToAdd);
+    }
+
+    private StoreItem createNewItem(int newItemId, String itemName, String purchaseCategory, int price) {
+        StoreItem outputStoreItem = new StoreItem(newItemId, itemName, purchaseCategory);
+        outputStoreItem.setPricePerUnit(price);
+        outputStoreItem.setIsAvailable(true);
+        outputStoreItem.setWasPartOfDiscount(false);
+
+        return outputStoreItem;
+    }
 }

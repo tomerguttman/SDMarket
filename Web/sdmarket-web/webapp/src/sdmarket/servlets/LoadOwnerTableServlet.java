@@ -51,6 +51,8 @@ public class LoadOwnerTableServlet extends HttpServlet {
                 Zone currentZone = sdMarketManager.getSystemZones().get(currentZoneName.replaceAll("\\s+",""));
                 jsonObject.add("wholeZoneStores", gson.toJsonTree(getAllZoneStoresAsList(currentZone.getStoresInZone())));
                 jsonObject.addProperty("userName", currentUserName);
+                boolean isZoneOwner = currentZone.getOwnerName().equals(currentUserName);
+                jsonObject.addProperty("isZoneOwner", isZoneOwner);
 
             }
             else { response.sendRedirect(DASHBOARD_OWNER_URL); } //Arrived without selecting a zone

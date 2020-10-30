@@ -202,4 +202,9 @@ public class Zone {
         List<StoreItem> itemsAvailableInZoneList = new ArrayList<>(this.itemsAvailableInZone.values());
         return itemsAvailableInZoneList;
     }
+
+    public void addItemToZone(StoreItem newItemToAdd) {
+        this.itemsAvailableInZone.put(newItemToAdd.getId(), newItemToAdd);
+        initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
+    }
 }
