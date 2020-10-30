@@ -3,6 +3,7 @@ var REFRESH_TABLE_OWNER_URL = buildUrlWithContextPath("getTableOwnerInformation"
 var CREATE_STORE_URL = buildUrlWithContextPath("createStore");
 var currentOrdersHistory;
 var currentZoneStores;
+var currentUserZoneStores;
 var currentZoneItems;
 var currentNotifications = [];
 
@@ -17,11 +18,12 @@ function createStoreOption(store) {
 }
 
 function updateOrderHistoryStorePickerSelectBox(storesAvailable) {
-    currentZoneStores = storesAvailable;
-
-    for(var store of storesAvailable){
-        if(!($('#ordersHistoryStoreSelectBox option[value=' + '"' + store.name + '"]').length > 0)) {
-            $("#ordersHistoryStoreSelectBox").append(createStoreOption(store));
+    if(storesAvailable !== undefined && storesAvailable !== null) {
+        currentUserZoneStores = storesAvailable;
+        for(var store of storesAvailable){
+            if(!($('#ordersHistoryStoreSelectBox option[value=' + '"' + store.name + '"]').length > 0)) {
+                $("#ordersHistoryStoreSelectBox").append(createStoreOption(store));
+            }
         }
     }
 }
@@ -61,16 +63,22 @@ function updateRelevantFeedbacksInTable(feedbacks) {
     }
 }
 
+function updateWholeZoneCurrentAvailableStores(wholeZoneStores) {
+    currentZoneStores = wholeZoneStores;
+}
+
 function refreshTableOwnerInformation() {
     $.ajax({
         url : REFRESH_TABLE_OWNER_URL,
         type: "GET",
         data: { "amountOfNotifications" : currentNotifications.length },
         success: function(data) {
-            console.log('storesAvailable: ' + data.storesAvailable);
+            // console.log('storesAvailable: ' + data.storesAvailable);
+            updateWholeZoneCurrentAvailableStores(data.wholeZoneStores);
             updateOrderHistoryStorePickerSelectBox(data.storesAvailable);
             updateRelevantFeedbacksInTable(data.feedbacks);
             updateDashboardNotificationsDropdownMenu(data.notifications);
+            //updateCurrentZon
             $('#usernameTopRightSpan').html(data.userName);
             currentZoneItems = data.zoneItems;
         },
@@ -181,9 +189,11 @@ function isStoreNameUnique(storeName) {
 }
 
 function storeLocationUnique(xCoordinate, yCoordinate) {
+    let xCoordinateParsed = parseInt(xCoordinate);
+    let yCoordinateParsed = parseInt(yCoordinate);
     var validFlag = true;
     for (var store of currentZoneStores) {
-        if(store.storeLocation.x === xCoordinate && store.storeLocation.y === yCoordinate) {
+        if(store.storeLocation.x === xCoordinateParsed && store.storeLocation.y === yCoordinateParsed) {
             validFlag = false;
             break;
         }
@@ -266,6 +276,9 @@ $("#createStoreButton").click(() => {
                 "storeItems" : JSON.stringify(storeItemsList)
             },
             type: "POST",
+            success: function (data) {
+                alert(data.message);
+            },
             error: function (data) {
                 alert(data.message);
             }
@@ -332,24 +345,24 @@ function createDropdownMenuNotification(notification) {
 }
 
 function updateDashboardNotificationsDropdownMenu(notifications) {
-    notifications.forEach(notification => currentNotifications.push(notification));
+    if(notifications !== undefined && notifications !== null) {
+        notifications.forEach(notification => currentNotifications.push(notification));
+        if (currentNotifications.length !== 0) {
+            if ($('#notificationsCounterSpan').text() === "0") {
+                $('#dropDownNotificationsMenu a').remove();
+            }
 
-    if(currentNotifications.length !== 0) {
-        if($('#notificationsCounterSpan').text() === "0") {
+            for (const notification of notifications) {
+                $('#dropDownNotificationsMenu').prepend(createDropdownMenuNotification(notification));
+            }
+        } else {
             $('#dropDownNotificationsMenu a').remove();
+            let noNotifications = $('<a class="text-cetner dropdown-item small text-gray-500">No notifications to show</a>')
+            $('#dropDownNotificationsMenu').append(noNotifications);
         }
 
-        for (const notification of notifications) {
-            $('#dropDownNotificationsMenu').prepend(createDropdownMenuNotification(notification));
-        }
+        $('#notificationsCounterSpan').text(currentNotifications.length);
     }
-    else {
-        $('#dropDownNotificationsMenu a').remove();
-        let noNotifications = $('<a class="text-cetner dropdown-item small text-gray-500">No notifications to show</a>')
-        $('#dropDownNotificationsMenu').append(noNotifications);
-    }
-
-    $('#notificationsCounterSpan').text(currentNotifications.length);
 }
 
 

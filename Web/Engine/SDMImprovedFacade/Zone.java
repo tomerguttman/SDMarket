@@ -5,9 +5,8 @@ import generatedClasses.SDMSell;
 import generatedClasses.SDMStore;
 import generatedClasses.SuperDuperMarketDescriptor;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Zone {
@@ -31,7 +30,7 @@ public class Zone {
     public Zone(SuperDuperMarketDescriptor inputSDM, String ownerName) {
         this.zoneName = inputSDM.getSDMZone().getName();
         this.ownerName = ownerName;
-        this.storesInZone.putAll(createStoresInZoneMap(inputSDM, ownerName));
+        this.storesInZone.putAll(createStoresInZoneMap(inputSDM, ownerName, zoneName));
         updateItemsBeingSoldForEachStore(inputSDM);
         this.itemsAvailableInZone.putAll(createItemsInZoneMap(inputSDM));
         initializeAveragePriceOfItemAndAmountOfStoresSellingAnItem();
@@ -94,12 +93,12 @@ public class Zone {
         }
     }
 
-    private Map<Integer, Store> createStoresInZoneMap(SuperDuperMarketDescriptor inputSDM, String ownerName) {
+    private Map<Integer, Store> createStoresInZoneMap(SuperDuperMarketDescriptor inputSDM, String ownerName, String zoneName) {
         Map<Integer, SDMStore> SDMStoreMap = inputSDM.getSDMStores().getSDMStore().stream().collect(Collectors.toMap(SDMStore::getId, store -> store));
         Map<Integer, Store> storesInZoneMap = new HashMap<>();
 
         for (SDMStore store : SDMStoreMap.values()) {
-            storesInZoneMap.put(store.getId(), new Store(store, ownerName));
+            storesInZoneMap.put(store.getId(), new Store(store, ownerName, zoneName));
         }
 
         return storesInZoneMap;
@@ -197,5 +196,10 @@ public class Zone {
         }
 
        return this.ordersMadeInZone.values().size() != 0 ? sum / this.ordersMadeInZone.values().size() : 0 ;
+    }
+
+    public List<StoreItem> getItemsAvailableInZoneAsList() {
+        List<StoreItem> itemsAvailableInZoneList = new ArrayList<>(this.itemsAvailableInZone.values());
+        return itemsAvailableInZoneList;
     }
 }

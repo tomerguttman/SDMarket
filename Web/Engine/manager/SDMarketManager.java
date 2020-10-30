@@ -95,7 +95,6 @@ public class SDMarketManager {
         //newStore is already updated with the zone average price. (not the whole system)
         this.SDMLogic.addStoreToZoneInSystem(currentZoneName, newStoreToAdd);
         addNotificationToZoneOwner(currentZone, newStoreToAdd, currentShopOwner);
-
     }
 
     private void addNotificationToZoneOwner(Zone currentZone, Store newStoreToAdd, ShopOwner currentShopOwner) {

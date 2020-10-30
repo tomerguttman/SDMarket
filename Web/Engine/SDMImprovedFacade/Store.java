@@ -18,7 +18,7 @@ public class Store {
     private double totalDeliveryRevenue;
     private final HashMap<Integer, List<Feedback>> feedbackHashMap = new HashMap<>();
 
-    public Store(SDMStore inputStore, String ownerName){
+    public Store(SDMStore inputStore, String ownerName, String zoneName){
         this.Id = inputStore.getId();
         this.deliveryPpk = inputStore.getDeliveryPpk();
         this.name = inputStore.getName();
@@ -28,6 +28,7 @@ public class Store {
         this.ownerName = ownerName;
         this.totalDeliveryRevenue = 0;
         this.totalItemsRevenue = 0;
+        this.zoneName = zoneName;
     }
 
     public Store(int id, String name, int storePpk, Location storeLocation) {

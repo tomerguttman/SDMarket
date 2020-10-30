@@ -360,7 +360,7 @@ function createDisplayOfferButton(itemDiscountName) {
 
 function createNewDiscountRow(discount, storeName) {
     let itemName = currentAvailableItemsMap[discount.buyThis.itemId].name.replace(/\s/g,'');
-    return $("<tr id=" + discount.name + ">\n" +
+    return $("<tr id=" + discount.name.replace(/\s/g,'') + ">\n" +
         "<td>" + discount.buyThis.itemId + "</td>\n" +
         "<td>" + itemName + "</td>\n" +
         "<td>" + discount.name + "</td>\n" +
@@ -371,29 +371,24 @@ function createNewDiscountRow(discount, storeName) {
 }
 
 function isDiscountAlreadyExistsInDiscountTable(discountName) {
-    return $('#availableDiscountsTable tbody tr[id="' + discountName + '"]').length > 0;
+    return $('#availableDiscountsTable tbody tr[id="' + discountName.replace(/\s/g,'') + '"]').length > 0;
 }
 
-function loadDiscountsToTable(discountsOfSelectedStore, storeName) {
-    for (const itemId in discountsOfSelectedStore) {
-        currentDiscountsOfSelectedStore = currentDiscountsOfSelectedStore.concat(discountsOfSelectedStore[itemId]);
-    }
+function loadDiscountsToTable(discountsOfSelectedStore, storeName, itemId) {
+    currentDiscountsOfSelectedStore = discountsOfSelectedStore[itemId];
 
-    for (const itemId in currentCartBucketListOfItems) {
-        let currentItemDiscounts = discountsOfSelectedStore[itemId]; // returns a list of discounts for the current item.
-        if(currentItemDiscounts !== undefined) {
-            for(const itemDiscount of currentItemDiscounts) {
-                if (itemDiscount.buyThis.quantity <= currentCartBucketListOfItems[itemId]) {
-                    //discount are unique, therefore we don't need to check if it already exists in the table.
-                    if(!isDiscountAlreadyExistsInDiscountTable(itemDiscount.name.replace(/\s/g,''))) {
-                        let rowToAdd = createNewDiscountRow(itemDiscount, storeName);
-                        let button = $(rowToAdd).find('button')[0];
-                        $(button).click(() => {
-                            currentDiscountName = $(button).attr('name');
-                            loadDiscountOfferToOfferTable(itemDiscount.name, storeName, itemId);
-                        });
-                        $('#availableDiscountsTable tbody').append(rowToAdd);
-                    }
+    if(currentDiscountsOfSelectedStore !== undefined) {
+        for(const itemDiscount of currentDiscountsOfSelectedStore) {
+            if (itemDiscount.buyThis.quantity <= currentCartBucketListOfItems[itemId]) {
+                //discount are unique, therefore we don't need to check if it already exists in the table.
+                if(!isDiscountAlreadyExistsInDiscountTable(itemDiscount.name.replace(/\s/g,''))) {
+                    let rowToAdd = createNewDiscountRow(itemDiscount, storeName);
+                    let button = $(rowToAdd).find('button')[0];
+                    $(button).click(() => {
+                        currentDiscountName = $(button).attr('name');
+                        loadDiscountOfferToOfferTable(itemDiscount.name, storeName, itemId);
+                    });
+                    $('#availableDiscountsTable tbody').append(rowToAdd);
                 }
             }
         }
@@ -438,7 +433,7 @@ function getRelevantDiscountFromWholeZoneAndAddToTable() {
     }
 
     for (const itemId in itemToStoreMap) {
-        loadDiscountsToTable(itemToStoreMap[itemId].storeToBuyFrom.storeDiscounts, itemToStoreMap[itemId].storeToBuyFrom.name);
+        loadDiscountsToTable(itemToStoreMap[itemId].storeToBuyFrom.storeDiscounts, itemToStoreMap[itemId].storeToBuyFrom.name, itemId);
     }
 
     dynamicItemToStoreMap = itemToStoreMap;
@@ -460,9 +455,18 @@ function getRowOfSelectedOfferItem(selectedOfferItemId) {
 }
 
 function findRelevantDiscount(discountName) {
-    for (const discount in currentDiscountsOfSelectedStore) {
-        if(currentDiscountsOfSelectedStore[discount].name === discountName) { return currentDiscountsOfSelectedStore[discount]; }
+    for(let storeKey in currentAvailableStoresMap) {
+        for(const itemKey in currentAvailableStoresMap[storeKey].storeDiscounts ){
+            let discountArray = currentAvailableStoresMap[storeKey].storeDiscounts[itemKey];
+            for(const index in discountArray) {
+                if(discountArray[index].name === discountName) {
+                    return discountArray[index];
+                }
+            }
+        }
     }
+
+    return null;
 }
 
 function addSelectedOfferItemToCart(selectedOfferItemId, discountName) {
@@ -815,8 +819,12 @@ $('#applyDiscountButton').click(() => {
 
         //subtract once for every discount.
         let discount = findRelevantDiscount(discountName);
-        let amountToSubtract = discount.buyThis.quantity;
-        currentCartBucketListOfItems[discount.buyThis.itemId] = currentCartBucketListOfItems[discount.buyThis.itemId] - amountToSubtract;
+        if(discount !== null) {
+            let amountToSubtract = discount.buyThis.quantity;
+            currentCartBucketListOfItems[discount.buyThis.itemId] = currentCartBucketListOfItems[discount.buyThis.itemId] - amountToSubtract;
+        }
+        else { alert("server error discount could not be found!"); }
+
         resetDiscountOffersTableAndReloadAvailableDiscounts();
     }
 })
@@ -954,6 +962,7 @@ function setOnClickForAddReviewButton(storeName) {
                 "reviewText" : review,
                 "date" : dateOfFeedback
             }
+            alert("Your feedback to " + storeName + " was updated successfully");
         }
         else { alert("You can't add a feedback with no rating"); }
     });

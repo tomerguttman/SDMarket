@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class LoadOwnerTableServlet extends HttpServlet {
@@ -37,7 +39,8 @@ public class LoadOwnerTableServlet extends HttpServlet {
             if(currentZoneName != null) {
                 List<Feedback> zoneFeedbackList = currentShopOwner.getZoneFeedbacks(currentZoneName);
                 List<Store> zoneStores = currentShopOwner.getZoneStores(currentZoneName);
-                List<StoreItem> zoneItemsList = currentShopOwner.getZoneItems(currentZoneName);
+                //List<StoreItem> zoneItemsList = currentShopOwner.getZoneItems(currentZoneName);
+                List<StoreItem> zoneItemsList = sdMarketManager.getSystemZones().get(currentZoneName).getItemsAvailableInZoneAsList();
                 int amountOfNotifications = Integer.parseInt(request.getParameter("amountOfNotifications"));
                 List<Notification> newestNotifications = currentShopOwner.getNewestNotifications(amountOfNotifications);
 
@@ -45,7 +48,10 @@ public class LoadOwnerTableServlet extends HttpServlet {
                 if (zoneStores != null) { jsonObject.add("storesAvailable", gson.toJsonTree(zoneStores)); }
                 if(zoneItemsList != null) { jsonObject.add("zoneItems", gson.toJsonTree(zoneItemsList)); }
                 jsonObject.add("notifications", gson.toJsonTree(newestNotifications));
+                Zone currentZone = sdMarketManager.getSystemZones().get(currentZoneName.replaceAll("\\s+",""));
+                jsonObject.add("wholeZoneStores", gson.toJsonTree(getAllZoneStoresAsList(currentZone.getStoresInZone())));
                 jsonObject.addProperty("userName", currentUserName);
+
             }
             else { response.sendRedirect(DASHBOARD_OWNER_URL); } //Arrived without selecting a zone
 
@@ -57,6 +63,15 @@ public class LoadOwnerTableServlet extends HttpServlet {
             out.println(jsonObject);
             out.flush();
         }
+    }
+
+    private List<Store> getAllZoneStoresAsList(HashMap<Integer, Store> storesInZone) {
+        List<Store> allZoneStoresList = new ArrayList<>();
+        for (Store store: storesInZone.values()) {
+            allZoneStoresList.add(store);
+        }
+
+        return allZoneStoresList;
     }
 
     @Override
