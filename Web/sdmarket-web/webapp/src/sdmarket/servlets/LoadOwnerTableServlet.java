@@ -45,6 +45,7 @@ public class LoadOwnerTableServlet extends HttpServlet {
                 if (zoneStores != null) { jsonObject.add("storesAvailable", gson.toJsonTree(zoneStores)); }
                 if(zoneItemsList != null) { jsonObject.add("zoneItems", gson.toJsonTree(zoneItemsList)); }
                 jsonObject.add("notifications", gson.toJsonTree(newestNotifications));
+                jsonObject.addProperty("userName", currentUserName);
             }
             else { response.sendRedirect(DASHBOARD_OWNER_URL); } //Arrived without selecting a zone
 

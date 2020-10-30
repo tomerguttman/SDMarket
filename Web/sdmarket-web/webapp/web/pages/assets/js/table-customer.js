@@ -214,6 +214,7 @@ function ajaxOrderHistory() {
         success: function(data) {
             loadOrderHistoryTable(data.ordersHistory);
             currentOrdersHistory = data.ordersHistory;
+            $('#usernameTopRightSpan').html(data.userName);
         },
         error: function (data) {
             alert(data.message);
@@ -305,6 +306,8 @@ function createOfferRow(currentOffer) {
 }
 
 function pushDiscountOffersToOffersTable(currentItemDiscount) {
+    $('#discountOffersTable tbody').empty();
+
     for (const currentOffer of currentItemDiscount.getThat.offerList) {
         $('#discountOffersTable tbody').append(createOfferRow(currentOffer));
     }

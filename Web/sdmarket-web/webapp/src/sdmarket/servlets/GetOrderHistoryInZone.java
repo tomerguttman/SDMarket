@@ -35,9 +35,9 @@ public class GetOrderHistoryInZone extends HttpServlet {
 
         String currentZoneName = Objects.requireNonNull(SessionUtils.getCurrentZone(request));
         HashMap<Integer, Order> relevantZoneOrderHistory = sdMarketManager.getUser(currentUserName).getOrderHistoryByZoneName(currentZoneName);
-
         try {
             json.add("ordersHistory", gson.toJsonTree(relevantZoneOrderHistory));
+            json.addProperty("userName", currentUserName);
         } catch (Exception e) {
             json.addProperty("message", e.getMessage());
             System.out.println(e.getMessage());

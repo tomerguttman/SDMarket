@@ -36,10 +36,10 @@ public class LoadDashboardServlet extends HttpServlet {
 
         try {
             assert currentUserType != null;
-            if(currentUserType.equals(Constants.CUSTOMER)) { json = getCustomerJson(currentUser, systemZones, userTransactions, otherUsers, sdMarketManager); }
+            if(currentUserType.equals(Constants.CUSTOMER)) { json = getCustomerJson(currentUser, systemZones, userTransactions, otherUsers, sdMarketManager, currentUserName); }
             else {
                 int amountOfNotifications = Integer.parseInt(request.getParameter("amountOfNotifications"));
-                json = getShopOwnerJson(currentUser, systemZones, userTransactions, otherUsers, amountOfNotifications);
+                json = getShopOwnerJson(currentUser, systemZones, userTransactions, otherUsers, amountOfNotifications, currentUserName);
             }
 
         } catch (Exception e) {
@@ -52,21 +52,21 @@ public class LoadDashboardServlet extends HttpServlet {
         }
     }
 
-    private String getCustomerJson(User currentUser, List<Zone> systemZones, List<Transaction> userTransactions, List<User> otherUsers, SDMarketManager sdMarketManager) {
+    private String getCustomerJson(User currentUser, List<Zone> systemZones, List<Transaction> userTransactions, List<User> otherUsers, SDMarketManager sdMarketManager, String userName) {
         Gson gson = new Gson();
         Customer customer = (Customer)currentUser;
         String lovedItem = customer.getMostLovedItem();
         CustomerJsonObject customerJson = new CustomerJsonObject(systemZones, userTransactions, otherUsers, customer.getBalance(), customer.getTotalNumberOfOrders(),
-                customer.getAverageOrderCost(), lovedItem);
+                customer.getAverageOrderCost(), lovedItem, userName);
 
         return gson.toJson(customerJson);
     }
 
-    private String getShopOwnerJson(User currentUser, List<Zone> systemZones, List<Transaction> userTransactions, List<User> otherUsers, int amountOfNotifications) {
+    private String getShopOwnerJson(User currentUser, List<Zone> systemZones, List<Transaction> userTransactions, List<User> otherUsers, int amountOfNotifications, String userName) {
         Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
         ShopOwner shopOwner = (ShopOwner)currentUser;
         ShopOwnerJsonObject shopOwnerJsonObject = new ShopOwnerJsonObject(systemZones, userTransactions, otherUsers, shopOwner.getNewestNotifications(amountOfNotifications),
-                shopOwner.getBalance(), shopOwner.getStoresOwned().size(), shopOwner.getUserOrdersMap().size(), shopOwner.getAverageRating());
+                shopOwner.getBalance(), shopOwner.getStoresOwned().size(), shopOwner.getUserOrdersMap().size(), shopOwner.getAverageRating(), userName);
         String json = gson.toJson(shopOwnerJsonObject);
 
         return gson.toJson(shopOwnerJsonObject);

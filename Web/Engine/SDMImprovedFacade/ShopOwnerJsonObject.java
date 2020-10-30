@@ -3,6 +3,7 @@ package SDMImprovedFacade;
 import java.util.List;
 
 public class ShopOwnerJsonObject extends UserJsonObject {
+    private final String userName;
     private double totalEarnings;
     private int amountOfStoresOwned;
     private int ordersMadeFromOwnedStores;
@@ -10,13 +11,18 @@ public class ShopOwnerJsonObject extends UserJsonObject {
     private List<Notification> notifications;
 
     public ShopOwnerJsonObject(List<Zone> systemZones, List<Transaction> userTransactions, List<User> otherUsers, List<Notification> notifications,
-                               double totalEarnings, int amountOfStoresOwned, int ordersMadeFromOwnedStores, double averageRating) {
+                               double totalEarnings, int amountOfStoresOwned, int ordersMadeFromOwnedStores, double averageRating, String userName) {
         super(systemZones, userTransactions, otherUsers);
         this.totalEarnings = totalEarnings;
         this.amountOfStoresOwned = amountOfStoresOwned;
         this.ordersMadeFromOwnedStores = ordersMadeFromOwnedStores;
         this.averageRating = averageRating;
         this.notifications = notifications;
+        this.userName = userName;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public double getTotalEarnings() {

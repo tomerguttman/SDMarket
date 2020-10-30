@@ -33,6 +33,7 @@ function refreshZoneInformationPage() {
             updateZoneSelectBoxPicker(data);
             if(data.userType === "shop_owner") { updateDashboardNotificationsDropdownMenu(data.notifications); }
             setHiddenPropertyForNotificationDropDownIfNeeded(data.userType);
+            $('#usernameTopRightSpan').html(data.userName);
         },
         error: function (data) {
             alert(data.message);

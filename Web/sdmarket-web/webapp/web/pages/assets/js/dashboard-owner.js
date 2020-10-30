@@ -42,7 +42,7 @@ function addTransactionToTransactionsOverview(transactionType, datePicked, amoun
         "<td>" + "$" + balanceBefore.toFixed(2) + "</td>\n" +
         "<td>" +  "$" + balanceAfter.toFixed(2) + "</td>" +
         "</tr>\n");
-    $('#transactionsOverviewTable tbody').append(newTransactionRow);
+    $('#transactionsOverviewTable tbody').prepend(newTransactionRow);
 }
 
 function refreshDashboardInformation() {
@@ -96,8 +96,8 @@ function loadNewDataToDashboard(data) {
     updateDashboardZonesTable(data.systemZones);
     updateDashboardTransactionsTable(data.userTransactions);
     updateDashboardActiveUsersTable(data.otherUsers);
-    updateDashboardNotificationsDropdownMenu(data.notifications) //all notifications must be new.
-
+    updateDashboardNotificationsDropdownMenu(data.notifications); //all notifications must be new.
+    $('#usernameTopRightSpan').html(data.userName);
 }
 
 function createZoneButton(zoneName) {

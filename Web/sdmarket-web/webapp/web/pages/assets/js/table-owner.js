@@ -49,7 +49,7 @@ function updateRelevantFeedbacksInTable(feedbacks) {
         var feedbackNumber = 1;
 
         for(var feedback of feedbacks){
-            $("#feedbackTable tbody").append(createFeedbackTableRow(feedback, feedbackNumber));
+            $("#feedbackTable tbody").prepend(createFeedbackTableRow(feedback, feedbackNumber));
             var feedbackId = "#feedback" + feedbackNumber;
             var ratingStars = $(feedbackId);
             feedbackNumber += 1;
@@ -71,6 +71,7 @@ function refreshTableOwnerInformation() {
             updateOrderHistoryStorePickerSelectBox(data.storesAvailable);
             updateRelevantFeedbacksInTable(data.feedbacks);
             updateDashboardNotificationsDropdownMenu(data.notifications);
+            $('#usernameTopRightSpan').html(data.userName);
             currentZoneItems = data.zoneItems;
         },
         error: function (data) {
@@ -84,7 +85,7 @@ function updateOrdersHistoryTableForStore(ordersHistory) {
 
     if(ordersHistory.length !== 0){
         for (var order of ordersHistory) {
-            $('#ordersHistoryTable tbody').append(createOrderTableRow(order));
+            $('#ordersHistoryTable tbody').prepend(createOrderTableRow(order));
         }
     }
 }

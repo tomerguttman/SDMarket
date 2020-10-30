@@ -46,6 +46,9 @@ public class LoadZoneSelectBoxInformationServlet extends HttpServlet {
 
             jsonObject.add("zonesAvailable", gson.toJsonTree(availableZonesNames));
             jsonObject.addProperty("userType", currentUserType);
+            //
+            jsonObject.addProperty("userName", currentUserName);
+            //
         } catch (Exception e) {
             jsonObject.addProperty("message", e.getMessage());
             System.out.println(e.getMessage());

@@ -107,7 +107,7 @@ public class SuperMarketLogic {
     }
 
     private boolean isSDMZoneNameUnique(SuperDuperMarketDescriptor sdMtoValidate, StringBuilder outputMessage) {
-        if(SDMarket.getSystemZones().containsKey(sdMtoValidate.getSDMZone().getName())){
+        if(SDMarket.getSystemZones().containsKey(sdMtoValidate.getSDMZone().getName().replaceAll("\\s+",""))){
             outputMessage.append("The XML file uploaded contains a zone with a name that is not unique");
             return false;
         }
