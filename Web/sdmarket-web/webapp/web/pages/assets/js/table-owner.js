@@ -469,5 +469,6 @@ $("#createNewItemButton").click(() => {
         });
     }
 
+    $('#addNewItemModal').modal("hide");
     resetAddNewItemModal();
 });

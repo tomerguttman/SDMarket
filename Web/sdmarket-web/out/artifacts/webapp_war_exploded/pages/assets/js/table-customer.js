@@ -1063,6 +1063,10 @@ $('#feedbackModal').on('hide.bs.modal', () => {
     resetOrderDetails();
 });
 
+$('#resetOrderButton').click(() => {
+    resetOrderDetails();
+});
+
 
 
 
