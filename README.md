@@ -1,5 +1,21 @@
 <p align="center">
-  <img src="https://i.ibb.co/xghRGsN/New-Project.png" title="SDMarket">
+  <img style="" src="https://i.ibb.co/xghRGsN/New-Project.png" title="SDMarket">
+</p>
+<br></br>
+<p align="center">
+  <img src="Web/design/customerDashboard.png" title="SDMarket">
+</p>
+<hr>
+<p align="center">
+  <img src="Web/design/notificationsCetner.png" title="SDMarket">
+</p>
+<hr>
+<p align="center">
+  <img src="Web/design/orderSummaryModal.png" title="SDMarket">
+</p>
+<hr>
+<p align="center">
+  <img src="Web/design/starsReview.png" title="SDMarket">
 </p>
 
 # SDMarket 🏪🛒
@@ -17,16 +33,13 @@ SDMarket allows you to set up stores that sell various items and will allow the 
 
 ## Main Features
 
-- [x] Add stores, customers and discounts
-- [x] Add items to the system or to a specific store
-- [x] Save orders history to a json file
-- [x] Map component which display all the stores and customers in the system
+- [x] Add stores and customers
+- [x] Add new items to the zone and store that zone
 - [x] Perform static/dynamic orders
-- [x] Multiple skins can be selected 
 - [x] Load data from an XML file
 - [x] Full web-application
 - [x] Users transaction system
-- [x] Users alert system for various events
+- [x] Users notifications system for various events
 - [x] Chat between the system users
 - [x] Stores feedback and rating system
 
