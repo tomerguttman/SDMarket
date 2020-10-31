@@ -41,9 +41,9 @@ SDMarket allows you to set up stores that sell various items and will allow the 
 - [x] Stores feedback and rating system
 
 ## Requirements
-  In order to deploy SDMarket you will need:
-    - [Apache Tomcat](http://tomcat.apache.org/)
-    - Java installed on your computer
+In order to deploy SDMarket you will need:
+* [Apache Tomcat](http://tomcat.apache.org/)
+* Java installed on your computer
     
 ## Deploying
 
