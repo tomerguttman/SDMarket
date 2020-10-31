@@ -9,6 +9,7 @@
 <p align="center">
   <img src="Web/design/notificationsCetner.png" title="SDMarket">
 </p>
+<hr>
 <p align="center">
   <img src="Web/design/starsReview.png" title="SDMarket">
 </p>
@@ -38,6 +39,24 @@ SDMarket allows you to set up stores that sell various items and will allow the 
 - [x] Users notifications system for various events
 - [x] Chat between the system users
 - [x] Stores feedback and rating system
+
+## Requirements
+  In order to deploy SDMarket you will need:
+    - [Apache Tomcat](http://tomcat.apache.org/)
+    - Java installed on your computer
+    
+## Deploying
+
+1. Install Tomcat on your system
+2. Fork/Clone the repository
+3. Download the .war file inside of `SDMarket/Web/warfile/` named `webapp_war.war`
+4. Put the war file `webapp_war.war` inside of `/Tomcat/webapps/` folder
+5. Run Tomcat
+6. Navigate to `localhost:8080` in the browser
+7. Press `Manager App` 
+8. Inside the applications table look for `webapp_war` link and press it
+9. Welcome to SDMarket!
+
 
 ## Contributing
 
