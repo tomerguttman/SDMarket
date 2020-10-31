@@ -1,0 +1,61 @@
+.main-panel {
+  height: 100%;
+}
+
+.main-panel .row {
+  height: 100%;
+}
+
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 300px;
+  height: 400px;
+  box-shadow: 0 0 20px #b3b3b3;
+  padding: 20px 10px;
+}
+
+.login-panel .login-user-avatar {
+  min-width: 150px;
+  min-height: 150px;
+  background-image: url(../../assets/img/user-icon.jpg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 50%;
+  margin: 20px 0;
+  -webkit-filter: grayscale(100%);
+  filter: gray;
+  transform: rotateY(0deg);
+  backface-visibility: hidden;
+  transition: transform .4s ease;
+}
+
+.login-panel .login-form input {
+  border: 0;
+  border-bottom: 1px solid gray;
+  border-radius: 0;
+}
+
+.login-panel .login-form input:focus, .login-panel .login-form input:active, .login-panel .login-form input:hover {
+  outline: none;
+  box-shadow: none;
+}
+
+.login-panel .login-form .btn.btn-primary {
+  margin-top: 40px;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+.login-panel .login-response {
+  max-height: 0;
+  width: 100%;
+  transition: max-height .4s ease;
+}
+
+.login-panel .login-response.has-error {
+  max-height: 100px;
+}
+

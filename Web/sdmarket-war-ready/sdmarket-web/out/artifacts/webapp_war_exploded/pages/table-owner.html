@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Table - Brand</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Spectral:300,300i,400,400i">
+    <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.css">
+    <script src="assets/js/context-path-helper.js"></script>
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: #1cc88a;">
+            <div class="container-fluid d-flex flex-column p-0">
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-shopping-cart" style="color: rgb(0,0,0);"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span style="color: rgb(0,0,0);">SDMARKET</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="nav navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link" href="dashboard-owner.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="zoneInformation.html"><i class="fas fa-user"></i><span>Zone Information</span></a></li>
+                    <li class="nav-item"></li>
+<!--                    <li class="nav-item"><a class="nav-link" href="login.html"><i class="far fa-user-circle"></i><span>Login</span></a></li>-->
+<!--                    <li class="nav-item"><a class="nav-link" href="register.html"><i class="fas fa-user-circle"></i><span>Register</span></a></li>-->
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        <form class="form-inline d-none d-sm-inline-block mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <div class="input-group-append"></div>
+                            </div>
+                        </form>
+                        <ul class="nav navbar-nav flex-nowrap ml-auto">
+                            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><i class="fas fa-search"></i></a>
+                                <div class="dropdown-menu dropdown-menu-right p-3 animated--grow-in" aria-labelledby="searchDropdown">
+                                    <form class="form-inline mr-auto navbar-search w-100">
+                                        <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
+                                            <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#">
+                                    <span id="notificationsCounterSpan" class="badge badge-danger badge-counter"></span><i class="fas fa-bell fa-fw"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in">
+                                        <h6 class="dropdown-header">notifications center</h6>
+                                        <div style="max-height:500px; overflow:scroll; overflow-x: hidden" id="dropDownNotificationsMenu"></div>
+                                    </div>
+                                </div>
+                            </li>
+<!--                            <li class="nav-item dropdown no-arrow mx-1">-->
+<!--                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><i class="fas fa-envelope fa-fw"></i><span class="badge badge-danger badge-counter">0</span></a>-->
+<!--                                    <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated&#45;&#45;grow-in">-->
+<!--                                        <h6 class="dropdown-header">alerts center</h6>-->
+<!--                                        <a class="d-flex align-items-center dropdown-item" href="#">-->
+<!--                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="assets/img/avatars/avatar4.jpeg">-->
+<!--                                                <div class="bg-success status-indicator"></div>-->
+<!--                                            </div>-->
+<!--                                            <div class="font-weight-bold">-->
+<!--                                                <div class="text-truncate"><span>Hi there! I am wondering if you can help me with a problem I've been having.</span></div>-->
+<!--                                                <p class="small text-gray-500 mb-0">Emily Fowler - 58m</p>-->
+<!--                                            </div>-->
+<!--                                        </a>-->
+<!--                                        <a class="d-flex align-items-center dropdown-item" href="#">-->
+<!--                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="assets/img/avatars/avatar2.jpeg">-->
+<!--                                                <div class="status-indicator"></div>-->
+<!--                                            </div>-->
+<!--                                            <div class="font-weight-bold">-->
+<!--                                                <div class="text-truncate"><span>I have the photos that you ordered last month!</span></div>-->
+<!--                                                <p class="small text-gray-500 mb-0">Jae Chun - 1d</p>-->
+<!--                                            </div>-->
+<!--                                        </a>-->
+<!--                                        <a class="d-flex align-items-center dropdown-item" href="#">-->
+<!--                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="assets/img/avatars/avatar3.jpeg">-->
+<!--                                                <div class="bg-warning status-indicator"></div>-->
+<!--                                            </div>-->
+<!--                                            <div class="font-weight-bold">-->
+<!--                                                <div class="text-truncate"><span>Last month's report looks great, I am very happy with the progress so far, keep up the good work!</span></div>-->
+<!--                                                <p class="small text-gray-500 mb-0">Morgan Alvarez - 2d</p>-->
+<!--                                            </div>-->
+<!--                                        </a>-->
+<!--                                        <a class="d-flex align-items-center dropdown-item" href="#">-->
+<!--                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="assets/img/avatars/avatar5.jpeg">-->
+<!--                                                <div class="bg-success status-indicator"></div>-->
+<!--                                            </div>-->
+<!--                                            <div class="font-weight-bold">-->
+<!--                                                <div class="text-truncate"><span>Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</span></div>-->
+<!--                                                <p class="small text-gray-500 mb-0">Chicken the Dog · 2w</p>-->
+<!--                                            </div>-->
+<!--                                        </a><a class="text-center dropdown-item small text-gray-500" href="#">Show All Alerts</a></div>-->
+<!--                                </div>-->
+<!--                                <div class="shadow dropdown-list dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown"></div>-->
+<!--                            </li>-->
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow">
+                                    <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#">
+                                        <span id="usernameTopRightSpan" class="d-lg-inline mr-2 text-gray-600 small"></span>
+                                        <img class="border rounded-circle img-profile" src="assets/img/user-icon.jpg">
+                                    </a>
+                                </div>
+                            </li>
+                    </ul>
+            </div>
+            </nav>
+            <div class="container" style="margin: 0px;">
+                <div class="row" style="width: 485px;">
+                    <div class="col col-12 col-sm-5 col-md-6 col-lg-6" style="padding: 0px;padding-left: 0px;">
+                        <div style="padding-left: 12px;"><a id="openCreateStoreModalButton" class="btn btn-info btn-lg" role="button" data-toggle="modal" href="#createStoreModal" style="padding-top: 6px;margin-top: 6px;">Create Store</a>
+                            <div class="modal fade" role="dialog" tabindex="-1" id="createStoreModal">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>Create Store</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                                        <div class="modal-body">
+                                            <div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Store Name</label></div>
+                                                    <div class="col"><input class="form-control" type="text" style="width: 308px;" name="storeName"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Price Per Kilometer</label></div>
+                                                    <div class="col"><input class="form-control" type="number" min="0" required="" style="width: 308px;" name="ppk"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Location</label></div>
+                                                    <div class="col"><input class="form-control" type="number" min="1" max="50" placeholder="X Coordinate" required="" name="x"></div>
+                                                    <div class="col"><input class="form-control" type="number" min="1" max="50" placeholder="Y Coordinate" required="" name="y"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>ID</th>
+                                                                    <th>Name</th>
+                                                                    <th>Price</th>
+                                                                    <th>Include</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-danger" data-dismiss="modal" type="button">Cancel</button>
+                                            <button id="createStoreButton" class="btn btn-primary" type="button" >Create</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col col-12 col-sm-5 col-md-6 col-lg-6" style="padding: 0px;padding-left: 0px;">
+                        <div style="padding-left: 5px;"><a hidden id="addNewItemButton" class="btn btn-info btn-lg" role="button" data-toggle="modal" href="#addNewItemModal" style="padding-top: 6px;margin-top: 6px;">Add New Item</a>
+                            <div class="modal fade" role="dialog" tabindex="-1" id="addNewItemModal">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>Add New Item</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                                        <div class="modal-body">
+                                            <div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Item Name</label></div>
+                                                    <div class="col"><input class="form-control" type="text" style="width: 308px;" name="itemName"></div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col"><label class="col-form-label">Purchase Category</label></div>
+                                                    <div class="col">
+                                                        <select id="selectPurchaseCategory" class="form-control" required="" style="width: 308px;" name="purchaseCategory"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row" style="margin-top: 6px;">
+                                                    <div class="col">
+                                                        <div class="table-responsive">
+                                                            <table class="table">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>ID</th>
+                                                                    <th>Store Name</th>
+                                                                    <th>Price</th>
+                                                                    <th>Include</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-danger" data-dismiss="modal" type="button">Cancel</button>
+                                            <button id="createNewItemButton" class="btn btn-primary" type="button" >Add</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <h3 class="text-dark mb-4"></h3>
+            </div>
+            <div class="container-fluid">
+                <h3 class="text-dark mb-4"></h3>
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <p class="text-primary m-0 font-weight-bold">Orders History</p>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div>
+                                <div class="form-row">
+                                    <div class="col-auto col-2 col-sm-2 col-md-2 col-lg-2"><label class="col-form-label">Store Picker</label></div>
+                                    <div class="col-2 col-sm-3">
+                                        <select class="form-control" id="ordersHistoryStoreSelectBox"></select>
+                                    </div>
+                                    <div class="col col-sm-3"><button class="btn btn-secondary" id="ordersHistoryPickStoreButton" type="button">Pick Store</button></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col">
+                                        <div class="table-responsive">
+                                            <table id="ordersHistoryTable" class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order ID</th>
+                                                        <th>Date</th>
+                                                        <th>Customer Name</th>
+                                                        <th>Customer Location</th>
+                                                        <th>Total Items</th>
+                                                        <th>Items Cost</th>
+                                                        <th>Delivery Cost</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <h3 class="text-dark mb-4"></h3>
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <p class="text-primary m-0 font-weight-bold">Feedback</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                            <table class="table my-0" id="feedbackTable">
+                                <thead>
+                                    <tr>
+                                        <th>Customer Name</th>
+                                        <th>Store Name</th>
+                                        <th>Date</th>
+                                        <th>Rating</th>
+                                        <th>Review</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                    <tr></tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="orderDetailsModal">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4>Order Details</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <div class="table-responsive">
+                                        <table id="orderDetailsModalTable" class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Category</th>
+                                                <th>Amount</th>
+                                                <th>Price Per Unit</th>
+                                                <th>Total Price</th>
+                                                <th>Part Of Discount</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" data-dismiss="modal" type="button">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <footer class="bg-white sticky-footer">
+            <div class="container my-auto">
+                <div class="text-center my-auto copyright"><span>Copyright: Tomer Guttman &amp; Ohad Slutzky © SDMarket 2020</span></div>
+            </div>
+        </footer>
+    </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.2.0/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="./assets/js/table-owner.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/pages/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RechargeBalanceServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.RechargeBalanceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RechargeBalanceServlet</servlet-name>
+        <url-pattern>/pages/recharge-balance</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadDashboardServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadDashboardServlet</servlet-name>
+        <url-pattern>/pages/load-dashboard</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OrdersZoneServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.OrdersZoneServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OrdersZoneServlet</servlet-name>
+        <url-pattern>/pages/order</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UploadZoneXMLServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.UploadZoneXMLServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UploadZoneXMLServlet</servlet-name>
+        <url-pattern>/pages/uploadXML</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OrderHistoryForStoreServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.OrderHistoryForStoreServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OrderHistoryForStoreServlet</servlet-name>
+        <url-pattern>/pages/getSelectedStoreOrdersHistory</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadOwnerTableServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadOwnerTableServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadOwnerTableServlet</servlet-name>
+        <url-pattern>/pages/getTableOwnerInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CreateStoreServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.CreateStoreServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateStoreServlet</servlet-name>
+        <url-pattern>/pages/createStore</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadSelectedZoneInformationServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadSelectedZoneInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadSelectedZoneInformationServlet</servlet-name>
+        <url-pattern>/pages/getSelectedZoneInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadZoneSelectBoxInformationServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.LoadZoneSelectBoxInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadZoneSelectBoxInformationServlet</servlet-name>
+        <url-pattern>/pages/getZoneInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RedirectToRelevantDashboardServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.RedirectToRelevantDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RedirectToRelevantDashboardServlet</servlet-name>
+        <url-pattern>/pages/getRelevantDashboardForUser</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetAvailableStoresInZoneServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.GetAvailableStoresInZoneServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetAvailableStoresInZoneServlet</servlet-name>
+        <url-pattern>/pages/getAvailableStoresInZone</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetAvailableItemsForPurchaseServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.GetAvailableItemsForPurchaseServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetAvailableItemsForPurchaseServlet</servlet-name>
+        <url-pattern>/pages/getAllAvailableItemsInZone</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PostOrderServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.PostOrderServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostOrderServlet</servlet-name>
+        <url-pattern>/pages/postOrder</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PostFeedbacksServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.PostFeedbacksServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostFeedbacksServlet</servlet-name>
+        <url-pattern>/pages/postFeedbacks</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetOrderHistoryInZone</servlet-name>
+        <servlet-class>sdmarket.servlets.GetOrderHistoryInZone</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetOrderHistoryInZone</servlet-name>
+        <url-pattern>/pages/getOrderHistoryInZone</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PostNewItemServlet</servlet-name>
+        <servlet-class>sdmarket.servlets.PostNewItemServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostNewItemServlet</servlet-name>
+        <url-pattern>/pages/createNewItem</url-pattern>
+    </servlet-mapping>
+
+</web-app>

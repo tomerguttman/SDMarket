@@ -1,0 +1,117 @@
+#box-2 {
+  height: 100vh;
+  width: 100%;
+  background-size: cover;
+  display: table;
+  background-attachment: fixed;
+  text-align: center;
+}
+
+h1 {
+  font-family: arial black;
+  font-size: 50px;
+  color: white;
+  margin: 0px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+@media (min-width: 576px) {
+  #logoimage1 {
+    width: 50%;
+    margin-top: 200px;
+  }
+}
+
+@media (max-width: 575px) {
+  #logoimage1 {
+    width: 50%;
+    margin-top: 200px;
+  }
+}
+
+@media (min-width: 768px) {
+  #logoimage1 {
+    width: 40%;
+    margin-top: 200px;
+  }
+}
+
+@media (min-width: 991px) {
+  #logoimage1 {
+    width: 40%;
+    margin-top: 20%;
+  }
+}
+
+@media (min-width: 1200px) {
+  #logoimage1 {
+    width: 40%;
+    margin-top: 200px;
+  }
+}
+
+@media (min-width: 300px) {
+  #heading1 {
+    font-size: 18px;
+    margin-top: 20px;
+  }
+}
+
+@media (min-width: 576px) {
+  #heading1 {
+    font-size: 25px;
+    margin-top: 20px;
+  }
+}
+
+@media (min-width: 991px) {
+  #heading1 {
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #heading1 {
+    font-size: 35px;
+  }
+}
+
+@media (min-width: 767px) {
+  #heading1 {
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 576px) {
+  #heading1 {
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #button1 {
+    font-size: 20px;
+  }
+}
+
+#button1 {
+  margin-top: 30px;
+  background-color: #80cfa9;
+  border-color: #80cfa9;
+}
+
+#button1:hover {
+  background-color: #80cfa9;
+  color: white;
+  border-color: white;
+}
+
+a:hover {
+  color: #000000;
+}
+
+a:hover {
+  color: #636262;
+}
+
