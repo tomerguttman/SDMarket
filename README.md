@@ -1,22 +1,21 @@
 <p align="center">
   <img style="" src="https://i.ibb.co/xghRGsN/New-Project.png" title="SDMarket">
 </p>
-<br></br>
+<br>
 <p align="center">
   <img src="Web/design/customerDashboard.png" title="SDMarket">
 </p>
 <hr>
+<br>
 <p align="center">
   <img src="Web/design/notificationsCetner.png" title="SDMarket">
 </p>
 <hr>
-<p align="center">
-  <img src="Web/design/orderSummaryModal.png" title="SDMarket">
-</p>
-<hr>
+<br>
 <p align="center">
   <img src="Web/design/starsReview.png" title="SDMarket">
 </p>
+<hr>
 
 # SDMarket 🏪🛒
 A java based super-market system
