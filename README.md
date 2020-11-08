@@ -56,7 +56,7 @@ In order to deploy SDMarket you will need:
 2. Fork/Clone the repository
 3. Download the .war file inside of `SDMarket/Web/warfile/` named `webapp_war.war`
 4. Put the war file `webapp_war.war` inside of `/Tomcat/webapps/` folder
-5. Run Tomcat
+5. Run Tomcat using the `startup.bat` in the `bin` folder.
 6. Navigate to `localhost:8080` in the browser
 7. Press `Manager App` 
 8. Inside the applications table look for `webapp_war` link and press it
