@@ -1,19 +1,18 @@
 <p align="center">
-  <img style="" src="https://i.ibb.co/xghRGsN/New-Project.png" title="SDMarket">
+  <img style="" src="https://i.ibb.co/kyNyN4p/customer-Dash.png" title="SDMarket">
 </p>
 
 <p align="center">
-  <img src="Web/design/customerDashboard.png" title="SDMarket">
+  <img src="https://i.ibb.co/ngLky0q/cart-And-Disc.png" title="SDMarket">
 </p>
-<hr>
+
 <p align="center">
-  <img src="Web/design/notificationsCetner.png" title="SDMarket">
+  <img src="https://i.ibb.co/M9tgGbb/notifi.png" title="SDMarket">
 </p>
-<hr>
+
 <p align="center">
-  <img src="Web/design/starsReview.png" title="SDMarket">
+  <img src="https://i.ibb.co/D5xXBc2/starz.png" title="SDMarket">
 </p>
-<hr>
 
 # SDMarket 🏪🛒
 A java based super-market system
