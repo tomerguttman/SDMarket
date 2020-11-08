@@ -1,6 +1,7 @@
 <p align="center">
   <img src="https://i.ibb.co/xghRGsN/New-Project.png" title="SDMarket">
 </p>
+<p align="center">A java-based supermarket system developed by <a href="mailto:tomerguttman27@gmail.com" target="_blank">Tomer Guttman</a> and <a href="mailto:ohadslu@gmail.com" target="_blank">Ohad Slutzky</a></p>
 <hr>
 
 <p align="center">
